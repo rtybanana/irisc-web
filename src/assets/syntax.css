@@ -28,3 +28,34 @@
 #app .token.op-label, #app .token.label {
   color: #f9e1b3;
 }
+
+/* .prism-editor__line-number {
+	padding-left: 10px;
+	position: relative;
+} */
+
+.prism-editor__line-number.highlight-line::after {
+	content: "";
+	height: 1.2em;
+	background: rgba(255, 210, 0, 0.25);
+	pointer-events: none;
+	position: absolute;
+	z-index: 1;
+	/* max-width: 920px; */
+	width: 100% !important;
+}
+
+.prism-editor-wrapper .prism-editor__line-number.highlight-line {
+	/* border-left: 5px solid var(--tut-color-accent); */
+	background: rgba(255, 210, 0, 0.30);
+  color: #1c1c1b;
+}
+
+.prism-editor__line-numbers {
+	user-select: none;
+	cursor: default;
+	margin-right: 20px;
+	min-width: 42px;
+	background: transparent !important;
+	overflow: visible;
+}

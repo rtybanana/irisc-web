@@ -20,7 +20,7 @@
               <registers></registers>
             </div>
             <div class="col-7 col-md-8 col-lg-9 pl-1">
-              <editor></editor>
+              <editor v-on:play="play($event)"></editor>
             </div>
           </div>
         </div>
@@ -39,6 +39,10 @@
 import registers from './components/registers.vue'
 import editor from './components/editor.vue'
 
+import { tokenize, languages } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-armv7';
+
+import './assets/generic.css'
 import './assets/syntax.css'
 
 export default {
@@ -46,6 +50,24 @@ export default {
   components: {
     registers,
     editor
+  },
+  data() {
+    return {
+      tokens: []
+    }
+  },
+  methods: {
+    play(program) {
+      console.log(program);
+
+      let linenumber = 1;
+      this.tokens = tokenize(program, languages.armv7).reduce((a, e) => {
+        if (typeof e === "object") a.push({...e, linenumber: e.type === "end" ? linenumber++ : linenumber});
+        return a;
+      }, []);
+
+      console.log(this.tokens);
+    }
   }
 }
 </script>
