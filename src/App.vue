@@ -24,6 +24,11 @@
             </div>
           </div>
         </div>
+        <div class="col-12">
+          <div class="col-6">
+
+          </div>
+        </div>
       </div>
     </div>
     
@@ -33,6 +38,8 @@
 <script>
 import registers from './components/registers.vue'
 import editor from './components/editor.vue'
+
+import './assets/syntax.css'
 
 export default {
   name: 'app',

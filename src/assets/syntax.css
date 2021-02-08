@@ -1,0 +1,30 @@
+.prism-editor-wrapper .prism-editor__container {
+  min-height: 488px;
+  line-height: 1.2em;
+}
+
+.prism-editor-wrapper .prism-editor__editor {
+  min-height: 488px;
+  color: white;
+  line-height: 1.2em;
+}
+
+#app .token.register {
+  color: #07a;
+}
+
+#app .token.operation {
+  color: #ff5555;
+}
+
+#app .token.immediate {
+  color: #a6a6a6;
+}
+
+#app .token.line-comment {
+  color: #5d9455;
+}
+
+#app .token.op-label, #app .token.label {
+  color: #f9e1b3;
+}
