@@ -9,7 +9,7 @@
     </prism-editor>
     <div id="buttons">
       <i class="stop fas fa-stop mx-1 clickable" ></i>
-      <i class="play fas fa-play mx-1 clickable" @click="play()"></i>
+      <i class="play fas fa-play mx-1 clickable" @click="$emit('play', program)"></i>
       <i class="step fas fa-step-forward clickable"></i>
     </div>
   </div>
@@ -39,13 +39,7 @@ export default {
   },
   methods: {
     highlighter(program) {
-      // console.log(program);
       return highlight(program, languages.armv7)
-    },
-    play: function () {
-      // this.program = '';
-      // console.log(this.program);
-      this.$emit('play', this.program);
     }
   }
 }
@@ -71,10 +65,10 @@ export default {
 }
 
 #buttons {
-  pointer-events: all;
+  /* pointer-events: all; */
   position: absolute;
   top: 5px;
-  right: 8px;
+  right: 20px;
   opacity: 0.1;
   height: 25px;
   width: 100px;

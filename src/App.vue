@@ -53,20 +53,23 @@ export default {
   },
   data() {
     return {
-      tokens: []
+      lines: []
     }
   },
   methods: {
     play(program) {
       console.log(program);
 
-      let linenumber = 1;
-      this.tokens = tokenize(program, languages.armv7).reduce((a, e) => {
-        if (typeof e === "object") a.push({...e, linenumber: e.type === "end" ? linenumber++ : linenumber});
-        return a;
-      }, []);
+      this.lines = tokenize(program, languages.armv7).reduce((a, e) => {
+        if (typeof e === "object") {
+          if (e.type !== "end") a[a.length - 1].push(e)
+          else a.push([]);
+        }
 
-      console.log(this.tokens);
+        return a;
+      }, [[]]);
+
+      console.log(this.lines);
     }
   }
 }
