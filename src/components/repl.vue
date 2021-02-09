@@ -4,11 +4,13 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+
 import { PrismEditor } from 'vue-prism-editor'
 import 'vue-prism-editor/dist/prismeditor.min.css';
 
-export default {
+export default Vue.extend({
   name: 'repl',
   components: {
     PrismEditor
@@ -19,12 +21,12 @@ export default {
     }
   },
   methods: {
-    highlighter(program) {
+    highlighter(program: string) {
       console.log(program);
       return program
     }
   }
-}
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

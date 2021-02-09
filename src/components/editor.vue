@@ -15,34 +15,32 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
+
 import { PrismEditor } from 'vue-prism-editor'
 import 'vue-prism-editor/dist/prismeditor.min.css';
 
-import { highlight, languages } from 'prismjs/components/prism-core';
+import { highlight, languages } from 'prismjs';
 import 'prismjs/components/prism-armv7';
 import 'prismjs/themes/prism.css'; // import syntax highlighting styles
 
-// import 'prismjs/plugins/line-highlight/prism-line-highlight.js'
-// import 'prismjs/plugins/line-highlight/prism-line-highlight.css'
-
-
-export default {
+export default Vue.extend({
   name: 'editor',
   components: {
     PrismEditor
   },
   data() {
     return {
-      program: ''
+      program: '' as string
     }
   },
   methods: {
-    highlighter(program) {
-      return highlight(program, languages.armv7)
+    highlighter(program: string) {
+      return highlight(program, languages.armv7, 'ARMv7')
     }
   }
-}
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -93,8 +91,3 @@ export default {
 }
 
 </style>
-
-<!-- css styles which are not limited to this component only -->
-<!-- <style>
-
-</style> -->

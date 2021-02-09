@@ -35,54 +35,68 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue';
 import registers from './components/registers.vue'
 import editor from './components/editor.vue'
 
-import { tokenize, languages } from 'prismjs/components/prism-core';
+import { tokenize, languages, Token } from 'prismjs';
+import { BiOperandNode, SyntaxNode } from './classes/syntax';
 import 'prismjs/components/prism-armv7';
 
 import './assets/generic.css'
 import './assets/syntax.css'
 
-export default {
+export default Vue.extend({
   name: 'app',
   components: {
     registers,
     editor
   },
-  data() {
+  data: function () {
     return {
-      lines: []
+      lines: [] as Token[][]
+    }
+  },
+  computed: {
+    nodes: function (): SyntaxNode[] {
+      return this.lines.reduce((a: SyntaxNode[], e: Token[], i: number) => {
+        let node: SyntaxNode | null = this.parse(e, i);
+        if (node !== null) {
+          a.push(node);
+        }
+        return a;
+      }, [] as SyntaxNode[]);
     }
   },
   methods: {
-    play(program) {
-      console.log(program);
-
+    play: function (program: string) {
       this.lines = tokenize(program, languages.armv7).reduce((a, e) => {
-        if (typeof e === "object") {
-          if (e.type !== "end") a[a.length - 1].push(e)
+        if (e instanceof Token) {
+          if (e.type !== "end") a[a.length - 1].push(e);
           else a.push([]);
         }
-
         return a;
-      }, [[]]);
+      }, [[]] as Token [][]);
 
-      console.log(this.lines);
+      console.log(this.nodes);
+    },
+    parse: function (line: Token[], lineNumber: number): SyntaxNode | null {
+      if (line[0].type === "bi-operand") {
+        return new BiOperandNode(line, lineNumber, 0);
+      }
+      return null;
     }
   }
-}
+})
 </script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap');
-
 html, body {
   width: 100vw;
   height: 100vh;
 }
-
 #app {
   font-family: 'Ubuntu Mono', monospace;
   -webkit-font-smoothing: antialiased;
@@ -94,7 +108,6 @@ html, body {
   width: 100%;
   background-color: #0d1117;
 }
-
 #emulator {
   height: calc(100% - 88px);
 }
