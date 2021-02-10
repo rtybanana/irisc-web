@@ -27,7 +27,8 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
-    "typescript": "~3.9.3",
+    "ts-loader": "^8.0.16",
+    "typescript": "^3.9.8",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {
