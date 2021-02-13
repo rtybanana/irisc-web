@@ -48,7 +48,7 @@ import './assets/generic.css'
 import './assets/syntax.css'
 
 export default Vue.extend({
-  name: 'app',
+  name: 'emulator',
   components: {
     registers,
     editor
@@ -82,6 +82,8 @@ export default Vue.extend({
       console.log(this.nodes);
     },
     parse: function (line: Token[], lineNumber: number): SyntaxNode | null {
+      if (line.length === 0) return null;
+
       if (line[0].type === "bi-operand") {
         return new BiOperandNode(line, lineNumber, 0);
       }
