@@ -23,7 +23,7 @@ export class SyntaxNode {
 /** Ancestor class for all instruction-type syntax nodes (Bi/TriOperandNode etc.) */
 class InstructionNode extends SyntaxNode {
   protected splitOpCode(token: Token) {
-
+    
   }
 }
 

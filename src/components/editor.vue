@@ -22,7 +22,7 @@ import { PrismEditor } from 'vue-prism-editor'
 import 'vue-prism-editor/dist/prismeditor.min.css';
 
 import { highlight, languages } from 'prismjs';
-import 'prismjs/components/prism-armv7';
+import '../assets/prism-armv7';
 import 'prismjs/themes/prism.css'; // import syntax highlighting styles
 
 export default Vue.extend({
