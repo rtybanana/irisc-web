@@ -3,7 +3,7 @@
     
     <div class="container h-100">
       <div class="row h-100">
-        <div class="col-12 my-3">
+        <div class="col-12 mt-3 mb-0">
           <h1>iRISC</h1>
         </div>
         <div id="emulator" class="col-12 my-auto">
@@ -15,7 +15,7 @@
               <h5 class="mb-0">editor</h5>
             </div>
           </div>
-          <div class="row px-0 my-auto" style="max-height: 500px; height: 500px;">
+          <div class="row px-0 my-auto">
             <div class="col-5 col-md-4 col-lg-3 pr-1">
               <registers></registers>
             </div>
@@ -23,10 +23,21 @@
               <editor v-on:play="play($event)"></editor>
             </div>
           </div>
-        </div>
-        <div class="col-12">
-          <div class="col-6">
-
+          <div class="row px-0 pt-2">
+            <div class="col-7 pr-1">
+              <tutorial></tutorial>
+            </div>
+            <div class="col-5 pl-1">
+              <instruction></instruction>
+            </div>
+          </div>
+          <div class="row px-0">
+            <div class="col-7 pr-1 text-right">
+              <h5 class="mb-0">tutorial</h5>
+            </div>
+            <div class="col-5 pl-1 text-right">
+              <h5 class="mb-0">instruction</h5>
+            </div>
           </div>
         </div>
       </div>
@@ -37,21 +48,24 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import registers from './components/registers.vue'
-import editor from './components/editor.vue'
+import editor from './components/editor.vue';
+import registers from './components/registers.vue';
+import instruction from './components/instruction.vue';
+import tutorial from './components/tutorial.vue';
 
 import { tokenize, languages, Token } from 'prismjs';
 import { BiOperandNode, SyntaxNode } from './classes/syntax';
-import 'prismjs/components/prism-armv7';
 
-import './assets/generic.css'
-import './assets/syntax.css'
+import './assets/generic.css';
+import './assets/syntax.css';
 
 export default Vue.extend({
   name: 'emulator',
   components: {
+    editor,
     registers,
-    editor
+    instruction,
+    tutorial
   },
   data: function () {
     return {

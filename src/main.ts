@@ -12,6 +12,8 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 // import '@fortawesome/fontawesome-free/css/brands'
 import '@fortawesome/fontawesome-free/css/all.css'
 
+import './assets/prism-armv7';
+
 Vue.use(BootstrapVue)
 Vue.use(BootstrapVueIcons)
 

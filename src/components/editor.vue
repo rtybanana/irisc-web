@@ -22,7 +22,7 @@ import { PrismEditor } from 'vue-prism-editor'
 import 'vue-prism-editor/dist/prismeditor.min.css';
 
 import { highlight, languages } from 'prismjs';
-import '../assets/prism-armv7';
+// import '../assets/prism-armv7';
 import 'prismjs/themes/prism.css'; // import syntax highlighting styles
 
 export default Vue.extend({
@@ -47,8 +47,8 @@ export default Vue.extend({
 <style scoped>
 .container {
   text-align: left;
-  height: 500px;
-  max-height: 500px;
+  height: 450px;
+  max-height: 450px;
   width: 100%;
   border: 2px dashed #8b0c3c;
 }
