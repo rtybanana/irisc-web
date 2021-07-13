@@ -109,10 +109,12 @@ export default Vue.extend({
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap');
+
 html, body {
   width: 100vw;
   height: 100vh;
 }
+
 #app {
   font-family: 'Ubuntu Mono', monospace;
   -webkit-font-smoothing: antialiased;
@@ -124,6 +126,7 @@ html, body {
   width: 100%;
   background-color: #0d1117;
 }
+
 #emulator {
   height: calc(100% - 88px);
 }
