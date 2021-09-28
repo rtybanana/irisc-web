@@ -9,7 +9,7 @@
     </prism-editor>
     <div id="buttons">
       <i class="stop fas fa-stop mx-1 clickable" ></i>
-      <i class="play fas fa-play mx-1 clickable" @click="$emit('play', program)"></i>
+      <i class="play fas fa-play mx-1 clickable" @click="$emit('run', program)"></i>
       <i class="step fas fa-step-forward clickable"></i>
     </div>
   </div>
@@ -47,8 +47,8 @@ export default Vue.extend({
 <style scoped>
 .container {
   text-align: left;
-  height: 450px;
-  max-height: 450px;
+  height: 100%;
+  max-height: 100%;
   width: 100%;
   border: 2px dashed #8b0c3c;
 }

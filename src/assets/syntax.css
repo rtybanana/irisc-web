@@ -1,10 +1,10 @@
 .prism-editor-wrapper .prism-editor__container {
-  min-height: 438px;
+  min-height: 100%;
   line-height: 1.2em;
 }
 
 .prism-editor-wrapper .prism-editor__editor {
-  min-height: 438px;
+  min-height: 100%;
   color: white;
   line-height: 1.2em;
 }

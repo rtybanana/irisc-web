@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     
-    <div class="container h-100">
+    <div class="container-fluid h-100">
       <div class="row h-100">
-        <div class="col-12 mt-3 mb-0">
+        <!-- <div class="col-12 mt-3 mb-0">
           <h1>iRISC</h1>
-        </div>
-        <div id="emulator" class="col-12 my-auto">
-          <div class="row px-0 my-auto">
+        </div> -->
+        <div id="emulator" class="col-12 h-100">
+          <div class="row px-0" style="height: 24px;">
             <div class="col-5 col-md-4 col-lg-3 pr-1 text-left">
               <h5 class="mb-0">registers</h5>
             </div>
@@ -15,15 +15,15 @@
               <h5 class="mb-0">editor</h5>
             </div>
           </div>
-          <div class="row px-0 my-auto">
+          <div class="row px-0" style="height: calc(100% - 260px);">
             <div class="col-5 col-md-4 col-lg-3 pr-1">
               <registers></registers>
             </div>
             <div class="col-7 col-md-8 col-lg-9 pl-1">
-              <editor v-on:play="play($event)"></editor>
+              <editor v-on:run="run($event)"></editor>
             </div>
           </div>
-          <div class="row px-0 pt-2">
+          <div class="row px-0 pt-2" style="height: 208px;">
             <div class="col-7 pr-1">
               <tutorial></tutorial>
             </div>
@@ -31,11 +31,11 @@
               <instruction></instruction>
             </div>
           </div>
-          <div class="row px-0">
-            <div class="col-7 pr-1 text-right">
+          <div class="row px-0" style="height: 24px;">
+            <div class="col-7 pr-1 text-left">
               <h5 class="mb-0">tutorial</h5>
             </div>
-            <div class="col-5 pl-1 text-right">
+            <div class="col-5 pl-1 text-left">
               <h5 class="mb-0">instruction</h5>
             </div>
           </div>
@@ -84,7 +84,7 @@ export default Vue.extend({
     }
   },
   methods: {
-    play: function (program: string) {
+    run: function (program: string) {
       this.lines = tokenize(program, languages.armv7).reduce((a, e) => {
         if (e instanceof Token) {
           if (e.type !== "end") a[a.length - 1].push(e);
@@ -101,6 +101,7 @@ export default Vue.extend({
       if (line[0].type === "bi-operand") {
         return new BiOperandNode(line, lineNumber, 0);
       }
+
       return null;
     }
   }

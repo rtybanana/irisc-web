@@ -1,4 +1,9 @@
+body {
+  overflow: hidden;
+}
+
 .clickable {
   cursor: pointer;
   /* pointer-events: all; */
 }
+

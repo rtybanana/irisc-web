@@ -12,7 +12,8 @@
     "@types/prismjs": "^1.16.2",
     "bootstrap-vue": "^2.21.2",
     "core-js": "^3.6.5",
-    "prismjs": "^1.23.0",
+    "module-alias": "^2.2.2",
+    "prismjs": "^1.24.1",
     "vue": "^2.6.11",
     "vue-prism-editor": "^1.2.2"
   },
