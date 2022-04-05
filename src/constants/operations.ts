@@ -1,13 +1,12 @@
-
 export enum Operation {
   // arithmetic operations
-  AND =  0,  EOR, SUB, RSB, ADD, ADC, SBC, RSC, TST, TEQ, CMP, CMN, ORR, MOV, BIC, MVN,
+  AND = 0,  EOR, SUB, RSB, ADD, ADC, SBC, RSC, TST, TEQ, CMP, CMN, ORR, MOV, BIC, MVN,
 
   // load/store instructions
   LDR = 16,  STR, 
 
   // branch instructions
-  B   = 32,  BL, BX
+  B = 32,  BL, BX
 }
 
 /**
@@ -91,28 +90,4 @@ export const opExplain: Record<Operation, string> = {
   [Operation.B]:   "Branches to the provided instruction address or label.",
   [Operation.BL]:  "Branches to the provided instruction address or label and stores the return address.",
   [Operation.BX]:  "Branches to the provided instruction address or label and optionally changes instruction type."
-};
-
-
-export enum Register {
-  R0, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, SP, LR, PC
-}
-
-export const regMap: Record<string, Register> = {
-  "r0":   Register.R0, 
-  "r1":   Register.R1,   
-  "r2":   Register.R2,   
-  "r3":   Register.R3,
-  "r4":   Register.R4,   
-  "r5":   Register.R5,   
-  "r6":   Register.R6,   
-  "r7":   Register.R7,
-  "r8":   Register.R8,   
-  "r9":   Register.R9,  
-  "r10":  Register.R10,  
-  "r11":  Register.R11, 
-  "r12":  Register.R12,   
-  "sp":   Register.SP,   
-  "lr":   Register.LR,   
-  "pc":   Register.PC  
 };

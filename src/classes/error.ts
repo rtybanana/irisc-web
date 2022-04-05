@@ -7,15 +7,15 @@ class IriscError extends Error {
   // errorType: string | null = null;
   message: string;
   statement: Token[];
-  tokenIndex: number;
   lineNumber: number;
+  tokenIndex: number;
 
-  constructor(message: string, statement: Token[], tokenIndex: number, lineNumber: number) {
+  constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
     super();
     this.message = message;
     this.statement = statement;
-    this.tokenIndex = tokenIndex;
     this.lineNumber = lineNumber;
+    this.tokenIndex = tokenIndex;
   }
 }
 
@@ -23,8 +23,8 @@ class IriscError extends Error {
  * General syntax error - incorrect token placement
  */
 export class SyntaxError extends IriscError {
-  constructor(message: string, statement: Token[], tokenIndex: number, lineNumber: number) {
-    super(message, statement, tokenIndex, lineNumber);
+  constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
+    super(message, statement, lineNumber, tokenIndex);
     // this.errorType = "Syntax Error"
   }
 } 
@@ -33,8 +33,8 @@ export class SyntaxError extends IriscError {
  * Numerical error - too large or impossible as an immediate
  */
 export class NumericalError extends IriscError {
-  constructor(message: string, statement: Token[], tokenIndex: number, lineNumber: number) {
-    super(message, statement, tokenIndex, lineNumber);
+  constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
+    super(message, statement, lineNumber, tokenIndex);
     // this.errorType = "Numerical Error"
   }
 }
@@ -43,8 +43,8 @@ export class NumericalError extends IriscError {
  * Error during assembly
  */
 export class AssemblyError extends IriscError {
-  constructor(message: string, statement: Token[], tokenIndex: number, lineNumber: number) {
-    super(message, statement, tokenIndex, lineNumber);
+  constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
+    super(message, statement, lineNumber, tokenIndex);
     // this.errorType = "Assembly Error"
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="container pl-1 pr-0 py-1 position-relative">
+  <div class="prism-container pl-1 pr-0 py-1 position-relative">
     <prism-editor id="editor" 
                   v-model="program" 
                   :highlight="highlighter" 
@@ -45,7 +45,7 @@ export default Vue.extend({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.container {
+.prism-container {
   text-align: left;
   height: 100%;
   max-height: 100%;
@@ -73,7 +73,7 @@ export default Vue.extend({
   text-align: right;
 }
 
-.container:hover > #buttons {
+.prism-container:hover > #buttons {
   opacity: 1;
 }
 

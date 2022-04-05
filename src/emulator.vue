@@ -48,10 +48,12 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import editor from './components/editor.vue';
-import registers from './components/registers.vue';
-import instruction from './components/instruction.vue';
-import tutorial from './components/tutorial.vue';
+import { editor, registers, instruction, tutorial } from "./components";
+import { EmulatorState } from "@/state";
+// import editor from './components/editor.vue';
+// import registers from './components/registers.vue';
+// import instruction from './components/instruction.vue';
+// import tutorial from './components/tutorial.vue';
 
 import { tokenize, languages, Token } from 'prismjs';
 import { BiOperandNode, SyntaxNode } from './classes/syntax';
@@ -73,6 +75,8 @@ export default Vue.extend({
     }
   },
   computed: {
+    ...EmulatorState.getters,
+
     nodes: function (): SyntaxNode[] {
       return this.lines.reduce((a: SyntaxNode[], e: Token[], i: number) => {
         let node: SyntaxNode | null = this.parse(e, i);
@@ -84,17 +88,9 @@ export default Vue.extend({
     }
   },
   methods: {
-    run: function (program: string) {
-      this.lines = tokenize(program, languages.armv7).reduce((a, e) => {
-        if (e instanceof Token) {
-          if (e.type !== "end") a[a.length - 1].push(e);
-          else a.push([]);
-        }
-        return a;
-      }, [[]] as Token [][]);
-
-      console.log(this.nodes);
-    },
+    /**
+     * 
+     */
     parse: function (line: Token[], lineNumber: number): SyntaxNode | null {
       if (line.length === 0) return null;
 
@@ -103,7 +99,40 @@ export default Vue.extend({
       }
 
       return null;
+    },
+
+    /**
+     * 
+     */
+    interpret: function (program: string) {
+      this.lines = tokenize(program, languages.armv7).reduce((a, e) => {
+        if (e instanceof Token) {
+          if (e.type !== "end") a[a.length - 1].push(e);
+          else a.push([]);
+        }
+        return a;
+      }, [[]] as Token [][]);
+    },
+
+    /**
+     * 
+     */
+    run: function (program: string) {
+      this.interpret(program);
+
+      console.log(this.nodes);
     }
+  },
+  created() {
+
+    let number: number = 15;
+
+    this.registers[0] = 4294967295;
+    this.registers[1] = number;
+    this.registers[2] = this.registers[0] + this.registers[1];
+
+    console.log(this.registers[0], this.registers[1], this.registers[2]);
+    console.log(this.registers[0].toString(16), this.registers[1].toString(16), this.registers[2].toString(16));
   }
 })
 </script>
