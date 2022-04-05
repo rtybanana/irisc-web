@@ -2,18 +2,24 @@
   <div class="d-flex flex-column container text-left py-3">
     <!-- registers -->
     <div 
-      v-for="(register, index) in registers" 
+      v-for="(value, index) in registers" 
       class="register text-truncate"
-      @mouseover="tip(regTitle[index], regExplain[index])"
+      @mouseover="registerTip(index)"
       @mouseleave="untip"
       :key="index"
     >
-      <span class="register-name">{{ regName[index] }}</span> {{ regstr(register) }}
+      <span class="register-name">{{ regName[index] }}</span> {{ regstr(value)  }}
     </div>
 
     <!-- cpsr -->
     <div class="register d-flex cpsr my-3 pr-0">
-      <div class="flex-grow-1">cpsr</div>
+      <div 
+        class="flex-grow-1"
+        @mouseover="tip(cpsrTitle, cpsrExplain)"
+        @mouseleave="untip"
+      >
+        cpsr
+      </div>
       <div
         v-for="(flag, index) in flagNames"
         class="flag"
@@ -32,7 +38,7 @@
         {{ computedTitle }}
       </div>
 
-      <div style="font-size: 14px;">
+      <div class="description">
         {{ computedDescription }}
       </div>
     </div>
@@ -42,7 +48,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { EmulatorState } from "@/state";
-import { regName, regTitle, regExplain } from "@/constants"
+import { Register, regName, regTitle, regExplain } from "@/constants"
 
 export default Vue.extend({
   name: 'registers',
@@ -55,8 +61,11 @@ export default Vue.extend({
       regTitle,
       regExplain,
 
+      cpsrTitle: "CPSR Flags", 
+      cpsrExplain: "Four bits in the Current Program Status Register which are used to decide whether a conditional instruction should execute.",
+
       flagNames: ["N", "Z", "C", "V"],
-      flagTitle: ["Negative Flag", "Zero Flag", "Carry Flag", "Overflow Flag"],
+      flagTitle: ["Negative Flag (N)", "Zero Flag (Z)", "Carry Flag (C)", "Overflow Flag (V)"],
       flagExplain: [
         "This bit is set when the signed result of the operation is negative.", 
         "This bit is set when the result of the operation is equal to zero.", 
@@ -85,8 +94,22 @@ export default Vue.extend({
       return `0x${value.toString(16).padStart(8, '0')} (${value})`;
     },
 
+    hexstr(value: number) : string {
+      return `0x${value.toString(16)}`
+    },
+
     flagstr(value: boolean) : string {
       return value ? '1' : '0';
+    },
+
+    registerTip(reg: Register) {
+      let value = this.registers[reg];
+      let hexValue = this.hexstr(value);
+
+      this.tip(
+        this.regTitle[reg],
+        `${this.regExplain[reg]}\n\nDec: ${value}\nHex: ${hexValue}`
+      )
     },
 
     tip(title: string, description: string) {
@@ -138,4 +161,8 @@ export default Vue.extend({
   left: 0px;
 }
 
+.description {
+  font-size: 14px;
+  white-space: pre-line;
+}
 </style>
