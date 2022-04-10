@@ -78,7 +78,7 @@ export default Vue.extend({
 
         // console.log(this.errors[errorIndex].message);
         this.tooltip = {
-          title: error.constructor.name,
+          title: error.type,
           message: error.message
         }
       }
