@@ -5,6 +5,7 @@
  * @returns a zero-indexed number representing the position of the first set bit
  */
 export function ffs(n: number) : number {
+  n = 0xffffffff & n;
   return Math.log2(n & -n);
 }
 
@@ -15,7 +16,8 @@ export function ffs(n: number) : number {
  * @returns a zero-indexed number representing the position of the last set bit
  */
 export function fls(n: number) : number {
-  return Math.log2(n);
+  n = 0xffffffff & n;
+  return Math.round(Math.log2(n));
 }
 
 /** Rotate right (rotr)
@@ -27,4 +29,17 @@ export function fls(n: number) : number {
  */
 export function rotr(n: number, d: number) : number {
   return (n >> d)|(n << (32 - d));
+}
+
+/**
+ * 
+ * @param n 
+ * @returns 
+ */
+export function bitset(size: number, value: number = 0) : number[] {
+  console.log((value >>> 0).toString(2));
+  console.log((value >>> 0).toString(2).padEnd(size, '0'));
+  console.log((value >>> 0).toString(2).padEnd(size, '0').split(''));
+
+  return (value >>> 0).toString(2).padEnd(size, '0').split('').map(e => parseInt(e, 10));
 }

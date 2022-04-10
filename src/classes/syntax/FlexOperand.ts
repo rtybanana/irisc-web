@@ -1,13 +1,13 @@
 import { Token } from 'prismjs';
-import { InstructionNode } from "./InstructionNode";
+import { SyntaxNode } from "./SyntaxNode";
 import { SyntaxError } from '../error';
 import { Register, Operation, Condition, Shift, regMap, opMap, condMap, shiftMap, OperandType } from '@/constants';
 import { ffs, fls, rotr } from '@/assets/bitset';
-import { BIconHandThumbsDown } from 'bootstrap-vue';
+import { TRegOrImm } from './types';
 
-export class FlexOperand extends InstructionNode {
-  protected _Rm: Register | number;
-  protected _Rs: Register | number | undefined;
+export class FlexOperand extends SyntaxNode {
+  protected _Rm: TRegOrImm;
+  protected _Rs: TRegOrImm | undefined;
   protected _shift: Shift | undefined;
   protected _immShift: number = 0;
 
@@ -89,5 +89,14 @@ export class FlexOperand extends InstructionNode {
     let [value, type] = this.parseRegOrImm(5);     // parse immediate with a max length of 5 bits
     this._Rs = value;
     this._shiftType = type;
+  }
+
+  unpack() : [TRegOrImm, Shift | undefined, TRegOrImm | undefined, number] {
+    return [ 
+      this._Rm, 
+      this._shift, 
+      this._Rs, 
+      this._immShift 
+    ];
   }
 }

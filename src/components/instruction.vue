@@ -1,6 +1,8 @@
 <template>
-  <div class="container">
-    
+  <div class="container text-center">
+    <div style="line-height:200px; font-size:28px;">
+      coming soon
+    </div>
   </div>
 </template>
 

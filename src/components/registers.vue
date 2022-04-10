@@ -12,7 +12,7 @@
     </div>
 
     <!-- cpsr -->
-    <div class="register d-flex cpsr my-3 pr-0">
+    <div class="d-flex register cpsr my-3 pr-0">
       <div 
         class="flex-grow-1"
         @mouseover="tip(cpsrTitle, cpsrExplain)"
@@ -21,14 +21,14 @@
         cpsr
       </div>
       <div
-        v-for="(flag, index) in flagNames"
+        v-for="(flag, index) in flagName"
         class="flag"
         @mouseover="tip(flagTitle[index], flagExplain[index])"
         @mouseleave="untip"
         :key="index"
       >
-        <span class="flag-name">{{ flagNames[index] }}</span>
-        {{ flagstr(cpsr[0]) }}
+        <span class="flag-name">{{ flagName[index] }}</span>
+        {{ flagstr(cpsr[index]) }}
       </div>
     </div>
     
@@ -48,7 +48,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { EmulatorState } from "@/state";
-import { Register, regName, regTitle, regExplain } from "@/constants"
+import { Register, regName, regTitle, regExplain, flagName, flagTitle, flagExplain } from "@/constants"
 
 export default Vue.extend({
   name: 'registers',
@@ -61,17 +61,22 @@ export default Vue.extend({
       regTitle,
       regExplain,
 
+      flagName, 
+      flagTitle,
+      flagExplain,
+
       cpsrTitle: "CPSR Flags", 
       cpsrExplain: "Four bits in the Current Program Status Register which are used to decide whether a conditional instruction should execute.",
 
-      flagNames: ["N", "Z", "C", "V"],
-      flagTitle: ["Negative Flag (N)", "Zero Flag (Z)", "Carry Flag (C)", "Overflow Flag (V)"],
-      flagExplain: [
-        "This bit is set when the signed result of the operation is negative.", 
-        "This bit is set when the result of the operation is equal to zero.", 
-        "This bit is set when the operation results in an unsigned overflow.", 
-        "This bit is set when the operation results in a signed overflow."
-      ],
+
+      // flagNames: ["N", "Z", "C", "V"],
+      // flagTitle: ["Negative Flag (N)", "Zero Flag (Z)", "Carry Flag (C)", "Overflow Flag (V)"],
+      // flagExplain: [
+      //   "This bit is set when the signed result of the operation is negative.", 
+      //   "This bit is set when the result of the operation is equal to zero.", 
+      //   "This bit is set when the operation results in an unsigned overflow.", 
+      //   "This bit is set when the operation results in a signed overflow."
+      // ],
 
       title: null as string | null,
       description: null as string | null
@@ -86,7 +91,7 @@ export default Vue.extend({
     },
 
     computedDescription() : string {
-      return this.description ?? "A simplified view of the data currently stored in the CPU. Hover over the different sections to learn what they are.";
+      return this.description ?? "A simplified view of the data currently stored in the CPU. Hover over the different sections to learn about them.";
     }
   },
   methods: {

@@ -12,33 +12,51 @@
               <h5 class="mb-0">registers</h5>
             </div>
             <div class="col-7 col-md-8 col-lg-9 pl-1 text-left">
-              <h5 class="mb-0">editor</h5>
+              <div class="row px-0">
+                <div class="col-8 pr-1">
+                  <h5 class="mb-0">editor</h5>
+                </div>
+                <div class="col-4 pl-1">
+                  <h5 class="mb-0">tutorial</h5>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="row px-0" style="height: calc(100% - 260px);">
+          <div class="row px-0" style="height: calc(100% - 36px);">
             <div class="col-5 col-md-4 col-lg-3 pr-1">
               <registers></registers>
             </div>
-            <div class="col-7 col-md-8 col-lg-9 pl-1">
-              <editor v-on:run="run($event)"></editor>
+            <div class="col-7 col-md-8 col-lg-9 pl-1" style="height: calc(100% - 232px);">
+              <div class="row px-0 h-100">
+                <div class="col-8 pr-1">
+                  <editor v-on:run="start($event)"></editor>
+                </div>
+                <div class="col-4 pl-1">
+                  <!-- <h5 class="mb-0">memory</h5> -->
+                  <tutorial></tutorial>
+                </div>
+              </div>
+              
+
+              <div class="row px-0 pt-2" style="height: 210px;">
+                <div class="col-6 pr-1">
+                  <instruction></instruction>
+                </div>
+                <div class="col-6 pl-1">
+                  <memory></memory>
+                </div>
+              </div>
+              <div class="row px-0" style="height: 24px;">
+                <div class="col-6 pr-1 text-left">
+                  <h5 class="mb-0">assembler</h5>
+                </div>
+                <div class="col-6 pl-1 text-left">
+                  <h5 class="mb-0">memory</h5>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="row px-0 pt-2" style="height: 208px;">
-            <div class="col-7 pr-1">
-              <tutorial></tutorial>
-            </div>
-            <div class="col-5 pl-1">
-              <instruction></instruction>
-            </div>
-          </div>
-          <div class="row px-0" style="height: 24px;">
-            <div class="col-7 pr-1 text-left">
-              <h5 class="mb-0">tutorial</h5>
-            </div>
-            <div class="col-5 pl-1 text-left">
-              <h5 class="mb-0">instruction</h5>
-            </div>
-          </div>
+          
         </div>
       </div>
     </div>
@@ -48,91 +66,85 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { editor, registers, instruction, tutorial } from "./components";
+import { editor, registers, memory, instruction, tutorial } from "./components";
+import { parse, compile, load } from "@/classes/compiler";
 import { EmulatorState } from "@/state";
-// import editor from './components/editor.vue';
-// import registers from './components/registers.vue';
-// import instruction from './components/instruction.vue';
-// import tutorial from './components/tutorial.vue';
-
-import { tokenize, languages, Token } from 'prismjs';
-import { BiOperandNode, SyntaxNode } from './classes/syntax';
+import { RuntimeError } from '@/classes/error';
+import { Register } from "@/constants"
 
 import './assets/generic.css';
 import './assets/syntax.css';
+import { TInstructionNode } from './classes/syntax/types';
 
 export default Vue.extend({
   name: 'emulator',
   components: {
     editor,
     registers,
+    memory,
     instruction,
     tutorial
   },
-  data: function () {
-    return {
-      lines: [] as Token[][]
-    }
-  },
   computed: {
     ...EmulatorState.getters,
-
-    nodes: function (): SyntaxNode[] {
-      return this.lines.reduce((a: SyntaxNode[], e: Token[], i: number) => {
-        let node: SyntaxNode | null = this.parse(e, i);
-        if (node !== null) {
-          a.push(node);
-        }
-        return a;
-      }, [] as SyntaxNode[]);
-    }
   },
   methods: {
     /**
      * 
      */
-    parse: function (line: Token[], lineNumber: number): SyntaxNode | null {
-      if (line.length === 0) return null;
+    start: function () {
+      if (this.running) return;
+      
+      // reset emulator state
+      EmulatorState.reset();
 
-      if (line[0].type === "bi-operand") {
-        return new BiOperandNode(line, lineNumber, 0);
-      }
-
-      return null;
+      // report errors (alert is temporary)
+      if (this.errors.length > 0) {
+        alert(`This code has errors!\n\n\t${this.errors.map(e => `${e.constructHelper()}`).join("\n\t")}`);
+        return;
+      } 
+      
+      // run the program
+      this.run();
     },
 
     /**
      * 
      */
-    interpret: function (program: string) {
-      this.lines = tokenize(program, languages.armv7).reduce((a, e) => {
-        if (e instanceof Token) {
-          if (e.type !== "end") a[a.length - 1].push(e);
-          else a.push([]);
+    run: async function () {
+      EmulatorState.start();
+
+      try {
+        while(this.running) {
+          let node: TInstructionNode = EmulatorState.instruction(this.registers[Register.PC]);
+
+          // if runtime instruction runoff
+          if (node === undefined) {
+            let last: TInstructionNode = this.memory.text[this.memory.textSize - 1];
+
+            throw new RuntimeError("Segmentation fault (core dumped)", last.statement, last.lineNumber, -1);
+          }
+
+          EmulatorState.cpu.setRegister(Register.PC, this.registers[Register.PC] + 32);           // increment to the next instruction
+          EmulatorState.execute(node);
+          
+          // int sleepfor = 50;
+          let sleptfor: number = 0;
+          while ((sleptfor < this.delay || this.paused) && this.running && !this.step) {          // check every 50ms to see if speed value has changed
+            await new Promise(r => setTimeout(r, 50));
+            sleptfor += 50;
+          }
         }
-        return a;
-      }, [[]] as Token [][]);
+      }
+      catch (e) {
+        if (e instanceof RuntimeError) {
+          alert(e.message); 
+          EmulatorState.stop();
+        }
+      }
     },
 
-    /**
-     * 
-     */
-    run: function (program: string) {
-      this.interpret(program);
-
-      console.log(this.nodes);
-    }
-  },
-  created() {
-
-    let number: number = 15;
-
-    this.registers[0] = 4294967295;
-    this.registers[1] = number;
-    this.registers[2] = this.registers[0] + this.registers[1];
-
-    console.log(this.registers[0], this.registers[1], this.registers[2]);
-    console.log(this.registers[0].toString(16), this.registers[1].toString(16), this.registers[2].toString(16));
+    
   }
 })
 </script>

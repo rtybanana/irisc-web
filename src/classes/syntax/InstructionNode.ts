@@ -3,15 +3,15 @@ import { SyntaxNode } from "./SyntaxNode";
 import { Operation, Condition, opMap } from '@/constants';
 
 /** Ancestor class for all instruction-type syntax nodes (Bi/TriOperandNode etc.) */
-export class InstructionNode extends SyntaxNode {
-  protected _op: Operation | undefined;
-  protected _cond: Condition | undefined;
-  protected _setFlags: boolean | undefined;
+export abstract class InstructionNode extends SyntaxNode {
+  protected abstract _op: Operation;
+  protected abstract _cond: Condition;
+  protected abstract _setFlags: boolean;
 
   // getters
-  get op(): Operation | undefined { return this._op; }
-  get cond(): Condition | undefined { return this._cond; }
-  get setFlags(): boolean | undefined { return this._setFlags; }
+  get op(): Operation { return this._op; }
+  get cond(): Condition { return this._cond; }
+  get setFlags(): boolean { return this._setFlags; }
 
   /**
    * 

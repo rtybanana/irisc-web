@@ -6,6 +6,9 @@ import { Register, Operation, Condition, opMap, condMap } from '@/constants';
 
 /** Class which holds all the information required to execute a bi-operand instruction */
 export class TriOperandNode extends InstructionNode {
+  protected _op: Operation = Operation.ADD;
+  protected _cond: Condition = Condition.AL;
+  protected _setFlags: boolean = false;
   // protected _Rd: Register;
   // protected _flex: FlexOperand;
 

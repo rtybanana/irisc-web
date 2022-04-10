@@ -6,6 +6,9 @@ import { Register, Operation, Condition, opMap, condMap } from '@/constants';
 
 /** Class which holds all the information required to execute a bi-operand instruction */
 export class BiOperandNode extends InstructionNode {
+  protected _op: Operation;
+  protected _cond: Condition;
+  protected _setFlags: boolean;
   protected _Rd: Register;
   protected _flex: FlexOperand;
 
@@ -26,12 +29,18 @@ export class BiOperandNode extends InstructionNode {
 
     this._Rd = this.parseReg(this.nextToken());
 
-    console.log()
-
-    console.log(Operation[this._op], this._setFlags, Condition[this._cond], Register[this._Rd]);
-
     this.peekToken();                                              // peek next token to see if it exists
     this._flex = new FlexOperand(statement, lineNumber, this._currentToken);          // parsing delegated to FlexOperand constructor
+  }
+
+  unpack() : [Operation, Condition, boolean, Register, FlexOperand] {
+    return [
+      this._op,
+      this._cond,
+      this._setFlags,
+      this._Rd,
+      this._flex
+    ];
   }
 
   /**

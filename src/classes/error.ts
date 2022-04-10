@@ -3,7 +3,7 @@ import { Token } from 'prismjs';
 /**
  * Base error class which provides the basis for catching specific syntax errors
  */
-class IriscError extends Error {
+export class IriscError extends Error {
   // errorType: string | null = null;
   message: string;
   statement: Token[];
@@ -17,7 +17,22 @@ class IriscError extends Error {
     this.lineNumber = lineNumber;
     this.tokenIndex = tokenIndex;
   }
+
+  constructHelper() : string {
+    return `${this.lineNumber} : ${this.tokenIndex} ${this.message}`;
+  }
 }
+
+/**
+ * General parser error - unparseable tokens
+ */
+ export class ParserError extends IriscError {
+  constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
+    super(message, statement, lineNumber, tokenIndex);
+    // this.errorType = "Syntax Error"
+  }
+} 
+
 
 /**
  * General syntax error - incorrect token placement
