@@ -37,9 +37,5 @@ export function rotr(n: number, d: number) : number {
  * @returns 
  */
 export function bitset(size: number, value: number = 0) : number[] {
-  console.log((value >>> 0).toString(2));
-  console.log((value >>> 0).toString(2).padEnd(size, '0'));
-  console.log((value >>> 0).toString(2).padEnd(size, '0').split(''));
-
   return (value >>> 0).toString(2).padEnd(size, '0').split('').map(e => parseInt(e, 10));
 }

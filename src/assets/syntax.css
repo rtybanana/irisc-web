@@ -9,6 +9,11 @@
   line-height: 1.2em;
 }
 
+.prism-editor-wrapper .prism-editor__textarea:focus-visible {
+  outline: none;
+}
+
+
 #app .token.register {
   color: #07a;
 }
@@ -38,6 +43,12 @@
 
 #app .token.error:hover {
 	background-color: rgba(240, 128, 128, 0.5);
+}
+
+#app .line.executing {
+	border-radius: 0.15rem;
+	background-color: rgba(255, 255, 255, 0.2);
+	padding-right: 0.25rem;
 }
 
 /* .prism-editor__line-number {

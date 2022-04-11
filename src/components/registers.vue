@@ -68,23 +68,13 @@ export default Vue.extend({
       cpsrTitle: "CPSR Flags", 
       cpsrExplain: "Four bits in the Current Program Status Register which are used to decide whether a conditional instruction should execute.",
 
-
-      // flagNames: ["N", "Z", "C", "V"],
-      // flagTitle: ["Negative Flag (N)", "Zero Flag (Z)", "Carry Flag (C)", "Overflow Flag (V)"],
-      // flagExplain: [
-      //   "This bit is set when the signed result of the operation is negative.", 
-      //   "This bit is set when the result of the operation is equal to zero.", 
-      //   "This bit is set when the operation results in an unsigned overflow.", 
-      //   "This bit is set when the operation results in a signed overflow."
-      // ],
-
       title: null as string | null,
       description: null as string | null
     };
   },
   computed: {
-    registers: EmulatorState.getters.registers,
-    cpsr: EmulatorState.getters.cpsr,
+    registers: EmulatorState.registers,
+    cpsr: EmulatorState.cpsr,
 
     computedTitle() : string {
       return this.title ?? "Registers";

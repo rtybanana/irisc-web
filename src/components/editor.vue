@@ -2,6 +2,7 @@
   <div 
     class="prism-container pl-1 pr-0 py-1 position-relative" 
     @mouseover="hover"
+    @mouseleave="unhover"
   >
     <prism-editor 
       id="editor" 
@@ -13,9 +14,11 @@
     ></prism-editor>
 
     <div id="buttons">
-      <i class="stop fas fa-stop mx-1 clickable" @click="stop"></i>
-      <i class="play fas fa-play mx-1 clickable" @click="$emit('run', program)"></i>
-      <i class="step fas fa-step-forward clickable"></i>
+      <div>
+        <i class="button red fas fa-stop mr-1 clickable" @click="stop"></i>
+        <i class="button green fas fa-play mx-1 clickable" @click="$emit('run', program)"></i>
+        <i class="button step fas fa-step-forward clickable"></i>
+      </div>
     </div>
 
     <div id="error">
@@ -37,7 +40,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { EmulatorState } from "@/state";
-import { parse, compile, load } from "@/classes/compiler";
+import { parse, compile, load } from "@/classes/assembler";
 import { debounce } from "@/assets/functions";
 
 import { PrismEditor } from 'vue-prism-editor'
@@ -48,6 +51,8 @@ import { highlight, languages } from 'prismjs';
 // import '../assets/prism-armv7';
 import 'prismjs/themes/prism.css'; // import syntax highlighting styles
 import { IriscError } from '@/classes/error';
+import { TInstructionNode } from '@/classes/syntax/types';
+import { Register } from '@/constants';
 
 export default Vue.extend({
   name: 'editor',
@@ -58,51 +63,85 @@ export default Vue.extend({
     return {
       program: '' as string,
       tooltip: {
+        // index: null as number | null,
         title: '' as string,
         message: '' as string
-      }
+      },
+
+      hovered: false as boolean
     }
   },
   computed: {
-    errors: EmulatorState.getters.errors
+    errors: EmulatorState.errors,
+    running: EmulatorState.running,
+    currentInstruction: EmulatorState.currentInstruction
   },
   methods: {
     stop: function () {
       EmulatorState.stop();
     },
 
+    /**
+     * 
+     */
     hover: function (e: any) {
+      // console.log(e);
+      this.hovered = true;
+
       if (e.target.parentNode.className === "token error") {
         let errorIndex = e.target.parentNode.dataset["errorIdx"] as number;
         let error = this.errors[errorIndex];
 
-        // console.log(this.errors[errorIndex].message);
         this.tooltip = {
           title: error.type,
           message: error.message
         }
       }
-      else this.tooltip = {
-        message: '',
-        title: ''
-      };
+      else {
+        this.tooltip = {
+          message: '',
+          title: ''
+        };
+      }
     },
 
-    // unhover: function () {
-    //   this.error = '';
-    // },
+    /**
+     * 
+     */
+    unhover: function (e: MouseEvent) {
+      this.hovered = false;
+    },
 
-    highlighter(program: string) {
+    /**
+     * 
+     */
+    highlighter: function (program: string) {
+      // initial ARMv7 syntax highlighting from file
       let highlit: string = highlight(program, languages.armv7, 'ARMv7');
       if (highlit.length === 0) return "";
-      // console.log(highlit);
 
+      // deconstruct program to lines
       let lines = highlit.split(`<span class="token end">\n</span>`);
-      let elements = lines.map(e => e.match(/<span.*?<\/span>\s*/gim) ?? []);
 
-      // TODO: add custom class spans around errors
+      // deconstruct lines to tokens
+      let tokens = lines.map(e => e.match(/<span.*?<\/span>\s*/gim) ?? []);
+
+      // squiggly underline token errors
+      this.highlightErrors(tokens);
+
+      // reconstruct highlit tokens to lines
+      lines = tokens.map(e => (e as string[]).join(""));
+      this.highlightExecuting(lines);
+      
+      // reconstruct highlit lines to program
+      return lines.join(`<span class="token end">\n</span>`);
+    },
+
+    /**
+     * 
+     */
+    highlightErrors: function (elements: RegExpMatchArray[]) {
       this.errors.forEach((error, index) => {
-        // console.log(error.message);
         let line = elements[error.lineNumber];
 
         let filteredIndex: number = -1;
@@ -115,22 +154,26 @@ export default Vue.extend({
         if (tokenString !== undefined) {
           line[tokenIndex] = `<span class="token error" data-error-idx="${index}">${tokenString}</span>`;
         }
+      });
+    },
 
-        console.log(tokenString, error.message);
-      })
+    /**
+     * 
+     */
+    highlightExecuting: function (lines: string[]) {
+    
+      if (this.running) {
+        let executing = lines[this.currentInstruction?.lineNumber];
 
-      console.log(elements);
-
-      // if (elements.length =
-
-      return elements
-        .map(e => (e as string[]).join(""))
-        .join(`<span class="token end">\n</span>`);
+        if (executing !== undefined) {
+          lines[this.currentInstruction.lineNumber] = `<span class="line executing">${executing}</span>`;
+        }
+      }
     }
   },
   watch: {
     program: debounce(function(program: string) {
-      EmulatorState.memory.clear();
+      EmulatorState.clearMemory();
 
       let lines = parse(program);
       let nodes = compile(lines);
@@ -161,14 +204,12 @@ export default Vue.extend({
 }
 
 #buttons {
-  /* pointer-events: all; */
   position: absolute;
   top: 8px;
   right: 8px;
-  opacity: 0.1;
-  height: 25px;
-  width: 100px;
-  text-align: right;
+  border-radius: 0.3rem; 
+  background-color: #191d21;
+  padding: 0.25rem 0.3rem 0.15rem 0.4rem;
 }
 
 #error {
@@ -178,21 +219,11 @@ export default Vue.extend({
   padding: 0.25rem 0.5rem 0.5rem 0.25rem;
 }
 
-.prism-container:hover > #buttons {
-  opacity: 1;
-}
-
-.stop {
+.red {
   color: #d9484c;
-  font-size: 17px; 
-}
-.play {
-  color:#1d8f46;
-  font-size: 16px; 
-  /* margin-bottom: 3px; */
-}
-.step {
-  font-size: 17px; 
 }
 
+.green {
+  color:#1d8f46;
+}
 </style>

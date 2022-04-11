@@ -1,8 +1,9 @@
 import { languages, Token, tokenize } from 'prismjs';
-import { BiOperandNode, DirectiveNode, InstructionNode, LabelNode, SyntaxNode } from './syntax';
+import { BiOperandNode, DirectiveNode, InstructionNode, LabelNode, SyntaxNode, TriOperandNode } from './syntax';
 import { AssemblyError, IriscError, SyntaxError } from './error';
 import { EmulatorState } from '@/state';
 import { Register } from '@/constants';
+import { BranchNode } from './syntax/BranchNode';
 
 /**
  * 
@@ -55,15 +56,15 @@ function compileOne(line: Token[], lineNumber: number) : SyntaxNode | null {
     if (line[0].type === "bi-operand") {
       return new BiOperandNode(line, lineNumber, 0);
     }
-    // if (line[0].type === "tri-operand") {
-    //   return new TriOperandNode(line, lineNumber, 0);
-    // }
+    if (line[0].type === "tri-operand") {
+      return new TriOperandNode(line, lineNumber, 0);
+    }
     // if (line[0].type === "shift") {
     //   return new ShiftNode(line, lineNumber, 0);
     // }
-    // if (line[0].type === "branch") {
-    //   return new BranchNode(line, lineNumber, 0);
-    // }
+    if (line[0].type === "branch") {
+      return new BranchNode(line, lineNumber, 0);
+    }
     if (line[0].type === "label") {
       if (line.length === 1) return new LabelNode(line, lineNumber, 0);
       // else return new syntax::AllocationNode(statement);
@@ -75,6 +76,7 @@ function compileOne(line: Token[], lineNumber: number) : SyntaxNode | null {
   }
   catch (e) {
     if (e instanceof IriscError) {
+      console.log(e);
       EmulatorState.addError(e);
     }
   }
@@ -86,7 +88,7 @@ function compileOne(line: Token[], lineNumber: number) : SyntaxNode | null {
  * 
  * @param nodes 
  */
-function load(nodes: SyntaxNode[]) {
+function load(nodes: (SyntaxNode | null)[]) {
   enum Mode { Text, Data }
 
   let mode: Mode = Mode.Text;
@@ -99,13 +101,10 @@ function load(nodes: SyntaxNode[]) {
     else if (node instanceof LabelNode) {
       if (mode !== Mode.Text) throw new AssemblyError("Cannot declare branchable labels outside of the text section.", node.statement, node.lineNumber, -1);
 
-      if (EmulatorState.memory.hasLabel(node.identifier)) {
+      if (EmulatorState.hasLabel(node.identifier)) {
         throw new AssemblyError(`Cannot declare multiple labels with the same name: '${node.identifier}'.`, node.statement, node.lineNumber, 0);
       }
-      else {
-        EmulatorState.memory.addLabel(node.identifier, EmulatorState.getters.memory().textSize * 32);
-        if (node.identifier === "main") EmulatorState.cpu.setRegister(Register.PC, EmulatorState.memory.label("main"));
-      }
+      else EmulatorState.addLabel(node.identifier, EmulatorState.memory().textSize * 32);
     }
 
     // TODO: memory allocation validation
@@ -114,9 +113,10 @@ function load(nodes: SyntaxNode[]) {
     // }
 
     else if (node instanceof InstructionNode) {
+      console.log(node.statement[0].type);
       if (mode !== Mode.Text) throw new AssemblyError("Cannot declare instructions outside of the .text section.", node.statement, node.lineNumber, -1);
 
-      EmulatorState.memory.addInstruction(node);
+      EmulatorState.addInstruction(node);
     }
   });
 }

@@ -67,7 +67,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { editor, registers, memory, instruction, tutorial } from "./components";
-import { parse, compile, load } from "@/classes/compiler";
+import { Interpreter } from "@/classes";
 import { EmulatorState } from "@/state";
 import { RuntimeError } from '@/classes/error';
 import { Register } from "@/constants"
@@ -75,6 +75,7 @@ import { Register } from "@/constants"
 import './assets/generic.css';
 import './assets/syntax.css';
 import { TInstructionNode } from './classes/syntax/types';
+import { BranchNode } from './classes/syntax/BranchNode';
 
 export default Vue.extend({
   name: 'emulator',
@@ -86,7 +87,14 @@ export default Vue.extend({
     tutorial
   },
   computed: {
-    ...EmulatorState.getters,
+    registers: EmulatorState.registers,
+    memory: EmulatorState.memory,
+    errors: EmulatorState.errors,
+    
+    running: EmulatorState.running,
+    paused: EmulatorState.paused,
+    delay: EmulatorState.delay,
+    step: EmulatorState.step,
   },
   methods: {
     /**
@@ -112,6 +120,7 @@ export default Vue.extend({
      * 
      */
     run: async function () {
+      EmulatorState.setEntryPoint();
       EmulatorState.start();
 
       try {
@@ -121,16 +130,14 @@ export default Vue.extend({
           // if runtime instruction runoff
           if (node === undefined) {
             let last: TInstructionNode = this.memory.text[this.memory.textSize - 1];
-
             throw new RuntimeError("Segmentation fault (core dumped)", last.statement, last.lineNumber, -1);
           }
 
-          EmulatorState.cpu.setRegister(Register.PC, this.registers[Register.PC] + 32);           // increment to the next instruction
-          EmulatorState.execute(node);
-          
-          // int sleepfor = 50;
+          Interpreter.execute(node);
+
+          // check every 50ms to see if speed value has changed
           let sleptfor: number = 0;
-          while ((sleptfor < this.delay || this.paused) && this.running && !this.step) {          // check every 50ms to see if speed value has changed
+          while ((sleptfor < this.delay || this.paused) && this.running && !this.step) {          
             await new Promise(r => setTimeout(r, 50));
             sleptfor += 50;
           }
