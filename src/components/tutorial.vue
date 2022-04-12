@@ -32,7 +32,7 @@ export default Vue.extend({
   data() {
     return {
       pages: tutorialPages as TTutorialPage[],
-      page: 5 as number
+      page: 0 as number
     }
   },
   computed: {
