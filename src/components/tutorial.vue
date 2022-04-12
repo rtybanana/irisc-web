@@ -7,10 +7,17 @@
 
     <div class="controls">
       <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
-        <i class="fas fa-chevron-left fa-sm p-1 clickable hoverable rounded-sm"></i>
-        <span class="mx-1">{{ page + 1 }}/{{ pages.length }}</span>
+        <i 
+          class="fas fa-chevron-left fa-sm p-1 clickable hoverable rounded-sm"
+          @click="prevPage"
+        ></i>
 
-        <i class="fas fa-chevron-right fa-sm p-1 clickable hoverable rounded-sm"></i>
+        <span class="mx-1 user-select-none">{{ page }}/{{ pages.length - 1 }}</span>
+
+        <i 
+          class="fas fa-chevron-right fa-sm p-1 clickable hoverable rounded-sm"
+          @click="nextPage"
+        ></i>
       </div>
     </div>
   </div>
@@ -25,12 +32,25 @@ export default Vue.extend({
   data() {
     return {
       pages: tutorialPages as TTutorialPage[],
-      page: 0 as number
+      page: 5 as number
     }
   },
   computed: {
     pageData: function () : TTutorialPage {
       return this.pages[this.page];
+    }
+  },
+  methods: {
+    nextPage: function () {
+      if (this.pages.length > this.page + 1) {
+        this.page++;
+      }
+    },
+
+    prevPage: function () {
+      if (this.page > 0) {
+        this.page--;
+      }
     }
   }
 })
@@ -42,9 +62,12 @@ export default Vue.extend({
   height: 100%;
   width: 100%;
   border: 2px dashed #8b0c3c;
+  overflow-x: hidden;
 }
 
 .title {
+  position: sticky;
+  top: 0;
   font-size: 18px;
   background-color: #191d21;
   border-radius: 0.3rem; 
@@ -56,6 +79,13 @@ export default Vue.extend({
 
 .content >>> .irisc {
   color: #8b0c3c;
+}
+
+.content >>> .hmm {
+  background-color: #191d21;
+  border-radius: 0.3rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
 }
 
 .controls {

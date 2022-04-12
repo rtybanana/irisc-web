@@ -1,6 +1,6 @@
 import { rotr } from "@/assets/bitset";
 import { Operation, Register, Shift, Flag } from "@/constants";
-import { BiOperandNode, FlexOperand, TriOperandNode } from "./syntax";
+import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode } from "./syntax";
 import { TInstructionNode } from "./syntax/types";
 import { EmulatorState } from "@/state";
 import { RuntimeError } from "./error";
@@ -38,6 +38,7 @@ export function execute(instruction: TInstructionNode) : boolean {
 
     if (instruction instanceof BiOperandNode) executed = executeBiOperand(instruction);
     if (instruction instanceof TriOperandNode) executed = executeTriOperand(instruction);
+    if (instruction instanceof ShiftNode) executed = executeShift(instruction);
   }
 
   return executed;
@@ -76,10 +77,10 @@ function deflex(flex: FlexOperand) : number {
 function applyFlexShift(shift: Shift, value: number, amount: number) : number {
   switch(shift) {
     case Shift.LSL:
-      return value <<= amount;
+      return value << amount;
     case Shift.LSR:
       if (amount == 0) amount = 32;       // special case for right shifts
-      return value >>= amount;
+      return value >>> amount;
     case Shift.ROR:
       return rotr(value, amount);
     default:
@@ -125,13 +126,13 @@ function executeBiOperand(instruction: BiOperandNode) : boolean {
 }
 
 function executeTriOperand(instruction: TriOperandNode) : boolean {
-  let [op, cond, set, dest, src, flex] = instruction.unpack();    // unpack the instruction
-  if (!EmulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
+  let [op, cond, set, dest, src, flex] = instruction.unpack();        // unpack the instruction
+  if (!EmulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
 
   let n = state.registers[src];
-  let m = deflex(flex);                                        // deflex the flex operand into a value
+  let m = deflex(flex);                                               // deflex the flex operand into a value
   let result: number | undefined;
-  switch (op) {                                                      // check opcode and execute instruction
+  switch (op) {                                                       // check opcode and execute instruction
     case Operation.AND:
       if (set) EmulatorState.setFlags(n, m, n & m);
       result = n & m;
@@ -184,6 +185,39 @@ function executeTriOperand(instruction: TriOperandNode) : boolean {
   return true;
 }
 
+function executeShift(instruction: ShiftNode) : boolean {
+  let [op, cond, set, dest, src1, src2] = instruction.unpack();       // unpack the instruction
+  if (!EmulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
+
+  let n = state.registers[src1];
+  let m;
+  if (instruction.isReg) m = state.registers[src2 as Register];
+  else m = src2 as number;
+
+  let result;
+  switch (op) {                                                        // check opcode and execute instruction
+    case Shift.LSL:
+      if (set) EmulatorState.setFlags(n, m, n << m);
+      result = n << m;
+      break;
+    case Shift.LSR:
+      if (set) EmulatorState.setFlags(n, m, n >> m);
+      result = n >>> m;
+      break;
+    case Shift.ASR:
+    case Shift.ROR:
+      if (set) EmulatorState.setFlags(n, m, rotr(n, m));
+      result = rotr(n, m);
+      break;
+    default:
+      throw new RuntimeError("While attempting to perform a shift operation.", instruction.statement, instruction.lineNumber, 0);
+  }
+
+  EmulatorState.setRegister(dest, result);
+
+  return true;
+}
+
 /**
  * 
  * @param instruction 
@@ -207,8 +241,6 @@ function executeBranch(instruction: BranchNode) : boolean {
       EmulatorState.setRegister(Register.PC, address);
       break;
   }
-
-  console.log(state.registers[Register.PC]);
 
   return true;
 }

@@ -2,6 +2,8 @@ export { SyntaxNode } from "./SyntaxNode";
 export { InstructionNode } from "./InstructionNode";
 export { DirectiveNode } from "./DirectiveNode";
 export { LabelNode } from "./LabelNode";
+export { BranchNode } from "./BranchNode";
 export { BiOperandNode } from "./BiOperandNode";
 export { TriOperandNode } from "./TriOperandNode";
+export { ShiftNode } from "./ShiftNode";
 export { FlexOperand } from "./FlexOperand";

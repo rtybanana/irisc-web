@@ -2,7 +2,6 @@
   <div 
     class="prism-container pl-1 pr-0 py-1 position-relative" 
     @mouseover="hover"
-    @mouseleave="unhover"
   >
     <prism-editor 
       id="editor" 
@@ -13,15 +12,20 @@
       line-numbers
     ></prism-editor>
 
-    <div id="buttons">
+    <div class="controls">
       <div>
         <i class="button red fas fa-stop mr-1 clickable" @click="stop"></i>
         <i class="button green fas fa-play mx-1 clickable" @click="$emit('run', program)"></i>
-        <i class="button step fas fa-step-forward clickable"></i>
+        <i class="button step fas fa-step-forward mx-1 clickable"></i>
+        <i 
+          class="button terminal fas fa-terminal ml-1 clickable" 
+          v-b-tooltip="'terminal'"
+          @click="$emit('switch')"
+        ></i>
       </div>
     </div>
 
-    <div id="error">
+    <div class="errors">
       <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
         <template v-if="tooltip.title !== ''">
           <div style="color: crimson">{{ tooltip.title }}</div>
@@ -67,8 +71,6 @@ export default Vue.extend({
         title: '' as string,
         message: '' as string
       },
-
-      hovered: false as boolean
     }
   },
   computed: {
@@ -85,9 +87,6 @@ export default Vue.extend({
      * 
      */
     hover: function (e: any) {
-      // console.log(e);
-      this.hovered = true;
-
       if (e.target.parentNode.className === "token error") {
         let errorIndex = e.target.parentNode.dataset["errorIdx"] as number;
         let error = this.errors[errorIndex];
@@ -103,13 +102,6 @@ export default Vue.extend({
           title: ''
         };
       }
-    },
-
-    /**
-     * 
-     */
-    unhover: function (e: MouseEvent) {
-      this.hovered = false;
     },
 
     /**
@@ -203,27 +195,31 @@ export default Vue.extend({
   overflow-x: hidden;
 }
 
-#buttons {
+.controls {
   position: absolute;
   top: 8px;
   right: 8px;
   border-radius: 0.3rem; 
   background-color: #191d21;
-  padding: 0.25rem 0.3rem 0.15rem 0.4rem;
+  padding: 0.25rem 0.33rem 0.15rem 0.4rem;
 }
 
-#error {
+.errors {
   /* width: 100%; */
   position: absolute;
   bottom: 0;
   padding: 0.25rem 0.5rem 0.5rem 0.25rem;
 }
 
-.red {
+.button.red {
   color: #d9484c;
 }
 
-.green {
+.button.green {
   color:#1d8f46;
+}
+
+.button.terminal {
+  color: #8b0c3c;
 }
 </style>

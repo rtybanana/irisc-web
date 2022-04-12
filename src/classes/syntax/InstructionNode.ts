@@ -1,6 +1,6 @@
 import { Token } from 'prismjs';
 import { SyntaxNode } from "./SyntaxNode";
-import { Operation, Condition, opMap } from '@/constants';
+import { Operation, Condition, opMap, operations } from '@/constants';
 
 /** Ancestor class for all instruction-type syntax nodes (Bi/TriOperandNode etc.) */
 export abstract class InstructionNode extends SyntaxNode {
@@ -25,7 +25,7 @@ export abstract class InstructionNode extends SyntaxNode {
 
     let forceFlags: string[] = [ "cmp", "cmn", "tst", "teq" ];
 
-    operation = Object.keys(opMap).find(e => (token.content as string).slice(0, e.length) === e) ?? "";
+    operation = operations.find(e => (token.content as string).slice(0, e.length) === e) ?? "";
 
     let suffix: string = (token.content as string).substring(operation.length);
     if (suffix.length === 1 || suffix.length === 3) {

@@ -32,7 +32,6 @@ export class IriscError extends Error {
 
   constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
     super(message, statement, lineNumber, tokenIndex);
-    // this.errorType = "Syntax Error"
   }
 } 
 
@@ -45,7 +44,6 @@ export class SyntaxError extends IriscError {
 
   constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
     super(message, statement, lineNumber, tokenIndex);
-    // this.errorType = "Syntax Error"
   }
 } 
 
@@ -57,7 +55,6 @@ export class NumericalError extends IriscError {
 
   constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
     super(message, statement, lineNumber, tokenIndex);
-    // this.errorType = "Numerical Error"
   }
 }
 
@@ -69,7 +66,6 @@ export class AssemblyError extends IriscError {
 
   constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
     super(message, statement, lineNumber, tokenIndex);
-    // this.errorType = "Assembly Error"
   }
 }
 
@@ -81,7 +77,17 @@ export class RuntimeError extends IriscError {
 
   constructor(message: string, statement: Token[], tokenIndex: number, lineNumber: number) {
     super(message, statement, tokenIndex, lineNumber);
-    // this.errorType = "Runtime Error"
+  }
+}
+
+/**
+ * Error during REPL interaction
+ */
+ export class InteractiveError extends IriscError {
+  get type() : string { return 'InteractiveError'; }
+
+  constructor(message: string, statement: Token[], tokenIndex: number, lineNumber: number) {
+    super(message, statement, tokenIndex, lineNumber);
   }
 }
 

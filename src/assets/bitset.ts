@@ -1,3 +1,5 @@
+// import decimal from "dec-to-binary";
+
 /** Find first set (ffs)
  * Returns the zero-indexed position of the least significant, set bit
  * 
@@ -37,5 +39,15 @@ export function rotr(n: number, d: number) : number {
  * @returns 
  */
 export function bitset(size: number, value: number = 0) : number[] {
-  return (value >>> 0).toString(2).padEnd(size, '0').split('').map(e => parseInt(e, 10));
+  let binary = get64binary(value);
+  return binary.substring(64 - size).split('').map(e => parseInt(e, 10)).reverse();
+}
+
+function get64binary(int: number) {
+  if (int>=0) return int.toString(2).padStart(64, "0");
+  
+  return (-int-1)
+    .toString(2)
+    .replace(/[01]/g, function(d: string) : string { return (+!+d).toString(); }) // hehe: inverts each char
+    .padStart(64, "1");
 }

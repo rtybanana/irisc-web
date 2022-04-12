@@ -118,8 +118,6 @@ export class SyntaxNode {
    * @returns 
    */
   parseShiftedImm(token: Token, bits: number): [number, number] {
-    console.log(bits);
-
     let imm: number = this.parseImm(token);
     let shift = 0;
 
@@ -127,8 +125,6 @@ export class SyntaxNode {
 
     let bottombit: number = ffs(imm);
     let topbit: number = fls(imm);
-
-    console.log(topbit, bottombit);
 
     if (topbit > 31)
       throw new NumericalError(`IMMEDIATE value '${token.content}' (decimal ${imm}) cannot be represented in 32 bits.`, this._statement, this._lineNumber, this._currentToken);

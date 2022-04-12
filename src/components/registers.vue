@@ -81,7 +81,7 @@ export default Vue.extend({
     },
 
     computedDescription() : string {
-      return this.description ?? "A simplified view of the data currently stored in the CPU. Hover over the different sections to learn about them.";
+      return this.description ?? "A simplified view of the data currently stored in the CPU. Hover over the different sections to learn more.";
     }
   },
   methods: {

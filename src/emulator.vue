@@ -14,7 +14,7 @@
             <div class="col-7 col-md-8 col-lg-9 pl-1 text-left">
               <div class="row px-0">
                 <div class="col-8 pr-1">
-                  <h5 class="mb-0">editor</h5>
+                  <h5 class="mb-0">{{ env }}</h5>
                 </div>
                 <div class="col-4 pl-1">
                   <h5 class="mb-0">tutorial</h5>
@@ -28,10 +28,18 @@
             </div>
             <div class="col-7 col-md-8 col-lg-9 pl-1" style="height: calc(100% - 232px);">
               <div class="row px-0 h-100">
-                <div class="col-8 pr-1">
-                  <editor v-on:run="start($event)"></editor>
+                <div class="col-8 pr-1 h-100">
+                  <!-- <editor @run="start($event)"></editor> -->
+
+                  <keep-alive>
+                    <component 
+                      :is="env" 
+                      @switch="switchEnvironment"
+                      @run="start"
+                    ></component>
+                  </keep-alive>
                 </div>
-                <div class="col-4 pl-1">
+                <div class="col-4 pl-1 h-100">
                   <!-- <h5 class="mb-0">memory</h5> -->
                   <tutorial></tutorial>
                 </div>
@@ -66,11 +74,11 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { editor, registers, memory, instruction, tutorial } from "./components";
+import { editor, terminal, registers, memory, instruction, tutorial } from "./components";
 import { Interpreter } from "@/classes";
 import { EmulatorState } from "@/state";
 import { RuntimeError } from '@/classes/error';
-import { Register } from "@/constants"
+import { Register, EnvironmentType } from "@/constants"
 
 import './assets/generic.css';
 import './assets/syntax.css';
@@ -81,10 +89,16 @@ export default Vue.extend({
   name: 'emulator',
   components: {
     editor,
+    terminal,
     registers,
     memory,
     instruction,
     tutorial
+  },
+  data() {
+    return {
+      env: EnvironmentType.TERMINAL
+    }
   },
   computed: {
     registers: EmulatorState.registers,
@@ -97,6 +111,11 @@ export default Vue.extend({
     step: EmulatorState.step,
   },
   methods: {
+    switchEnvironment: function () {
+      if (this.env === EnvironmentType.TERMINAL) this.env = EnvironmentType.EDITOR;
+      else this.env = EnvironmentType.TERMINAL;
+    },
+
     /**
      * 
      */

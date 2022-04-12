@@ -1,9 +1,8 @@
 import { languages, Token, tokenize } from 'prismjs';
-import { BiOperandNode, DirectiveNode, InstructionNode, LabelNode, SyntaxNode, TriOperandNode } from './syntax';
+import { BiOperandNode, BranchNode, DirectiveNode, InstructionNode, LabelNode, ShiftNode, SyntaxNode, TriOperandNode } from './syntax';
 import { AssemblyError, IriscError, SyntaxError } from './error';
 import { EmulatorState } from '@/state';
 import { Register } from '@/constants';
-import { BranchNode } from './syntax/BranchNode';
 
 /**
  * 
@@ -36,8 +35,15 @@ function parse(program: string) : Token[][] {
  */
 function compile(lines: Token[][]): SyntaxNode[] {
   return lines.reduce((a: SyntaxNode[], e: Token[], i: number) => {
-    let node: SyntaxNode | null = compileOne(e, i);
-    if (node !== null) a.push(node);
+    try {
+      let node: SyntaxNode | null = compileOne(e, i);
+      if (node !== null) a.push(node);
+    }
+    catch (e) {
+      if (e instanceof IriscError) {
+        EmulatorState.addError(e);
+      }
+    }
     
     return a;
   }, [] as SyntaxNode[]);
@@ -52,33 +58,25 @@ function compile(lines: Token[][]): SyntaxNode[] {
 function compileOne(line: Token[], lineNumber: number) : SyntaxNode | null {
   if (line.length === 0) return null;
 
-  try {
-    if (line[0].type === "bi-operand") {
-      return new BiOperandNode(line, lineNumber, 0);
-    }
-    if (line[0].type === "tri-operand") {
-      return new TriOperandNode(line, lineNumber, 0);
-    }
-    // if (line[0].type === "shift") {
-    //   return new ShiftNode(line, lineNumber, 0);
-    // }
-    if (line[0].type === "branch") {
-      return new BranchNode(line, lineNumber, 0);
-    }
-    if (line[0].type === "label") {
-      if (line.length === 1) return new LabelNode(line, lineNumber, 0);
-      // else return new syntax::AllocationNode(statement);
-    }
-
-    if (line[0].type === "op-label") {
-      throw new SyntaxError("Invalid label-like token detected, did you forget a colon?", line, lineNumber, 0);
-    }
+  if (line[0].type === "bi-operand") {
+    return new BiOperandNode(line, lineNumber, 0);
   }
-  catch (e) {
-    if (e instanceof IriscError) {
-      console.log(e);
-      EmulatorState.addError(e);
-    }
+  if (line[0].type === "tri-operand") {
+    return new TriOperandNode(line, lineNumber, 0);
+  }
+  if (line[0].type === "shift") {
+    return new ShiftNode(line, lineNumber, 0);
+  }
+  if (line[0].type === "branch") {
+    return new BranchNode(line, lineNumber, 0);
+  }
+  if (line[0].type === "label") {
+    if (line.length === 1) return new LabelNode(line, lineNumber, 0);
+    // else return new syntax::AllocationNode(statement);
+  }
+
+  if (line[0].type === "op-label") {
+    throw new SyntaxError("Invalid label-like token detected, did you forget a colon?", line, lineNumber, 0);
   }
 
   return null;
@@ -113,7 +111,6 @@ function load(nodes: (SyntaxNode | null)[]) {
     // }
 
     else if (node instanceof InstructionNode) {
-      console.log(node.statement[0].type);
       if (mode !== Mode.Text) throw new AssemblyError("Cannot declare instructions outside of the .text section.", node.statement, node.lineNumber, -1);
 
       EmulatorState.addInstruction(node);
@@ -121,4 +118,4 @@ function load(nodes: (SyntaxNode | null)[]) {
   });
 }
 
-export { parse, compile, load }
+export { parse, compile, compileOne, load }
