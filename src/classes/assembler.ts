@@ -79,7 +79,7 @@ function compileOne(line: Token[], lineNumber: number) : SyntaxNode | null {
     throw new SyntaxError("Invalid label-like token detected, did you forget a colon?", line, lineNumber, 0);
   }
 
-  return null;
+  throw new SyntaxError("Unrecognised instruction.", line, lineNumber, 0);
 }
 
 /**
@@ -102,7 +102,7 @@ function load(nodes: (SyntaxNode | null)[]) {
       if (EmulatorState.hasLabel(node.identifier)) {
         throw new AssemblyError(`Cannot declare multiple labels with the same name: '${node.identifier}'.`, node.statement, node.lineNumber, 0);
       }
-      else EmulatorState.addLabel(node.identifier, EmulatorState.memory().textSize * 32);
+      else EmulatorState.addLabel(node.identifier, EmulatorState.memory().textSize * 4);
     }
 
     // TODO: memory allocation validation

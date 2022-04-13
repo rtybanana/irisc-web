@@ -19,7 +19,6 @@
         <i class="button step fas fa-step-forward mx-1 clickable"></i>
         <i 
           class="button terminal fas fa-terminal ml-1 clickable" 
-          v-b-tooltip="'terminal'"
           @click="$emit('switch')"
         ></i>
       </div>
@@ -165,7 +164,7 @@ export default Vue.extend({
   },
   watch: {
     program: debounce(function(program: string) {
-      EmulatorState.clearMemory();
+      EmulatorState.initMemory();
 
       let lines = parse(program);
       let nodes = compile(lines);

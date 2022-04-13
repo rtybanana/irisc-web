@@ -36,6 +36,9 @@ const intro2: TTutorialPage = {
     Errors printed as command output.
     
     Type the string 'error' into the terminal and press enter to produce an error.
+
+    You can use ':clear' (or ':c' shorthand) to clear the terminal and ':reset' (or ':r') to reset\
+    the simulator.
   `
 }
 
@@ -55,8 +58,10 @@ const intro3: TTutorialPage = {
     <span class="token label">Labels</span> are highlighted in yellow.
     <span class="token error">Errors</span> are shown with a wavy underline.
     
-    Type the string 'error' into the text editor to produce an error. Hover over the offending token\
-    to show more detailed information in the bottom left corner of the editor.
+    Type the string 'error' into the text editor to produce an error. Hover over the underlined token\
+    to show more detailed information about the error in the bottom left corner of the editor.
+
+    You can use the <i class="fas fa-terminal fa-sm irisc"></i> button to return to the terminal at any time.
   `
 }
 
@@ -91,7 +96,7 @@ const intro5: TTutorialPage = {
     knows where to return to after the function completes.
 
     The <span class="token register">pc</span> is the <span class="token register">program counter</span>. This register\
-    is a <span class="irisc">pointer</span> to the next instruction to be executed in the program; also stored in RAM.\
+    is a <span class="irisc">pointer</span> to the next instruction to be executed in the program; also stored in RAM.
     
     The <span class="token register">program counter</span> is not considered <i>general-purpose</i> because editing the\
     contents of the <span class="token register">pc</span> during execution has side-effects. Actually, just one very\
@@ -119,7 +124,7 @@ const basics1: TTutorialPage = {
     <span class="irisc">flexible operand</span> which means it can either be an <span class="token immediate">immediate</span>\
     (a numeric literal), or the contents of a <span class="token register">register</span>.
 
-    In ARM assembly, source values move from right to left into the destination register. For example:\
+    For most instructions in ARM assembly, source values move from right to left into the destination register. For example:\
 
     <div class="ml-5">
       <span class="token operation">mov</span>\
@@ -148,9 +153,7 @@ const basics2: TTutorialPage = {
     
     <div class="hmm">\
       <div class="token label mb-1">Hmm...</div>\
-      You may notice that the result is a very large, positive number. 
-      
-      This isn't a mistake... But why?\
+      You may notice that the result is a very large, positive number. This isn't a mistake... But why?\
     </div>
   `
 }
@@ -183,10 +186,123 @@ const basics3: TTutorialPage = {
   `
 }
 
+const basics4: TTutorialPage = {
+  title: "Basics 3: sub",
+  content: // html
+  `\
+    The <span class="token operation">sub</span> instruction performs integer subtraction.\
+    Like the <span class="token operation">mov</span> and <span class="token operation">add</span> instructions, the\
+    operation is evaluated from right to left. For example:\
+
+    <div class="ml-5">
+      <span class="token operation">sub</span>\
+      <span class="token register">r0</span>, \
+      <span class="token register">r1</span>, \
+      <span class="token immediate">#1</span>
+    </div>\
+
+    Takes the second source value <span class="token immediate">#1</span> (the number 1), subtracts it from the first source value\
+    <span class="token register">r1</span>, and places the result into the destination register <span class="token register">r0</span>.
+
+    Experiment with <span class="token operation">sub</span>tracting now.
+
+
+    <div class="hmm">\
+      <div class="token label mb-1">Hmm...</div>\
+      What happens if you subtract a larger number from a smaller number?
+    </div>
+  `
+}
+
+const basics5: TTutorialPage = {
+  title: "Basics 4: rsb",
+  content: // html
+  `\
+    The <span class="token operation">rsb</span> instruction works similarly to the regular <span class="token operation">sub</span>\
+    instruction, except the first source register is subtracted from the second source register and then the result is placed in the\
+    destination register. For example:\
+
+    <div class="ml-5">
+      <span class="token operation">rsb</span>\
+      <span class="token register">r0</span>, \
+      <span class="token register">r1</span>, \
+      <span class="token immediate">#1</span>
+    </div>\
+
+    Takes the first source value <span class="token register">r1</span>, subtracts it from the first source value\
+    <span class="token immediate">#1</span> (the number 1), and places the result into the destination register\
+    <span class="token register">r0</span>.
+
+    Try out the <span class="token operation">rsb</span> instruction now.
+
+
+    <div class="hmm">\
+      <div class="token label mb-1">Hmm...</div>\
+      Why have both the <span class="token operation">rsb</span> and <span class="token operation">sub</span> instructions? Maybe\
+      it'll become clear later...
+    </div>
+  `
+}
+
+const basics6: TTutorialPage = {
+  title: "Basics 5: Bitwise Operations",
+  content: // html
+  `\
+    The <span class="token operation">and</span>, <span class="token operation">orr</span>, <span class="token operation">eor</span>,\
+    and <span class="token operation">bic</span> instructions are all what are called bitwise operations. Much like the\
+    <span class="token operation">add</span> and <span class="token operation">sub</span> instructions, they are evaluated from right\
+    to left.
+
+    <span class="token operation">and</span> performs a bitwise <i>and</i> operation.\
+    <div class="ml-5 mt-1">\
+      <span class="token register">1</span>01<span class="token register">1</span>1 
+      <span class="token register">1</span>10<span class="token register">1</span>0 >>> <span class="token register">10010</span>
+    </div>\
+
+    <span class="token operation">orr</span> performs a bitwise <i>or</i> operation.\
+    <div class="ml-5 mt-1">\
+      10<span class="token register">1</span>1<span class="token register">1</span>
+      <span class="token register">1</span><span class="token register">1</span>0<span class="token register">1</span>0 >>> <span class="token register">11111</span>
+    </div>\
+
+    <span class="token operation">eor</span> performs an <i>exclusive or</i> operation.\
+    <div class="ml-5 mt-1">\
+      10<span class="token register">1</span>1<span class="token register">1</span> 
+      1<span class="token register">1</span>010 >>> <span class="token register">01101</span>
+    </div>\
+
+    <span class="token operation">bic</span> performs a <i>bit clear</i> operation, which is an <span class="token operation">and</span>\
+    operation between the first operand and the complement of the second.\
+    <div class="ml-5 mt-1">\
+      10<span class="token register">1</span>1<span class="token register">1</span> 
+      11<span class="token register">0</span>1<span class="token register">0</span> >>> <span class="token register">00101</span>
+    </div>\
+
+    Play around with the bitwise operations now to see their effects.
+  `
+}
+
+// const basics7: TTutorialPage = {
+//   title: "Basics 6: Shifts",
+//   content: // html
+//   `\
+
+//   `
+// }
+
+const intermediate1: TTutorialPage = {
+  title: "Intermediate 0: CPSR",
+  content: // html
+  `\
+    Test
+  `
+}
 
 
 export const pages = [
   intro1, intro2, intro3, intro4, intro5, intro99,
 
-  basics1, basics2, basics3
+  basics1, basics2, basics3, basics4, basics5, basics6,
+
+  // intermediate1
 ]

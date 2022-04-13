@@ -21,26 +21,13 @@
       v-html="highlitInput"
     ></pre>
 
+    <!-- environment controls -->
     <div class="controls">
       <div>
         <i 
           class="button code fas fa-code clickable" 
-          v-b-tooltip="'code editor'"
           @click="$emit('switch')"
         ></i>
-      </div>
-    </div>
-
-    <div class="errors">
-      <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
-        <template v-if="tooltip.title !== ''">
-          <div style="color: crimson">{{ tooltip.title }}</div>
-          <div>{{ tooltip.message }}</div>
-        </template>
-
-        <div v-else-if="errors.length > 0">
-          {{ errors.length }} errors
-        </div>
       </div>
     </div>
   </div>
@@ -94,7 +81,9 @@ export default Vue.extend({
     },
     
     enter: function (e: any) {
-      let input = this.input.substring(this.prompt.length);
+      let input = this.input
+        .substring(this.prompt.length)
+        .replace(/(\r\n|\n|\r)/gm, "");
 
       this.$nextTick(() => {
         this.history += `\n${this.highlitInput}`;
@@ -133,7 +122,7 @@ export default Vue.extend({
             throw new InteractiveError("Branch instructions cannot be executed on the command-line.", [], -1, -1);
           }
 
-          Interpreter.execute(node);
+          Interpreter.execute(node, false);
         }
         else throw new InteractiveError("This operation is not supported on the command-line.", [], -1, -1);
       }
@@ -148,7 +137,7 @@ export default Vue.extend({
     printError: function (e: IriscError) {
       this.history += // html
       `
-        <span class="error-type">${e.type}</span>: ${e.message}
+        <span class="error-type">${e.type}</span>: ${e.message}\
       `
       //<span class="ml-5">${e.statement}</span>\
     }

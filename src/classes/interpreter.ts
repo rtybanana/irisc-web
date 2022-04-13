@@ -22,19 +22,17 @@ const state = {
  * 
  * @param instruction the instruction to be executed
  */
-export function execute(instruction: TInstructionNode) : boolean {
+export function execute(instruction: TInstructionNode, incPC: boolean = true) : boolean {
   let executed: boolean = false;
-
-  // EmulatorState.setRegister(Register.PC, state.registers[Register.PC] + 32);
 
   if (instruction instanceof BranchNode) {
     executed = executeBranch(instruction);
 
     // // only increment to the next instruction if branch didn't already (not executed)
-    if (!executed) EmulatorState.setRegister(Register.PC, state.registers[Register.PC] + 32);
+    if (!executed && incPC) EmulatorState.setRegister(Register.PC, state.registers[Register.PC] + 4);
   }
   else {
-    EmulatorState.setRegister(Register.PC, state.registers[Register.PC] + 32);
+    if (incPC) EmulatorState.setRegister(Register.PC, state.registers[Register.PC] + 4);
 
     if (instruction instanceof BiOperandNode) executed = executeBiOperand(instruction);
     if (instruction instanceof TriOperandNode) executed = executeTriOperand(instruction);
@@ -237,7 +235,7 @@ function executeBranch(instruction: BranchNode) : boolean {
       EmulatorState.setRegister(Register.PC, address);
       break;
     case Operation.BL:
-      EmulatorState.setRegister(Register.LR, state.registers[Register.PC] + 32);
+      EmulatorState.setRegister(Register.LR, state.registers[Register.PC] + 4);
       EmulatorState.setRegister(Register.PC, address);
       break;
   }

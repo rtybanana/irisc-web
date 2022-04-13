@@ -17,7 +17,7 @@ export const operations = [
   // shift instructions
   "lsl", "lsr", "asr", "ror",
   
-  //load/store 
+  // load/store 
   "ldr", "str",
 
   // branch instructions

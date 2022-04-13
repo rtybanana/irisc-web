@@ -6,15 +6,17 @@ import { TInstructionNode } from '@/classes/syntax/types';
 
 
 type TMemory = {
-  memstart: number,
-  text: TInstructionNode[],
-  labels: Record<string, number>
+  size: number;
+  text: TInstructionNode[];
+  data: number[];
+  stack: number[];
+  labels: Record<string, number>;
 }
 
 type TCPU = {
-  registers: Uint32Array,
-  observableRegisters: number[],
-  cpsr: boolean[]
+  registers: Uint32Array;
+  observableRegisters: number[];
+  cpsr: boolean[];
 }
 
 type TEmulatorState = {
@@ -36,7 +38,7 @@ const data = Vue.observable<TEmulatorState>({
   running: false,
   paused: false,
   step: false,
-  delay: 1000,
+  delay: 500,
 
   cpu: {
     registers: new Uint32Array(new ArrayBuffer(4 * 16)),
@@ -46,8 +48,10 @@ const data = Vue.observable<TEmulatorState>({
 
   // memory data
   memory: {
-    memstart: 0,
+    size: 256,
     text: [],
+    data: [],
+    stack: [],
     labels: {}
   },
 
@@ -69,7 +73,9 @@ const getters = {
   // memory getters
   memory: () => ({
     ...data.memory,
-    textSize: data.memory.text.length
+    textSize: data.memory.text.length,
+    dataSize: data.memory.data.length,
+    stackSize: data.memory.stack.length
   }),
 
   currentInstruction: () => actions.instruction(data.previousPC),
@@ -79,6 +85,19 @@ const getters = {
 }
 
 const actions = {
+  init: function () {
+    this.reset();
+    this.initMemory();
+  },
+
+  reset: function () {
+    data.cpu.registers = new Uint32Array(new ArrayBuffer(4 * 16));
+    this.setRegister(Register.SP, data.memory.size);
+    this.observeRegisters();
+
+    data.cpu.cpsr = Vue.observable([false, false, false, false]);
+  },
+
   start: function () {
     data.running = true;
   },
@@ -95,14 +114,7 @@ const actions = {
   },
 
   instruction: function (offset: number) : TInstructionNode {
-    return data.memory.text[(offset - data.memory.memstart) / 32];
-  },
-
-  reset: function () {
-    data.cpu.registers = new Uint32Array(new ArrayBuffer(4 * 16));
-    this.observeRegisters();
-
-    data.cpu.cpsr = Vue.observable([false, false, false, false]);
+    return data.memory.text[offset / 4];
   },
 
   setEntryPoint: function () {
@@ -168,13 +180,14 @@ const actions = {
     let result_ext: number[] = bitset(33, result);                    // msb = carry bit
 
     Vue.set(data.cpu.cpsr, Flag.N, result_ext[31] === 1);             // msb = 1
-    Vue.set(data.cpu.cpsr, Flag.Z, (result & 0xffffffff) === 0);      // first 32 bits are 0
-    Vue.set(data.cpu.cpsr, Flag.C, result_ext[32] === 1);             // unsigned overflow            
+    Vue.set(data.cpu.cpsr, Flag.Z, (result & 0xffffffff) === 0);      // first 32 bits are 0 
 
     if (operator === '+') {
+      Vue.set(data.cpu.cpsr, Flag.C, result_ext[32] === 1);                     // unsigned overflow           
       Vue.set(data.cpu.cpsr, Flag.V, sign1 === sign2 && sign1 !== signr);       // two operands of the same sign result in changed sign
     }
     else if (operator === '-') {
+      Vue.set(data.cpu.cpsr, Flag.C, !(result_ext[32] === 1));                  // unsigned underflow           
       Vue.set(data.cpu.cpsr, Flag.V, sign1 !== sign2 && sign2 === signr);       // signs different and result sign same as subtrahend 
     }
   },
@@ -195,14 +208,17 @@ const actions = {
     return data.memory.labels[label];
   },
 
-  clearMemory: function () {
-    data.memory.memstart = 0;
+  initMemory: function () {
     data.memory.text = [];
+    data.memory.data = [];
+    data.memory.stack = [];
     data.memory.labels = {};
 
     data.errors = [];
   }
 }
+
+actions.init();
 
 
 export default {

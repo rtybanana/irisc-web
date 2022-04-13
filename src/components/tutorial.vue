@@ -2,7 +2,7 @@
   <div class="container p-2 text-left">
     <div>
       <div class="title px-1">{{ pageData.title }}</div>
-      <div class="content mt-2 p-1" v-html="pageData.content"></div>
+      <div class="content mt-2 mb-5 p-1" v-html="pageData.content"></div>
     </div>
 
     <div class="controls">
