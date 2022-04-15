@@ -29,7 +29,17 @@ export class SyntaxNode {
    * 
    * @returns 
    */
-  nextToken(): Token {
+  previousToken() : Token {
+    if (this._currentToken > 0)
+      return this._statement[this._currentToken - 1];
+    else throw new SyntaxError("Could not assemble instruction - please contact the developer.", this.statement, this.lineNumber, -1);
+  }
+
+  /**
+   * 
+   * @returns 
+   */
+  nextToken() : Token {
     if (this._currentToken < this._statement.length)
       return this._statement[this._currentToken++];
     else throw new SyntaxError("Unexpected instruction end '" + this._statement[this._statement.length - 1].content + "'.", this._statement, this._lineNumber, this._statement.length - 1);
@@ -49,7 +59,7 @@ export class SyntaxNode {
    * 
    * @returns 
    */
-  hasToken(): boolean {
+  hasToken() : boolean {
     if (this._currentToken < this._statement.length) return true;
     return false;
   }
@@ -59,7 +69,7 @@ export class SyntaxNode {
    * @param token 
    * @returns 
    */
-  parseComma(token: Token): boolean {
+  parseComma(token: Token) : boolean {
     if (token.type == "comma") return true;
     else throw new SyntaxError("COMMA expected between operands - received " + token.type + " '" + token.content + "', instead.", this._statement, this._lineNumber, this._currentToken - 1);
   }
@@ -69,7 +79,7 @@ export class SyntaxNode {
    * @param token 
    * @returns 
    */
-  parseReg(token: Token): Register {
+  parseReg(token: Token) : Register {
     if (token.type == "register") return regMap[token.content as string];
     else throw new SyntaxError("REGISTER expected - received " + token.type.toUpperCase() + " '" + token.content + "' instead.", this._statement, this._lineNumber, this._currentToken - 1);
   }
@@ -80,7 +90,7 @@ export class SyntaxNode {
    * @param bits 
    * @returns 
    */
-  parseImm(token: Token, bits?: number): number {
+  parseImm(token: Token, bits?: number) : number {
     let base: number = 0;
     let start: number;
     let reveresedToken = [...(token.content as string)].reverse();
@@ -103,6 +113,9 @@ export class SyntaxNode {
     }
     else throw new SyntaxError("IMMEDIATE value expected - received " + token.type.toUpperCase() + " '" + token.content + "' instead.", this._statement, this._lineNumber, this._currentToken);
 
+    // correct start index for tokens which don't have '#' or '0n' identifiers
+    start = start === -1 ? reveresedToken.length : start;
+    
     start = reveresedToken.length - start;
     let imm: number = parseInt((token.content as string).slice(start), base);
 
@@ -117,7 +130,7 @@ export class SyntaxNode {
    * @param bits 
    * @returns 
    */
-  parseShiftedImm(token: Token, bits: number): [number, number] {
+  parseShiftedImm(token: Token, bits: number) : [number, number] {
     let imm: number = this.parseImm(token);
     let shift = 0;
 

@@ -8,8 +8,8 @@ import { TRegOrImm } from './types';
 
 /** Class which holds all the information required to execute a bi-operand instruction */
 export class ShiftNode extends InstructionNode {
-  protected _op: Operation;
-  protected _shiftOp: Shift;
+  protected _op: Shift;
+  // protected _shiftOp: Shift;
   protected _cond: Condition;
   protected _setFlags: boolean;
   protected _Rd: Register;
@@ -30,12 +30,9 @@ export class ShiftNode extends InstructionNode {
    */
   constructor(statement: Token[], lineNumber: number, currentToken: number = 0) {
     super(statement, lineNumber, currentToken);
-    
-    // this is a bit clunky - both shift and (unused) operation - needs a rework
-    this._op = opMap[0];
 
     const [operation, modifier, condition] = this.splitOpCode(this.nextToken());
-    this._shiftOp = shiftMap[operation];
+    this._op = shiftMap[operation];
     this._setFlags = modifier.length === 0 ? false : true;
     this._cond = condMap[condition];
 
@@ -44,7 +41,6 @@ export class ShiftNode extends InstructionNode {
     this._Rn = this.parseReg(this.nextToken());
     this.parseComma(this.nextToken());
 
-    // this._Rs = this.parseRegOrImm();
     let [value, type] = this.parseRegOrImm();         
     this._Rs = value;
     this._type = type;
@@ -78,7 +74,7 @@ export class ShiftNode extends InstructionNode {
 
   unpack() : [Shift, Condition, boolean, Register, Register, TRegOrImm] {
     return [
-      this._shiftOp,
+      this._op,
       this._cond,
       this._setFlags,
       this._Rd,

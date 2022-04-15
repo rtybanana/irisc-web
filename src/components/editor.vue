@@ -86,7 +86,7 @@ export default Vue.extend({
      * 
      */
     hover: function (e: any) {
-      if (e.target.parentNode.className === "token error") {
+      if (e.target.parentNode.className.includes("error")) {
         let errorIndex = e.target.parentNode.dataset["errorIdx"] as number;
         let error = this.errors[errorIndex];
 
@@ -118,10 +118,11 @@ export default Vue.extend({
       let tokens = lines.map(e => e.match(/<span.*?<\/span>\s*/gim) ?? []);
 
       // squiggly underline token errors
-      this.highlightErrors(tokens);
+      this.highlightTokenErrors(tokens);
 
       // reconstruct highlit tokens to lines
       lines = tokens.map(e => (e as string[]).join(""));
+      this.highlightLineErrors(lines);
       this.highlightExecuting(lines);
       
       // reconstruct highlit lines to program
@@ -131,21 +132,35 @@ export default Vue.extend({
     /**
      * 
      */
-    highlightErrors: function (elements: RegExpMatchArray[]) {
-      this.errors.forEach((error, index) => {
-        let line = elements[error.lineNumber];
+    highlightTokenErrors: function (elements: RegExpMatchArray[]) {
+      this.errors
+        .filter(e => e.tokenIndex !== -1)
+        .forEach((error, index) => {
+          let line = elements[error.lineNumber];
 
-        let filteredIndex: number = -1;
-        let tokenIndex = line?.findIndex((e, i) => {
-          if (!e.includes("whitespace")) filteredIndex++;
-          if (filteredIndex === error.tokenIndex) return true;
-        })
-        let tokenString = line?.[tokenIndex];
+          let filteredIndex: number = -1;
+          let tokenIndex = line?.findIndex((e, i) => {
+            if (!e.includes("whitespace")) filteredIndex++;
+            if (filteredIndex === error.tokenIndex) return true;
+          })
+          let tokenString = line?.[tokenIndex];
 
-        if (tokenString !== undefined) {
-          line[tokenIndex] = `<span class="token error" data-error-idx="${index}">${tokenString}</span>`;
-        }
-      });
+          if (tokenString !== undefined) {
+            line[tokenIndex] = `<span class="token error" data-error-idx="${index}">${tokenString}</span>`;
+          }
+        });
+    },
+
+    highlightLineErrors: function (lines: string []) {
+      this.errors
+        .filter(e => e.tokenIndex === -1)
+        .forEach((error, index) => {
+          let line = lines[error.lineNumber];
+
+          if (line !== undefined) {
+            lines[error.lineNumber] = `<span class="line error" data-error-idx="${index}">${line}</span>`;
+          }
+        });
     },
 
     /**

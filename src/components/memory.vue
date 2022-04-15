@@ -73,15 +73,15 @@ export default Vue.extend({
     registers: EmulatorState.registers,
 
     textWidth: function () : number {
-      return ((this.memory.textSize * 4) / this.memory.size) * 100;
+      return this.memory.textHeight / this.memory.size * 100;
     },
 
     dataWidth: function () {
-      return ((this.memory.dataSize * 4) / this.memory.size) * 100;
+      return this.memory.heapHeight / this.memory.size * 100;
     },
 
     stackWidth: function () {
-      return ((this.memory.stackSize * 4) / this.memory.size) * 100;
+      return this.memory.stackHeight / this.memory.size * 100;
     },
 
     stackPointer: function () : number {
@@ -91,7 +91,7 @@ export default Vue.extend({
     },
 
     used: function () : number {
-      return (this.memory.textSize + this.memory.dataSize + this.memory.stackSize) * 4;
+      return this.memory.textHeight + this.memory.heapHeight + this.memory.stackHeight;
     }
   }
 })

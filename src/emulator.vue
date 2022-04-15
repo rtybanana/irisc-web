@@ -148,7 +148,7 @@ export default Vue.extend({
 
           // if runtime instruction runoff
           if (node === undefined) {
-            let last: TInstructionNode = this.memory.text[this.memory.textSize - 1];
+            let last: TInstructionNode = EmulatorState.currentInstruction();
             throw new RuntimeError("Segmentation fault (core dumped)", last.statement, last.lineNumber, -1);
           }
 

@@ -1,15 +1,16 @@
 import { Token } from 'prismjs';
 import { SyntaxNode } from "./SyntaxNode";
 import { Operation, Condition, opMap, operations } from '@/constants';
+import { TOperation } from './types';
 
 /** Ancestor class for all instruction-type syntax nodes (Bi/TriOperandNode etc.) */
 export abstract class InstructionNode extends SyntaxNode {
-  protected abstract _op: Operation;
+  protected abstract _op: TOperation;
   protected abstract _cond: Condition;
   protected abstract _setFlags: boolean;
 
   // getters
-  get op(): Operation { return this._op; }
+  get op(): TOperation { return this._op; }
   get cond(): Condition { return this._cond; }
   get setFlags(): boolean { return this._setFlags; }
 

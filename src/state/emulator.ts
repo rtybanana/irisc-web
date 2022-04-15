@@ -1,16 +1,31 @@
 import Vue from 'vue';
-import { Condition, Register, Flag } from "@/constants";
+import { Condition, Register, Flag, TTransferSize } from "@/constants";
 import { bitset } from "@/assets/bitset";
-import { IriscError } from "@/classes/error";
+import { IriscError, ReferenceError } from "@/classes/error";
 import { TInstructionNode } from '@/classes/syntax/types';
+import { AllocationNode, LabelNode } from '@/classes/syntax';
+import { SingleTransferNode } from '@/classes/syntax/transfer/SingleTransferNode';
+import { EmulatorState } from '.';
 
+
+type TRam = {
+}
 
 type TMemory = {
   size: number;
+
+  buffer: ArrayBuffer | undefined;
+  wordView: Uint32Array;
+  byteView: Uint8Array;
+
+  heapHeight: number;
+  heapMap: Record<string, number>;
+  
   text: TInstructionNode[];
-  data: number[];
-  stack: number[];
-  labels: Record<string, number>;
+  textHeight: number;
+  textMap: Record<string, number>;
+
+  stackHeight: number;
 }
 
 type TCPU = {
@@ -49,10 +64,19 @@ const data = Vue.observable<TEmulatorState>({
   // memory data
   memory: {
     size: 256,
+
+    buffer: undefined,
+    wordView: new Uint32Array(),
+    byteView: new Uint8Array(),
+
+    heapHeight: 0,
+    heapMap: {},
+    
     text: [],
-    data: [],
-    stack: [],
-    labels: {}
+    textHeight: 0,
+    textMap: {},
+
+    stackHeight: 0,
   },
 
   previousPC: 0,
@@ -69,17 +93,9 @@ const getters = {
 
   registers: () => data.cpu.observableRegisters,
   cpsr: () => data.cpu.cpsr,
-
-  // memory getters
-  memory: () => ({
-    ...data.memory,
-    textSize: data.memory.text.length,
-    dataSize: data.memory.data.length,
-    stackSize: data.memory.stack.length
-  }),
+  memory: () => data.memory,
 
   currentInstruction: () => actions.instruction(data.previousPC),
-
   errors: () => data.errors,
   hoveredError: () => data.hoveredError
 }
@@ -192,29 +208,74 @@ const actions = {
     }
   },
 
-  addInstruction: function (instruction: TInstructionNode) {
-    data.memory.text.push(instruction);
+  // memory actions
+  initMemory: function () {
+    data.memory.text = [];
+    data.memory.buffer = new ArrayBuffer(data.memory.size);
+    data.memory.byteView = new Uint8Array(data.memory.buffer);
+    data.memory.wordView = new Uint32Array(data.memory.buffer);
+    data.memory.textHeight = 0;
+    data.memory.heapHeight = 0;
+    data.memory.stackHeight = 0;
+    data.memory.textMap = {};
+
+    data.errors = [];
+  },
+
+  setInstructions: function (instructions: TInstructionNode[]) {
+    data.memory.text = instructions;
+    data.memory.textHeight = instructions.length * 4;
   },
 
   addLabel: function (label: string, address: number) {
-    Vue.set(data.memory.labels, label, address);
+    Vue.set(data.memory.textMap, label, address);
   },
 
   hasLabel: function (label: string) : boolean {
-    return data.memory.labels[label] !== undefined;
+    return data.memory.textMap[label] !== undefined;
   },
 
   label: function (label: string) : number {
-    return data.memory.labels[label];
+    return data.memory.textMap[label];
   },
 
-  initMemory: function () {
-    data.memory.text = [];
-    data.memory.data = [];
-    data.memory.stack = [];
-    data.memory.labels = {};
+  allocateHeap: function (heap: Uint8Array, height: number, map: Record<string, number>) {
+    data.memory.byteView?.set(heap.slice(0, height), data.memory.textHeight);
+    data.memory.heapHeight = height;
 
-    data.errors = [];
+    for (let label in map) map[label] = map[label] + data.memory.textHeight;
+    data.memory.heapMap = map;
+  },
+
+  dataLabel: function (label: string) : number {
+    return data.memory.heapMap[label];
+  },
+
+  store: function (toStore: number, address: number, size: TTransferSize) {
+    if (size === "word") {
+      data.memory.wordView[address / 4] = toStore;
+    }
+    else if (size === "byte") {
+      data.memory.byteView[address] = toStore;
+    }
+  },
+
+  validate: function () {
+    data.memory.text.forEach(ins => {
+      if (ins instanceof LabelNode) {
+        if (data.memory.textMap[ins.identifier] === undefined) {
+          EmulatorState.addError(new ReferenceError(`Missing reference to '${ins.identifier}'`, ins.statement, ins.lineNumber, -1));
+        }
+      }
+      else if (ins instanceof SingleTransferNode && ins.isLiteral) {
+        if (data.memory.heapMap[ins.literal] === undefined) {
+          EmulatorState.addError(new ReferenceError(`Missing reference to '${ins.literal}'`, ins.statement, ins.lineNumber, -1));
+        }
+      }
+      // else if (instruction instanceof BlockTransferNode) {
+
+      // }
+    });
   }
 }
 

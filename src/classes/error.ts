@@ -70,6 +70,17 @@ export class AssemblyError extends IriscError {
 }
 
 /**
+ * Error while validating that all label references exist
+ */
+export class ReferenceError extends IriscError {
+  get type() : string { return 'ReferenceError'; }
+
+  constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
+    super(message, statement, lineNumber, tokenIndex);
+  }
+}
+
+/**
  * Error during runtime
  */
 export class RuntimeError extends IriscError {

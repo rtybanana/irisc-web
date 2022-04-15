@@ -2,8 +2,8 @@ export enum Operation {
   // arithmetic operations
   AND = 0,  EOR, SUB, RSB, ADD, ADC, SBC, RSC, TST, TEQ, CMP, CMN, ORR, MOV, BIC, MVN,
 
-  // load/store instructions
-  LDR = 16,  STR, 
+  // // load/store instructions
+  // LDR = 16,  STR, 
 
   // branch instructions
   B = 32,  BL, BX
@@ -34,9 +34,9 @@ export const opMap: Record<string, Operation> = {
   "bic": Operation.BIC,
   "mvn": Operation.MVN,
 
-  //load/store instructions
-  "ldr": Operation.LDR,
-  "str": Operation.STR,
+  // //load/store instructions
+  // "ldr": Operation.LDR,
+  // "str": Operation.STR,
 
   // branch instructions
   "bx": Operation.BX,
@@ -61,8 +61,8 @@ export const opTitle: Record<Operation, string> = {
   [Operation.MOV]: "Move",
   [Operation.BIC]: "Bit Clear",
   [Operation.MVN]: "Move Negative",
-  [Operation.LDR]: "Load",
-  [Operation.STR]: "Store",
+  // [Operation.LDR]: "Load",
+  // [Operation.STR]: "Store",
   [Operation.B]:   "Branch",
   [Operation.BL]:  "Branch and Link",
   [Operation.BX]:  "Branch and Exchange"
@@ -85,8 +85,8 @@ export const opExplain: Record<Operation, string> = {
   [Operation.MOV]: "Stores the second operand value in the destination register.",
   [Operation.BIC]: "Performs a bitwise AND operation with the complement of the second operand.",
   [Operation.MVN]: "Stores the additive inverse of the second operand value in the destination register.",
-  [Operation.LDR]: "Loads the data at the memory address in the source register into the destination register.",
-  [Operation.STR]: "Stores the data in the destination register into the memory address of the source register.",
+  // [Operation.LDR]: "Loads the data at the memory address in the source register into the destination register.",
+  // [Operation.STR]: "Stores the data in the destination register into the memory address of the source register.",
   [Operation.B]:   "Branches to the provided instruction address or label.",
   [Operation.BL]:  "Branches to the provided instruction address or label and stores the return address.",
   [Operation.BX]:  "Branches to the provided instruction address or label and optionally changes instruction type."

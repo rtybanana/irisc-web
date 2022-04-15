@@ -1,10 +1,11 @@
 import { rotr } from "@/assets/bitset";
-import { Operation, Register, Shift, Flag } from "@/constants";
+import { Operation, Register, Shift, Flag, SingleTransfer } from "@/constants";
 import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode } from "./syntax";
 import { TInstructionNode } from "./syntax/types";
 import { EmulatorState } from "@/state";
 import { RuntimeError } from "./error";
 import { BranchNode } from "./syntax/BranchNode";
+import { SingleTransferNode } from "./syntax/transfer/SingleTransferNode";
 
 /**
  * Local declaration of useful EmulatorState getters with the js object getter
@@ -12,8 +13,9 @@ import { BranchNode } from "./syntax/BranchNode";
  * the function execution brackets (()).
  */
 const state = {
-  get registers() { return EmulatorState.registers() },
-  get cpsr() { return EmulatorState.cpsr() }
+  get registers() { return EmulatorState.registers(); },
+  get cpsr() { return EmulatorState.cpsr(); },
+  get memory() { return EmulatorState.memory(); }
 }
 
 /**
@@ -28,7 +30,7 @@ export function execute(instruction: TInstructionNode, incPC: boolean = true) : 
   if (instruction instanceof BranchNode) {
     executed = executeBranch(instruction);
 
-    // // only increment to the next instruction if branch didn't already (not executed)
+    // only increment to the next instruction if branch didn't already (not executed)
     if (!executed && incPC) EmulatorState.setRegister(Register.PC, state.registers[Register.PC] + 4);
   }
   else {
@@ -37,6 +39,8 @@ export function execute(instruction: TInstructionNode, incPC: boolean = true) : 
     if (instruction instanceof BiOperandNode) executed = executeBiOperand(instruction);
     if (instruction instanceof TriOperandNode) executed = executeTriOperand(instruction);
     if (instruction instanceof ShiftNode) executed = executeShift(instruction);
+
+    if (instruction instanceof SingleTransferNode) executed = executeSingleTransfer(instruction);
   }
 
   return executed;
@@ -222,12 +226,12 @@ function executeShift(instruction: ShiftNode) : boolean {
  * @returns 
  */
 function executeBranch(instruction: BranchNode) : boolean {
-  let [op, cond, to] = instruction.unpack();
+  let [op, cond, addr] = instruction.unpack();
   if (!EmulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
   let address: number;
-  if (typeof to === 'string') address = EmulatorState.label(to as string);
-  else address = state.registers[to as Register];
+  if (typeof addr === 'string') address = EmulatorState.label(addr as string);
+  else address = state.registers[addr as Register];
   
   switch (op) {
     case Operation.B:
@@ -237,6 +241,38 @@ function executeBranch(instruction: BranchNode) : boolean {
     case Operation.BL:
       EmulatorState.setRegister(Register.LR, state.registers[Register.PC] + 4);
       EmulatorState.setRegister(Register.PC, address);
+      break;
+  }
+
+  return true;
+}
+
+function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
+  let [op, cond, size, reg, addr, sign, flex, mode, wb] = instruction.unpack();
+  if (!EmulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
+
+  let address: number;
+  if (typeof addr === "string") address = EmulatorState.dataLabel(addr as string);
+  else {
+    address = state.registers[addr as Register];
+
+    // TODO: pre, post increment + updating addressing modes
+  }
+
+  
+  let data: number;
+  switch (op) {
+    case SingleTransfer.LDR:
+      if (size === "word") data = state.memory.wordView[address / 4];
+      else data = state.memory.byteView[address];
+
+      EmulatorState.setRegister(reg, data);
+      break;
+    case SingleTransfer.STR:
+      if (size === "word") data = state.registers[reg];
+      else data = state.registers[reg] & 0xff;
+
+      EmulatorState.store(data, address, size);
       break;
   }
 

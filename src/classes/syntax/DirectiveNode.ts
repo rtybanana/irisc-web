@@ -13,7 +13,9 @@ export class DirectiveNode extends SyntaxNode {
   constructor(statement: Token[], lineNumber: number, currentToken: number = 0) {
     super(statement, lineNumber, currentToken);
 
-    if (directiveMap[this.peekToken().content as string]) {
+    console.log(this.peekToken().content as string);
+
+    if (directiveMap[this.peekToken().content as string] !== undefined) {
       this.directive = directiveMap[this.nextToken().content as string];
     }
     else throw new SyntaxError(`Unrecognised directive '${this.peekToken().content}'.`, statement, lineNumber, currentToken);

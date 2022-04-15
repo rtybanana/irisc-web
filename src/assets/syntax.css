@@ -22,7 +22,8 @@
   color: #ff5555;
 }
 
-#app .token.immediate {
+#app .token.immediate,
+#app .token.number {
   color: #a6a6a6;
 }
 
@@ -30,18 +31,33 @@
   color: #5d9455;
 }
 
-#app .token.op-label, #app .token.label {
+#app .token.op-label, 
+#app .token.label {
   color: #f9e1b3;
 }
 
-#app .token.error {
+#app .token.data-label {
+	color: #85fbff;
+}
+
+#app .token.directive {
+	color: #e02f72;
+}
+
+#app .token.string {
+	color: #ce9178;
+}
+
+#app .token.error,
+#app .line.error {
 	text-decoration: underline wavy crimson 1px;
 	border-radius: 0.15rem;
 	pointer-events: auto;
 	cursor: help;
 }
 
-#app .token.error:hover {
+#app .token.error:hover,
+#app .line.error:hover {
 	background-color: rgba(240, 128, 128, 0.5);
 }
 
