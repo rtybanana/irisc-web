@@ -252,15 +252,29 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
   if (!EmulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
   let address: number;
-  if (typeof addr === "string") address = EmulatorState.dataLabel(addr as string);
+  let postAddress: number;
+  let data: number;
+  if (typeof addr === "string") {
+    address = EmulatorState.dataLabel(addr as string);
+
+    if (op === SingleTransfer.LDR) {
+      EmulatorState.setRegister(reg, address);
+      return true;
+    }
+
+    throw new RuntimeError('Cannot store directly to label.', instruction.statement, instruction.lineNumber, -1);
+
+    // other cases should be caught by assembler
+  }
   else {
     address = state.registers[addr as Register];
+    let m = flex ? deflex(flex) : 0;
+    postAddress = sign === "+" ? address + m : address - m;
 
+    if (mode === "pre") address = postAddress;
     // TODO: pre, post increment + updating addressing modes
   }
 
-  
-  let data: number;
   switch (op) {
     case SingleTransfer.LDR:
       if (size === "word") data = state.memory.wordView[address / 4];
@@ -274,6 +288,10 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
 
       EmulatorState.store(data, address, size);
       break;
+  }
+
+  if (wb) {
+    EmulatorState.setRegister((addr as Register), postAddress);
   }
 
   return true;

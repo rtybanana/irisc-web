@@ -41,7 +41,8 @@ export class AllocationNode extends SyntaxNode {
       throw new SyntaxError(`Expected STRING - received ${token.type.toUpperCase()} '${token.content}' instead.`, this.statement, this.lineNumber, this._currentToken);
     }
 
-    let data = new Uint8Array(new ArrayBuffer(token.length));
+    // string length + 1 because null (0) terminated
+    let data = new Uint8Array(new ArrayBuffer(token.length + 1));
     let string = (token.content as string).slice(1, -1);
 
     for (let i = 0; i < string.length; i++) data[i] = string.charCodeAt(i);

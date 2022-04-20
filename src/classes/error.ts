@@ -86,8 +86,8 @@ export class ReferenceError extends IriscError {
 export class RuntimeError extends IriscError {
   get type() : string { return 'RuntimeError'; }
 
-  constructor(message: string, statement: Token[], tokenIndex: number, lineNumber: number) {
-    super(message, statement, tokenIndex, lineNumber);
+  constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
+    super(message, statement, lineNumber, tokenIndex);
   }
 }
 
@@ -97,8 +97,8 @@ export class RuntimeError extends IriscError {
  export class InteractiveError extends IriscError {
   get type() : string { return 'InteractiveError'; }
 
-  constructor(message: string, statement: Token[], tokenIndex: number, lineNumber: number) {
-    super(message, statement, tokenIndex, lineNumber);
+  constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
+    super(message, statement, lineNumber, tokenIndex);
   }
 }
 

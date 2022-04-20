@@ -4,8 +4,8 @@
     class="container px-2" 
     @click="focus"
   >
-    <!-- prompt history -->
-    <pre class="repl history" v-html="history"></pre>
+    <!-- prompt output -->
+    <pre class="repl output" v-html="output"></pre>
 
     <!-- input and syntax highlighter -->
     <pre
@@ -50,7 +50,8 @@ export default Vue.extend({
     return {
       prompt: "irisc:~$ ",
       input: "" as string,
-      history: replWelcome,
+      output: replWelcome,
+      history: [] as string[],
 
       tooltip: {
         // index: null as number | null,
@@ -86,7 +87,7 @@ export default Vue.extend({
         .replace(/(\r\n|\n|\r)/gm, "");
 
       this.$nextTick(() => {
-        this.history += `\n${this.highlitInput}`;
+        this.output += `\n${this.highlitInput}`;
 
         this.input = this.prompt;
         e.target.innerText = "";
@@ -110,7 +111,7 @@ export default Vue.extend({
         }
 
         if (input === ":clear" || input === ":c") {
-          this.history = replWelcome;
+          this.output = replWelcome;
           return;
         }
 
@@ -135,7 +136,7 @@ export default Vue.extend({
     },
 
     printError: function (e: IriscError) {
-      this.history += // html
+      this.output += // html
       `
         <span class="error-type">${e.type}</span>: ${e.message}\
       `
@@ -160,7 +161,7 @@ export default Vue.extend({
   overflow-x: hidden;
 }
 
-.repl.history >>> .welcome {
+.repl.output >>> .welcome {
   color: #bfbfbf;
 }
 
@@ -169,7 +170,7 @@ export default Vue.extend({
   margin-bottom: 0;
 }
 
-.repl.history {
+.repl.output {
   white-space: pre-line;
 }
 
@@ -206,7 +207,7 @@ export default Vue.extend({
   padding: 0.25rem 0.5rem 0.5rem 0.25rem;
 }
 
-.repl.history >>> .error-type {
+.repl.output >>> .error-type {
   color: crimson;
 }
 

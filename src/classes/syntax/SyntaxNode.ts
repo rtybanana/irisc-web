@@ -12,6 +12,7 @@ export class SyntaxNode {
   // getters
   get statement(): Token[] { return this._statement; }
   get lineNumber(): number { return this._lineNumber; }
+  get currentToken() : number { return this._currentToken; }
 
   /**
    * 

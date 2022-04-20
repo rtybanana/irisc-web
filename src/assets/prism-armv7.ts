@@ -1,5 +1,4 @@
 import { languages } from 'prismjs'
-// import { Grammar } from "prismjs";
 
 languages.armv7 =  {
 	'line-comment': {
@@ -61,6 +60,11 @@ languages.armv7 =  {
 	'directive': /\.\b(text|data|byte|hword|word|asciz|skip)\b/m,
 	'data-label': /=\b[A-Za-z_][A-Za-z_\d]+\b/m,
 	'string': /".+"/m,
+	'sign': [
+		{ pattern: /-/m, alias: "minus" },
+		{ pattern: /\+/m, alias: "plus" }
+	],
+	'updating': /!/m,
 	'label': /\b[A-Za-z_][A-Za-z_\d]+\b:/m,
 	'op-label': /\b[A-Za-z_][A-Za-z_\d]+\b/m,
 	'end': /\n/m,

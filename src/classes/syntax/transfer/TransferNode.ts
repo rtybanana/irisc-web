@@ -11,7 +11,7 @@ export abstract class TransferNode extends InstructionNode {
   protected abstract _op: TTransfer;
   protected abstract _cond: Condition;
   protected abstract _transferSize: TTransferSize;
-  protected abstract _Rn: TBranchAddress;
+  protected abstract _Rn: TBranchAddress | undefined;
   // protected abstract _addressMode: TAddressMode | undefined;
 
   protected  _setFlags: boolean = false;

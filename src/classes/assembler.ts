@@ -145,7 +145,7 @@ function load(nodes: (SyntaxNode | null)[]) {
       if (EmulatorState.hasLabel(node.identifier)) {
         EmulatorState.addError(new AssemblyError(`Cannot declare multiple labels with the same name: '${node.identifier}'.`, node.statement, node.lineNumber, 0));
       }
-      else EmulatorState.addLabel(node.identifier, state.memory.textHeight);
+      else EmulatorState.addLabel(node.identifier, instructions.length * 4);
     }
 
     else if (node instanceof InstructionNode) {

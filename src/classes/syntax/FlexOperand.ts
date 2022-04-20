@@ -29,14 +29,14 @@ export class FlexOperand extends SyntaxNode {
   constructor(statement: Token[], lineNumber: number, currentToken: number = 0) {
     super(statement, lineNumber, currentToken);
 
-    this.parseComma(this.nextToken());
+    // this.parseComma(this.nextToken());
     let [value, type] = this.parseRegOrImm();      // parse immediate with default 8 bits (with extended 4 bit shift)
     this._Rm = value;
     this._type = type;
 
     if (this.isReg && this.hasToken()) this.parseShift();
 
-    if (this.hasToken()) throw new SyntaxError(`Unexpected token '${this.peekToken().content}' after valid instruction end.`, this._statement, this._lineNumber, this._currentToken + 1);
+    // if (this.hasToken()) throw new SyntaxError(`Unexpected token '${this.peekToken().content}' after valid instruction end.`, this._statement, this._lineNumber, this._currentToken + 1);
   }
 
   /**

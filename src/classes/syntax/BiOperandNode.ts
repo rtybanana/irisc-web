@@ -2,6 +2,7 @@ import { Token } from 'prismjs';
 import { InstructionNode } from './InstructionNode';
 import { FlexOperand } from './FlexOperand';
 import { Register, Operation, Condition, opMap, condMap } from '@/constants';
+import { SyntaxError } from '../error';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */
@@ -29,8 +30,13 @@ export class BiOperandNode extends InstructionNode {
 
     this._Rd = this.parseReg(this.nextToken());
 
+    this.parseComma(this.nextToken());
+
     this.peekToken();                                              // peek next token to see if it exists
     this._flex = new FlexOperand(statement, lineNumber, this._currentToken);          // parsing delegated to FlexOperand constructor
+    this._currentToken = this._flex.currentToken;
+
+    if (this.hasToken()) throw new SyntaxError(`Unexpected token '${this.peekToken().content}' after valid instruction end.`, this._statement, this._lineNumber, this._currentToken + 1);
   }
 
   unpack() : [Operation, Condition, boolean, Register, FlexOperand] {

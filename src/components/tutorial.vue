@@ -78,7 +78,7 @@ export default Vue.extend({
 }
 
 .content >>> .irisc {
-  color: #8b0c3c;
+  color: #e02f72;
 }
 
 .content >>> .hmm {
