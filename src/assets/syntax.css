@@ -54,6 +54,7 @@
 	border-radius: 0.15rem;
 	pointer-events: auto;
 	cursor: help;
+	user-select: none;
 }
 
 #app .token.error:hover,

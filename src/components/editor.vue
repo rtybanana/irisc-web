@@ -1,9 +1,12 @@
 <template>
+  <!-- @click="click" -->
   <div 
     class="prism-container pl-1 pr-0 py-1 position-relative" 
     @mouseover="hover"
+    @click="redirect"
   >
     <prism-editor 
+      ref="prism"
       id="editor" 
       v-model="program"
       :highlight="highlighter" 
@@ -41,10 +44,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue, { Component } from 'vue';
 import { EmulatorState } from "@/state";
 import { parse, compile, load } from "@/classes/assembler";
 import { debounce } from "@/assets/functions";
+import getCaretCoordinates from "textarea-caret";
 
 import { PrismEditor } from 'vue-prism-editor'
 import 'vue-prism-editor/dist/prismeditor.min.css';
@@ -56,6 +60,12 @@ import 'prismjs/themes/prism.css'; // import syntax highlighting styles
 import { IriscError } from '@/classes/error';
 import { TInstructionNode } from '@/classes/syntax/types';
 import { Register } from '@/constants';
+import { ExtendedVue } from 'vue/types/vue';
+
+type TPoint = {
+  x: number;
+  y: number;
+}
 
 export default Vue.extend({
   name: 'editor',
@@ -100,6 +110,23 @@ export default Vue.extend({
           message: '',
           title: ''
         };
+      }
+    },
+
+    redirect: function (e: any) {
+      if (e.target.parentNode.className.includes("error")) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        let prismEditor = this.$refs.prism as any;    // casting to any :(
+        let newTarget = prismEditor.$refs.textarea as HTMLInputElement;
+        newTarget.dispatchEvent(
+          new CustomEvent('customClick', {
+            detail: {
+              coords: { x: e.layerX, y: e.layerY } as TPoint
+            }
+          }
+        ));
       }
     },
 
@@ -167,7 +194,6 @@ export default Vue.extend({
      * 
      */
     highlightExecuting: function (lines: string[]) {
-    
       if (this.running) {
         let executing = lines[this.currentInstruction?.lineNumber];
 
@@ -175,7 +201,53 @@ export default Vue.extend({
           lines[this.currentInstruction.lineNumber] = `<span class="line executing">${executing}</span>`;
         }
       }
+    },
+
+    /**
+     * 
+     */
+    moveCaretToCursor: function (e: any) {
+      let mouseCoords: TPoint = e.detail.coords;
+
+      function getDistance(p1: TPoint, p2: TPoint) : number {
+        let y = p2.x - p1.x;
+        let x = p2.y - p1.y;
+        
+        return Math.sqrt(x * x + y * y);
+      }
+
+      let textarea = e.target as HTMLTextAreaElement;
+      let smallestDistance = Number.MAX_VALUE;
+      let caretPosition = 0;
+      for (let i = 0; i < textarea.value.length + 1; i++) {
+        let textPos = getCaretCoordinates(textarea, i);
+        let charCoords: TPoint = { 
+          x: textPos.left, 
+          y: textPos.top + (textPos.height / 2)
+        };
+
+        let distance = getDistance(mouseCoords, charCoords);
+        if (distance < smallestDistance) {
+          smallestDistance = distance;
+          caretPosition = i;
+        }
+      }
+
+      textarea.setSelectionRange(caretPosition, caretPosition);
+      textarea.focus();
     }
+  },
+  mounted: function () {
+    let prismEditor = this.$refs.prism as any;    // casting to any :(
+    let textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
+
+    textarea.addEventListener('customClick', this.moveCaretToCursor)
+  },
+  beforeDestroy: function () {
+    let prismEditor = this.$refs.prism as any;    // casting to any :(
+    let textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
+
+    textarea.removeEventListener('customClick', this.moveCaretToCursor)
   },
   watch: {
     program: debounce(function(program: string) {
