@@ -30,8 +30,6 @@ export class SingleTransferNode extends TransferNode {
   constructor(statement: Token[], lineNumber: number, currentToken: number = 0) {
     super(statement, lineNumber, currentToken);
 
-    console.log(statement);
-
     const [operation, modifier, condition] = this.splitOpCode(this.nextToken());
     this._op = transferMap[operation] as SingleTransfer;
     this._transferSize = modifier.length === 0 ? "word" : "byte";
@@ -52,8 +50,6 @@ export class SingleTransferNode extends TransferNode {
   }
 
   parseAddressOrLabel() {
-    console.log("parse address or label");
-
     if (this.peekToken().type === "data-label") {
       this._Rn = (this.nextToken().content as string).slice(1);
     }

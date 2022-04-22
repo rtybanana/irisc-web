@@ -50,7 +50,7 @@
 
 #app .token.error,
 #app .line.error {
-	text-decoration: underline wavy crimson 1px;
+	text-decoration: underline wavy 1px;
 	border-radius: 0.15rem;
 	pointer-events: auto;
 	cursor: help;

@@ -86,7 +86,6 @@ export default Vue.extend({
 
     stackPointer: function () : number {
       let reversePtr = this.memory.size - this.registers[Register.SP];
-      // console.log
       return (reversePtr / this.memory.size) * 100;
     },
 

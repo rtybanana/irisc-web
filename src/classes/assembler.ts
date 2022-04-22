@@ -127,14 +127,9 @@ function load(nodes: (SyntaxNode | null)[]) {
         EmulatorState.addError(new AssemblyError("Cannot declare data allocations outside of the .data section.", node.statement, node.lineNumber, -1));
       }
 
-      // heapHeight = allocate(heap, heapHeight, node.data);
-      console.log("allocating", node.data, "at height", heapHeight);
-
       heap.set(node.data, heapHeight);
       heapMap[node.identifier] = heapHeight; 
       heapHeight = Math.ceil((heapHeight + node.data.length) / 4) * 4;    // new heap height with word alignment 
-      
-      console.log("new height", heapHeight);
     }
 
     else if (node instanceof LabelNode) {

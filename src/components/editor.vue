@@ -3,7 +3,9 @@
   <div 
     class="prism-container pl-1 pr-0 py-1 position-relative" 
     @mouseover="hover"
-    @click="redirect"
+    @click="click"
+    @dblclick="dblclick"
+    @keydown.ctrl.191.capture.prevent.stop="lineComment"
   >
     <prism-editor 
       ref="prism"
@@ -30,7 +32,7 @@
     <div class="errors">
       <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
         <template v-if="tooltip.title !== ''">
-          <div style="color: crimson">{{ tooltip.title }}</div>
+          <div :style="`color: ${tooltip.color}`">{{ tooltip.title }}</div>
           <div>{{ tooltip.message }}</div>
         </template>
 
@@ -76,8 +78,8 @@ export default Vue.extend({
     return {
       program: '' as string,
       tooltip: {
-        // index: null as number | null,
         title: '' as string,
+        color: '' as string,
         message: '' as string
       },
     }
@@ -102,31 +104,103 @@ export default Vue.extend({
 
         this.tooltip = {
           title: error.type,
+          color: error.color,
           message: error.message
         }
       }
       else {
         this.tooltip = {
           message: '',
+          color: '',
           title: ''
         };
       }
     },
 
-    redirect: function (e: any) {
+    click: function (e: any) {
       if (e.target.parentNode.className.includes("error")) {
         e.preventDefault();
         e.stopPropagation();
 
         let prismEditor = this.$refs.prism as any;    // casting to any :(
         let newTarget = prismEditor.$refs.textarea as HTMLInputElement;
+
         newTarget.dispatchEvent(
-          new CustomEvent('customClick', {
+          new CustomEvent('errorClick', {
             detail: {
               coords: { x: e.layerX, y: e.layerY } as TPoint
             }
           }
         ));
+      }
+    },
+
+    /**
+     * 
+     */
+    dblclick: function (e: any) {
+      if (e.target.parentNode.className.includes("error")) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        let prismEditor = this.$refs.prism as any;    // casting to any :(
+        let newTarget = prismEditor.$refs.textarea as HTMLInputElement;
+
+        newTarget.dispatchEvent(
+          new CustomEvent('errorDblClick', {
+            detail: {
+              coords: { x: e.layerX, y: e.layerY } as TPoint
+            }
+          }
+        ));
+      }
+    },
+
+    lineComment: function (e: any) {
+      let prismEditor = this.$refs.prism as any;    // casting to any :(
+      let textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
+
+      // save current selection and reinstate after comments are added
+      let selectionStart = textarea.selectionStart;
+      let selectionEnd = textarea.selectionEnd;
+      
+      // split into lines
+      let lines = textarea.value.split(/\r?\n|\r/);
+
+      // get selected line indexes
+      let lineIdxs = getSelectedLineIndexes(textarea);
+      let commentCount = lineIdxs.reduce((count, lineIdx) => {
+        let line = lines[lineIdx];
+        if (line.substring(0, 3) !== "// " && line !== "") count++;
+
+        return count;
+      }, 0);
+
+      let addComment = true;
+      if (commentCount < lineIdxs.length / 2) addComment = false;
+
+      lineIdxs.forEach(e => {
+        if (addComment && lines[e].substring(0, 3) !== "// " && lines[e] !== "") {
+          lines[e] = `// ${lines[e]}`
+          selectionEnd += 3;      // increment persisted selection end
+        }
+        else if (!addComment && lines[e].substring(0, 3) === "// ") {
+          lines[e] = lines[e].substring(3);
+          selectionEnd -= 3;      // decrement persisted selection end
+        }
+      });
+
+      // join commented lines and reinstate selection
+      this.program = lines.join("\n");
+      this.$nextTick(() => textarea.setSelectionRange(selectionStart, selectionEnd));
+
+      function getSelectedLineIndexes(textarea: HTMLTextAreaElement) {
+        let start = textarea.value.substr(0, textarea.selectionStart).split(/\r?\n|\r/).length - 1;
+        let end = textarea.value.substr(0, textarea.selectionEnd).split(/\r?\n|\r/).length - 1;
+
+        // create array of all line indexes i.e.
+        // [3, 4, 5] if lines 4, 5, and 6 are selected
+        return Array.from({length: (end - start) + 1}, (_, i) => i + start);
       }
     },
 
@@ -161,8 +235,10 @@ export default Vue.extend({
      */
     highlightTokenErrors: function (elements: RegExpMatchArray[]) {
       this.errors
-        .filter(e => e.tokenIndex !== -1)
+        // .filter(e => e.tokenIndex !== -1)
         .forEach((error, index) => {
+          if (error.tokenIndex === -1) return;
+
           let line = elements[error.lineNumber];
 
           let filteredIndex: number = -1;
@@ -173,19 +249,24 @@ export default Vue.extend({
           let tokenString = line?.[tokenIndex];
 
           if (tokenString !== undefined) {
-            line[tokenIndex] = `<span class="token error" data-error-idx="${index}">${tokenString}</span>`;
+            line[tokenIndex] = `<span class="token error" style="text-decoration-color: ${error.color}" data-error-idx="${index}">${tokenString}</span>`;
           }
         });
     },
 
+    /**
+     * 
+     */
     highlightLineErrors: function (lines: string []) {
       this.errors
-        .filter(e => e.tokenIndex === -1)
+        // .filter(e => e.tokenIndex === -1)
         .forEach((error, index) => {
+          if (error.tokenIndex !== -1) return;
+
           let line = lines[error.lineNumber];
 
           if (line !== undefined) {
-            lines[error.lineNumber] = `<span class="line error" data-error-idx="${index}">${line}</span>`;
+            lines[error.lineNumber] = `<span class="line error" style="text-decoration-color: ${error.color}" data-error-idx="${index}">${line}</span>`;
           }
         });
     },
@@ -208,19 +289,37 @@ export default Vue.extend({
      */
     moveCaretToCursor: function (e: any) {
       let mouseCoords: TPoint = e.detail.coords;
-
-      function getDistance(p1: TPoint, p2: TPoint) : number {
-        let y = p2.x - p1.x;
-        let x = p2.y - p1.y;
-        
-        return Math.sqrt(x * x + y * y);
-      }
-
       let textarea = e.target as HTMLTextAreaElement;
+      let caretPosition = this.getCaretPositionAtCursor(textarea, mouseCoords);
+
+      textarea.setSelectionRange(caretPosition, caretPosition);
+      textarea.focus();
+    },
+
+    /**
+     * 
+     */
+    highlightWordAtCursor: function (e: any) {
+      let mouseCoords: TPoint = e.detail.coords;
+      let textarea = e.target as HTMLTextAreaElement;
+      let caretPosition = this.getCaretPositionAtCursor(textarea, mouseCoords);
+      let [wordStart, wordEnd] = [caretPosition, caretPosition];
+
+      while (/\w/.test(textarea.value[wordStart - 1]) && wordStart > 0) wordStart--;
+      while (/\w/.test(textarea.value[wordEnd]) && wordEnd < textarea.value.length) wordEnd++;
+
+      textarea.setSelectionRange(wordStart, wordEnd);
+      textarea.focus();
+    },
+
+    /**
+     * 
+     */
+    getCaretPositionAtCursor: function (element: HTMLTextAreaElement, mouseCoords: TPoint) : number {
       let smallestDistance = Number.MAX_VALUE;
       let caretPosition = 0;
-      for (let i = 0; i < textarea.value.length + 1; i++) {
-        let textPos = getCaretCoordinates(textarea, i);
+      for (let i = 0; i < element.value.length + 1; i++) {
+        let textPos = getCaretCoordinates(element, i);
         let charCoords: TPoint = { 
           x: textPos.left, 
           y: textPos.top + (textPos.height / 2)
@@ -233,23 +332,43 @@ export default Vue.extend({
         }
       }
 
-      textarea.setSelectionRange(caretPosition, caretPosition);
-      textarea.focus();
+      return caretPosition;
+
+      function getDistance(p1: TPoint, p2: TPoint) : number {
+        let y = p2.x - p1.x;
+        let x = p2.y - p1.y;
+        
+        return Math.sqrt(x * x + y * y);
+      }
     }
   },
+
+  /**
+   * 
+   */
   mounted: function () {
     let prismEditor = this.$refs.prism as any;    // casting to any :(
     let textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
 
-    textarea.addEventListener('customClick', this.moveCaretToCursor)
+    textarea.addEventListener('errorClick', this.moveCaretToCursor);
+    textarea.addEventListener('errorDblClick', this.highlightWordAtCursor);
   },
+
+  /**
+   * 
+   */
   beforeDestroy: function () {
     let prismEditor = this.$refs.prism as any;    // casting to any :(
     let textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
 
-    textarea.removeEventListener('customClick', this.moveCaretToCursor)
+    textarea.removeEventListener('errorClick', this.moveCaretToCursor);
+    textarea.removeEventListener('errorDblClick', this.highlightWordAtCursor);
   },
+
   watch: {
+    /**
+     * 
+     */
     program: debounce(function(program: string) {
       EmulatorState.initMemory();
 

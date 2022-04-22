@@ -25,15 +25,13 @@ export class AllocationNode extends SyntaxNode {
   }
 
   parseData(token: Token) : Uint8Array {
-    console.log(token);
-
     if (this.previousToken().content === ".asciz") return this.parseString(token);
     if (this.previousToken().content === ".byte") return this.parseByte(token);
     if (this.previousToken().content === ".hword") return this.parseHWord(token);
     if (this.previousToken().content === ".word") return this.parseWord(token);
     if (this.previousToken().content === ".skip") return this.parseSkip(token);
 
-    throw new SyntaxError(`Unrecognised data type '${this.previousToken().content}'.`, this.statement, this.lineNumber, this._currentToken)
+    throw new SyntaxError(`Unrecognised data type '${this.previousToken().content}'.`, this.statement, this.lineNumber, this._currentToken - 1)
   }
 
   parseString(token: Token) : Uint8Array {
@@ -78,7 +76,7 @@ export class AllocationNode extends SyntaxNode {
 
   parseSkip(token: Token) : Uint8Array {
     let length = this.parseImm(token);
-    console.log(length);
+    
     return new Uint8Array(new ArrayBuffer(length));
   }
 }

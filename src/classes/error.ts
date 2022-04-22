@@ -1,5 +1,10 @@
 import { Token } from 'prismjs';
 
+const red = "#dc143c";
+const blue = "#6A5ACD";
+const amber = "#ffbf00";
+type TErrorColour = typeof red | typeof blue | typeof amber;
+
 /**
  * Base error class which provides the basis for catching specific syntax errors
  */
@@ -8,6 +13,7 @@ export class IriscError extends Error {
   statement: Token[];
   lineNumber: number;
   tokenIndex: number;
+  color: TErrorColour = red;
 
   get type() : string { return 'IriscError'; }
  
@@ -63,6 +69,7 @@ export class NumericalError extends IriscError {
  */
 export class AssemblyError extends IriscError {
   get type() : string { return 'AssemblyError'; }
+  color: TErrorColour = amber;
 
   constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
     super(message, statement, lineNumber, tokenIndex);
@@ -74,6 +81,7 @@ export class AssemblyError extends IriscError {
  */
 export class ReferenceError extends IriscError {
   get type() : string { return 'ReferenceError'; }
+  color: TErrorColour = blue;
 
   constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
     super(message, statement, lineNumber, tokenIndex);
@@ -85,6 +93,7 @@ export class ReferenceError extends IriscError {
  */
 export class RuntimeError extends IriscError {
   get type() : string { return 'RuntimeError'; }
+  color: TErrorColour = amber;
 
   constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
     super(message, statement, lineNumber, tokenIndex);
