@@ -1,4 +1,10 @@
 
+/**
+ * 
+ * @param fn 
+ * @param ms 
+ * @returns 
+ */
 export function debounce(fn: Function, ms = 300) {
   let timeoutId: ReturnType<typeof setTimeout>;
   return function (this: any, ...args: any[]) {

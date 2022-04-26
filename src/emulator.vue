@@ -149,7 +149,7 @@ export default Vue.extend({
           // if runtime instruction runoff
           if (node === undefined) {
             let last: TInstructionNode = EmulatorState.currentInstruction();
-            throw new RuntimeError("Segmentation fault (core dumped)", last.statement, last.lineNumber, -1);
+            throw new RuntimeError("SIGSEG: Segmentation fault.", last.statement, last.lineNumber);
           }
 
           Interpreter.execute(node);
@@ -160,12 +160,16 @@ export default Vue.extend({
             await new Promise(r => setTimeout(r, 50));
             sleptfor += 50;
           }
+
+          // check for bx lr to static exit point
+          if (this.registers[Register.PC] === this.memory.exitPoint) {
+            EmulatorState.setExitStatus(0);
+          }
         }
       }
       catch (e) {
         if (e instanceof RuntimeError) {
-          alert(e.message); 
-          EmulatorState.stop();
+          EmulatorState.setExitStatus(e);
         }
       }
     },

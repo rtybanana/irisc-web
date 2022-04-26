@@ -80,7 +80,7 @@ const intro4: TTutorialPage = {
      (<span class="token register">sp</span>, \
       <span class="token register">lr</span>, \
       <span class="token register">pc</span>) \
-    have semantic roles which, in general, the conscientious programmer should aim to respect.
+    have semantic roles which, in general, a defensive programmer should aim to respect.
   `
 }
 

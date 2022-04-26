@@ -1,15 +1,13 @@
 import Vue from 'vue';
 import { Condition, Register, Flag, TTransferSize } from "@/constants";
 import { bitset } from "@/assets/bitset";
-import { IriscError, ReferenceError } from "@/classes/error";
+import { IriscError, ReferenceError, RuntimeError } from "@/classes/error";
 import { TInstructionNode } from '@/classes/syntax/types';
 import { AllocationNode, LabelNode } from '@/classes/syntax';
 import { SingleTransferNode } from '@/classes/syntax/transfer/SingleTransferNode';
 import { EmulatorState } from '.';
 
-
-type TRam = {
-}
+type TExitStatus = RuntimeError | number;
 
 type TMemory = {
   size: number;
@@ -35,18 +33,19 @@ type TCPU = {
 }
 
 type TEmulatorState = {
-  running: boolean,
-  paused: boolean,
-  step: boolean,
-  delay: number,
+  running: boolean;
+  paused: boolean;
+  step: boolean;
+  delay: number;
 
-  cpu: TCPU,
-  memory: TMemory,
+  cpu: TCPU;
+  memory: TMemory;
 
-  previousPC: number,
+  previousPC: number;
 
-  errors: IriscError[],
-  hoveredError: IriscError | null
+  errors: IriscError[];
+  hoveredError: IriscError | null;
+  exitStatus: TExitStatus | undefined;
 }
 
 const data = Vue.observable<TEmulatorState>({
@@ -63,7 +62,7 @@ const data = Vue.observable<TEmulatorState>({
 
   // memory data
   memory: {
-    size: 256,
+    size: 128,
 
     buffer: undefined,
     wordView: new Uint32Array(),
@@ -82,7 +81,8 @@ const data = Vue.observable<TEmulatorState>({
   previousPC: 0,
 
   errors: [],
-  hoveredError: null
+  hoveredError: null,
+  exitStatus: undefined,
 });
 
 const getters = {
@@ -93,11 +93,16 @@ const getters = {
 
   registers: () => data.cpu.observableRegisters,
   cpsr: () => data.cpu.cpsr,
-  memory: () => data.memory,
+  memory: () => ({
+    ...data.memory,
+    exitPoint: data.memory.size + 4
+  }),
 
   currentInstruction: () => actions.instruction(data.previousPC),
   errors: () => data.errors,
-  hoveredError: () => data.hoveredError
+  hoveredError: () => data.hoveredError,
+
+  exitStatus: () => data.exitStatus
 }
 
 const actions = {
@@ -109,9 +114,11 @@ const actions = {
   reset: function () {
     data.cpu.registers = new Uint32Array(new ArrayBuffer(4 * 16));
     this.setRegister(Register.SP, data.memory.size);
+    this.setRegister(Register.LR, data.memory.size + 4);    // one word after total memory
     this.observeRegisters();
 
     data.cpu.cpsr = Vue.observable([false, false, false, false]);
+    data.exitStatus = undefined;
   },
 
   start: function () {
@@ -130,6 +137,13 @@ const actions = {
   },
 
   instruction: function (offset: number) : TInstructionNode {
+    if (offset > data.memory.textHeight) {
+      throw new RuntimeError(`SIGSEG: Segmentation fault.`, [], -1);
+    }
+    if (offset % 4 !== 0) {
+      throw new RuntimeError("SIGBUS: Bus error - misaligned access.", [], -1);
+    }
+
     return data.memory.text[offset / 4];
   },
 
@@ -220,6 +234,7 @@ const actions = {
     data.memory.textMap = {};
 
     data.errors = [];
+    data.exitStatus = undefined;
   },
 
   setInstructions: function (instructions: TInstructionNode[]) {
@@ -276,6 +291,15 @@ const actions = {
 
       // }
     });
+  },
+
+  setExitStatus: function (status: TExitStatus) {
+    data.exitStatus = status;
+    if (status instanceof RuntimeError) {
+      alert(status.message); 
+    }
+
+    this.stop();
   }
 }
 

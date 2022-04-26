@@ -95,8 +95,8 @@ export class RuntimeError extends IriscError {
   get type() : string { return 'RuntimeError'; }
   color: TErrorColour = amber;
 
-  constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
-    super(message, statement, lineNumber, tokenIndex);
+  constructor(message: string, statement: Token[], lineNumber: number) {
+    super(message, statement, lineNumber, -1);
   }
 }
 

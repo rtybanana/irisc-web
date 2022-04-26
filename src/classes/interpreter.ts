@@ -1,11 +1,12 @@
 import { rotr } from "@/assets/bitset";
-import { Operation, Register, Shift, Flag, SingleTransfer } from "@/constants";
+import { Operation, Register, Shift, Flag, SingleTransfer, TTransfer, TTransferSize } from "@/constants";
 import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode } from "./syntax";
 import { TInstructionNode } from "./syntax/types";
 import { EmulatorState } from "@/state";
 import { RuntimeError } from "./error";
 import { BranchNode } from "./syntax/BranchNode";
 import { SingleTransferNode } from "./syntax/transfer/SingleTransferNode";
+import { TransferNode } from "./syntax/transfer/TransferNode";
 
 /**
  * Local declaration of useful EmulatorState getters with the js object getter
@@ -87,7 +88,7 @@ function applyFlexShift(shift: Shift, value: number, amount: number) : number {
       return rotr(value, amount);
     default:
       // TODO: get executing instruction from the EmulatorState and populate the error location params
-      throw new RuntimeError("While attempting to perform a flex operand optional shift.", [], -1, -1);
+      throw new RuntimeError("While attempting to perform a flex operand optional shift.", [], -1);
   }
 }
 
@@ -179,7 +180,7 @@ function executeTriOperand(instruction: TriOperandNode) : boolean {
 
   if (result === undefined) {
     // TODO: get executing instruction from the EmulatorState and populate the error location params
-    throw new RuntimeError("While attempting to perform a an instruction.", [], -1, -1);
+    throw new RuntimeError("While attempting to perform a an instruction.", [], -1);
   }
 
   EmulatorState.setRegister(dest, result);
@@ -212,7 +213,7 @@ function executeShift(instruction: ShiftNode) : boolean {
       result = rotr(n, m);
       break;
     default:
-      throw new RuntimeError("While attempting to perform a shift operation.", instruction.statement, instruction.lineNumber, 0);
+      throw new RuntimeError("While attempting to perform a shift operation.", instruction.statement, instruction.lineNumber);
   }
 
   EmulatorState.setRegister(dest, result);
@@ -262,7 +263,7 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
       return true;
     }
 
-    throw new RuntimeError('Cannot store directly to label.', instruction.statement, instruction.lineNumber, -1);
+    throw new RuntimeError('Cannot store directly to label.', instruction.statement, instruction.lineNumber);
 
     // other cases should be caught by assembler
   }
@@ -272,8 +273,10 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
     postAddress = sign === "+" ? address + m : address - m;
 
     if (mode === "pre") address = postAddress;
-    // TODO: pre, post increment + updating addressing modes
+
   }
+
+  checkAlignment(address, size, instruction);
 
   switch (op) {
     case SingleTransfer.LDR:
@@ -283,6 +286,8 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
       EmulatorState.setRegister(reg, data);
       break;
     case SingleTransfer.STR:
+      checkStore(postAddress, addr, instruction);
+
       if (size === "word") data = state.registers[reg];
       else data = state.registers[reg] & 0xff;
 
@@ -295,4 +300,46 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
   }
 
   return true;
+}
+
+/**
+ * Checks that the requested load/store address is aligned with the data size. The instruction is
+ * also passed so that runtime errors can be raised. If an error is not thrown then the address can
+ * be assumed to be aligned.
+ * 
+ * @param address byte address to load/store from/to
+ * @param size the size of the data to load/store
+ * @returns 
+ */
+function checkAlignment(address: number, size: TTransferSize, instruction: TInstructionNode) : void {
+  switch (size) {
+    case "byte": return;
+    case "word":
+      if (address % 4 === 0) return;
+  }
+
+  throw new RuntimeError("SIGBUS: Bus error - misaligned access.", instruction.statement, instruction.lineNumber);
+}
+
+/**
+ * Checks that the requested load/store address is read/writeable in the current context. Checks the 
+ * stack pointer post-decrement to ensure that stack is not overflowing. Ensures that data is not 
+ * written to the text section.
+ * 
+ * @param address 
+ * @param register 
+ * @param instruction 
+ */
+function checkStore(address: number, register: Register, instruction: TInstructionNode) : void {
+  console.log(state.memory.size, address, register, address >= state.memory.size);
+
+  if (register === Register.SP) {
+    if (address < state.memory.textHeight + state.memory.heapHeight) {
+      throw new RuntimeError("SIGSEG: Segmentation fault.", instruction.statement, instruction.lineNumber);
+    }
+  }
+
+  else if (address <= state.memory.textHeight || address >= state.memory.size) {
+    throw new RuntimeError("SIGSEG: Segmentation fault.", instruction.statement, instruction.lineNumber);
+  }
 }

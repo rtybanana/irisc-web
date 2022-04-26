@@ -14,6 +14,8 @@
       :style="`margin-left: ${prompt.length}ch`"
       contenteditable
       @keydown.enter.stop="enter"
+      @keydown.up.stop.prevent="upHistory"
+      @keydown.down.stop.prevent="downHistory"
       @input="onInput"
     ></pre>
     <pre
@@ -52,6 +54,7 @@ export default Vue.extend({
       input: "" as string,
       output: replWelcome,
       history: [] as string[],
+      historyIndex: -1 as number,
 
       tooltip: {
         // index: null as number | null,
@@ -86,6 +89,9 @@ export default Vue.extend({
         .substring(this.prompt.length)
         .replace(/(\r\n|\n|\r)/gm, "");
 
+      if (this.history[0] !== input) this.history.unshift(input);
+      this.historyIndex = -1;
+
       this.$nextTick(() => {
         this.output += `\n${this.highlitInput}`;
 
@@ -101,6 +107,41 @@ export default Vue.extend({
       });
 
       e.preventDefault();
+    },
+
+    upHistory: function (e: any) {
+      this.historyIndex = Math.min(this.historyIndex + 1, this.history.length - 1);
+      let input = this.history[this.historyIndex];
+
+      this.insertInput(e.target, input);
+    },
+
+    downHistory: function (e: any) {
+      this.historyIndex = Math.max(this.historyIndex - 1, -1);
+      let input = "";
+      if (this.historyIndex > -1) {
+        input = this.history[this.historyIndex];
+      } 
+
+      this.insertInput(e.target, input);
+    },
+
+    insertInput: function (target: any, input: string) {
+      target.innerText = input;
+      this.input = `${this.prompt}${input}`;
+      
+      this.$nextTick(() => {
+        target.focus();
+
+        // set caret position to end
+        let range = document.createRange();
+        range.setStart(target.firstChild, input.length);
+        range.collapse(true);
+
+        let sel = window.getSelection() as Selection;
+        sel.removeAllRanges();
+        sel.addRange(range);
+      });
     },
 
     execute: function (input: string) {

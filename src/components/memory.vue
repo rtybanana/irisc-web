@@ -35,6 +35,7 @@
         </div>
 
         <div 
+          v-if="stackPointer >= 0 && stackPointer <= 100"
           class="d-flex flex-column sector stack-pointer"
           :style="`width: ${stackPointer}%`"
         >
@@ -42,7 +43,7 @@
           <div class="region"></div>
           <div 
             class="label rtl text-white text-left">
-            <span>sp</span>
+            <span>sp</span> 
           </div>
         </div>
 
@@ -85,7 +86,11 @@ export default Vue.extend({
     },
 
     stackPointer: function () : number {
+      console.log(this.memory.size, this.registers[Register.SP]);
       let reversePtr = this.memory.size - this.registers[Register.SP];
+
+      console.log(reversePtr / this.memory.size);
+
       return (reversePtr / this.memory.size) * 100;
     },
 

@@ -31,9 +31,9 @@
 
     <div class="errors">
       <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
-        <template v-if="tooltip.title !== ''">
-          <div :style="`color: ${tooltip.color}`">{{ tooltip.title }}</div>
-          <div>{{ tooltip.message }}</div>
+        <template v-if="computedTooltip.title !== ''">
+          <div :style="`color: ${computedTooltip.color}`">{{ computedTooltip.title }}</div>
+          <div>{{ computedTooltip.message }}</div>
         </template>
 
         <div v-else-if="errors.length > 0">
@@ -59,7 +59,7 @@ import 'vue-prism-editor/dist/prismeditor.min.css';
 import { highlight, languages } from 'prismjs';
 // import '../assets/prism-armv7';
 import 'prismjs/themes/prism.css'; // import syntax highlighting styles
-import { IriscError } from '@/classes/error';
+import { IriscError, RuntimeError } from '@/classes/error';
 import { TInstructionNode } from '@/classes/syntax/types';
 import { Register } from '@/constants';
 import { ExtendedVue } from 'vue/types/vue';
@@ -67,6 +67,12 @@ import { ExtendedVue } from 'vue/types/vue';
 type TPoint = {
   x: number;
   y: number;
+}
+
+type TTooltip = {
+  title: string;
+  color: string;
+  message: string;
 }
 
 export default Vue.extend({
@@ -77,17 +83,34 @@ export default Vue.extend({
   data() {
     return {
       program: '' as string,
-      tooltip: {
-        title: '' as string,
-        color: '' as string,
-        message: '' as string
-      },
+      tooltip: { title: '', color: '', message: '' } as TTooltip,
     }
   },
   computed: {
     errors: EmulatorState.errors,
     running: EmulatorState.running,
-    currentInstruction: EmulatorState.currentInstruction
+    currentInstruction: EmulatorState.currentInstruction,
+    exitStatus: EmulatorState.exitStatus,
+
+    computedTooltip: function () : TTooltip {
+      if (this.tooltip.title !== "") return this.tooltip;
+      if (this.exitStatus instanceof RuntimeError) {
+        return {
+          title: this.exitStatus.type,
+          color: this.exitStatus.color,
+          message: this.exitStatus.message
+        }
+      }
+      if (this.exitStatus === 0) {
+        return {
+          title: "Exit Success",
+          color: "#5d9455",
+          message: "Program executed without error."
+        }
+      }
+
+      return { title: '', color: '', message: '' };
+    }
   },
   methods: {
     stop: function () {
@@ -99,6 +122,8 @@ export default Vue.extend({
      */
     hover: function (e: any) {
       if (e.target.parentNode.className.includes("error")) {
+        if (!e.target.parentNode.dataset["errorIdx"]) return;
+        
         let errorIndex = e.target.parentNode.dataset["errorIdx"] as number;
         let error = this.errors[errorIndex];
 
@@ -179,6 +204,7 @@ export default Vue.extend({
       let addComment = true;
       if (commentCount < lineIdxs.length / 2) addComment = false;
 
+      // add or remove "// " to create a solid block of commented or uncommented code within the selection.
       lineIdxs.forEach(e => {
         if (addComment && lines[e].substring(0, 3) !== "// " && lines[e] !== "") {
           lines[e] = `// ${lines[e]}`
@@ -235,7 +261,6 @@ export default Vue.extend({
      */
     highlightTokenErrors: function (elements: RegExpMatchArray[]) {
       this.errors
-        // .filter(e => e.tokenIndex !== -1)
         .forEach((error, index) => {
           if (error.tokenIndex === -1) return;
 
@@ -258,8 +283,8 @@ export default Vue.extend({
      * 
      */
     highlightLineErrors: function (lines: string []) {
+      // compile-time errors
       this.errors
-        // .filter(e => e.tokenIndex === -1)
         .forEach((error, index) => {
           if (error.tokenIndex !== -1) return;
 
@@ -269,6 +294,15 @@ export default Vue.extend({
             lines[error.lineNumber] = `<span class="line error" style="text-decoration-color: ${error.color}" data-error-idx="${index}">${line}</span>`;
           }
         });
+
+      // exit status runtime error
+      if (this.exitStatus instanceof RuntimeError) {
+        let line = lines[this.exitStatus.lineNumber];
+
+        if (line !== undefined) {
+          lines[this.exitStatus.lineNumber] = `<span class="line error" style="text-decoration-color: ${this.exitStatus.color}">${line}</span>`;
+        }
+      }
     },
 
     /**
@@ -276,6 +310,8 @@ export default Vue.extend({
      */
     highlightExecuting: function (lines: string[]) {
       if (this.running) {
+        console.log(this.currentInstruction);
+
         let executing = lines[this.currentInstruction?.lineNumber];
 
         if (executing !== undefined) {
@@ -370,6 +406,7 @@ export default Vue.extend({
      * 
      */
     program: debounce(function(program: string) {
+      EmulatorState.stop();
       EmulatorState.initMemory();
 
       let lines = parse(program);
