@@ -201,7 +201,10 @@ export default Vue.extend({
       }
       
       EmulatorState.pause();
-      if (!this.running) this.run();
+      if (!this.running) {
+        EmulatorState.reset();
+        this.run();
+      }
     }
   }
 })

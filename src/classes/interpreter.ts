@@ -328,10 +328,10 @@ function executeBlockTransfer(instruction: BlockTransferNode) : boolean {
     case BlockTransfer.LDM:
       reglist.forEach(reg => {
         if (before) increment ? address += 4 : address -= 4;
-
         EmulatorState.setRegister(reg, state.memory.wordView[address / 4]);
 
         if (!before) increment ? address += 4 : address -= 4;
+        if (base === Register.SP) EmulatorState.setStackHeight(state.memory.size - address);
       });
 
       break;
@@ -341,7 +341,6 @@ function executeBlockTransfer(instruction: BlockTransferNode) : boolean {
         
         if (base === Register.SP) EmulatorState.setStackHeight(state.memory.size - address);
         checkStore(address, base, instruction);
-
         EmulatorState.store(state.registers[reg], address, "word");
         
         if (!before) increment ? address += 4 : address -= 4;

@@ -282,6 +282,7 @@ const actions = {
   },
 
   setStackHeight: function (height: number) {
+    console.log(height);
     data.memory.stackHeight = height;
   },
 
