@@ -1,6 +1,7 @@
 import { languages } from 'prismjs'
 
 languages.armv7 =  {
+	'string': /".+"/m,
 	'line-comment': {
 		pattern: /\/\/(?:[^\r\n\\]|\\(?:\r\n?|\n|(?![\r\n])))*|\/\*[\s\S]*?(?:\*\/|$)/,
 		greedy: true
@@ -60,7 +61,6 @@ languages.armv7 =  {
 	'comma': /,/,
 	'directive': /\.\b(text|data|byte|hword|word|asciz|skip)\b/m,
 	'data-label': /=\b[A-Za-z_][A-Za-z_\d]+\b/m,
-	'string': /".+"/m,
 	'sign': [
 		{ pattern: /-/m, alias: "minus" },
 		{ pattern: /\+/m, alias: "plus" }
