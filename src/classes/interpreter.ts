@@ -1,5 +1,5 @@
 import { rotr } from "@/assets/bitset";
-import { Operation, Register, Shift, Flag, SingleTransfer, TTransfer, TTransferSize } from "@/constants";
+import { Operation, Register, Shift, Flag, SingleTransfer, TTransfer, TTransferSize, BlockTransfer, BlockAddressMode, addressModeGroup } from "@/constants";
 import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode } from "./syntax";
 import { TInstructionNode } from "./syntax/types";
 import { EmulatorState } from "@/state";
@@ -7,6 +7,7 @@ import { RuntimeError } from "./error";
 import { BranchNode } from "./syntax/BranchNode";
 import { SingleTransferNode } from "./syntax/transfer/SingleTransferNode";
 import { TransferNode } from "./syntax/transfer/TransferNode";
+import { BlockTransferNode } from "./syntax/transfer/BlockTransferNode";
 
 /**
  * Local declaration of useful EmulatorState getters with the js object getter
@@ -42,6 +43,7 @@ export function execute(instruction: TInstructionNode, incPC: boolean = true) : 
     if (instruction instanceof ShiftNode) executed = executeShift(instruction);
 
     if (instruction instanceof SingleTransferNode) executed = executeSingleTransfer(instruction);
+    if (instruction instanceof BlockTransferNode) executed = executeBlockTransfer(instruction);
   }
 
   return executed;
@@ -128,6 +130,11 @@ function executeBiOperand(instruction: BiOperandNode) : boolean {
   return true;
 }
 
+/**
+ * 
+ * @param instruction 
+ * @returns 
+ */
 function executeTriOperand(instruction: TriOperandNode) : boolean {
   let [op, cond, set, dest, src, flex] = instruction.unpack();        // unpack the instruction
   if (!EmulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
@@ -188,6 +195,11 @@ function executeTriOperand(instruction: TriOperandNode) : boolean {
   return true;
 }
 
+/**
+ * 
+ * @param instruction 
+ * @returns 
+ */
 function executeShift(instruction: ShiftNode) : boolean {
   let [op, cond, set, dest, src1, src2] = instruction.unpack();       // unpack the instruction
   if (!EmulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
@@ -277,6 +289,9 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
   }
 
   checkAlignment(address, size, instruction);
+  if (wb) {
+    EmulatorState.setRegister((addr as Register), postAddress);
+  }
 
   switch (op) {
     case SingleTransfer.LDR:
@@ -295,11 +310,49 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
       break;
   }
 
-  if (wb) {
-    EmulatorState.setRegister((addr as Register), postAddress);
+  return true;
+}
+
+function executeBlockTransfer(instruction: BlockTransferNode) : boolean {
+  let [op, cond, base, reglist, mode, wb] = instruction.unpack();
+  if (!EmulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
+
+  let address = state.registers[base as Register];
+  let increment = addressModeGroup.increment.includes(mode);
+  let before = addressModeGroup.before.includes(mode);
+
+  checkAlignment(address, "word", instruction);
+
+  if (!increment) reglist = reglist.slice().reverse();
+  switch (op) {
+    case BlockTransfer.LDM:
+      reglist.forEach(reg => {
+        if (before) increment ? address += 4 : address -= 4;
+
+        EmulatorState.setRegister(reg, state.memory.wordView[address / 4]);
+
+        if (!before) increment ? address += 4 : address -= 4;
+      });
+
+      break;
+    case BlockTransfer.STM:
+      reglist.forEach(reg => {
+        if (before) increment ? address += 4 : address -= 4;
+        
+        if (base === Register.SP) EmulatorState.setStackHeight(state.memory.size - address);
+        checkStore(address, base, instruction);
+
+        EmulatorState.store(state.registers[reg], address, "word");
+        
+        if (!before) increment ? address += 4 : address -= 4;
+      });
+
+      break;
   }
 
-  return true;
+  if (wb) EmulatorState.setRegister((base as Register), address);
+
+  return false;
 }
 
 /**
@@ -331,8 +384,6 @@ function checkAlignment(address: number, size: TTransferSize, instruction: TInst
  * @param instruction 
  */
 function checkStore(address: number, register: Register, instruction: TInstructionNode) : void {
-  console.log(state.memory.size, address, register, address >= state.memory.size);
-
   if (register === Register.SP) {
     if (address < state.memory.textHeight + state.memory.heapHeight) {
       throw new RuntimeError("SIGSEG: Segmentation fault.", instruction.statement, instruction.lineNumber);

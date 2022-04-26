@@ -26,11 +26,12 @@ languages.armv7 =  {
 		alias: 'operation'
 	},
 	'block-transfer': {
-		pattern: /\b(stm|ldm)(b)?(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)?(fd|ed|fa|ea|ia|ib|da|db)\b/i,
+		pattern: /\b(stm|ldm)(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)?(fd|ed|fa|ea|ia|ib|da|db)?\b/i,
 		alias: 'operation'
 	},
 	'stack-transfer': {
 		pattern: /\b(push|pop)(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)?\b/i,
+		alias: 'operation'
 	},
 	'register': {
 		pattern: /\b(r([0-9]|(10|11|12))|(sp|lr|pc))\b/i,

@@ -4,6 +4,7 @@ import { AssemblyError, IriscError, SyntaxError } from './error';
 import { EmulatorState } from '@/state';
 import { Register } from '@/constants';
 import { SingleTransferNode } from './syntax/transfer/SingleTransferNode';
+import { BlockTransferNode } from './syntax/transfer/BlockTransferNode';
 
 const state = {
   get memory() { return EmulatorState.memory(); }
@@ -87,9 +88,10 @@ function compileOne(line: Token[], lineNumber: number) : SyntaxNode | null {
   if (line[0].type === "single-transfer") {
     return new SingleTransferNode(line, lineNumber, 0);
   }
-  // if (line[0].type === "multiple-transfer") {
-    
-  // }
+  if (line[0].type === "block-transfer" ||
+      line[0].type === "stack-transfer") {
+    return new BlockTransferNode(line, lineNumber, 0);
+  }
   // if (line[0].type === "stack-transfer") {
 
   // }

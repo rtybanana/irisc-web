@@ -19,9 +19,18 @@
 
     <div class="controls">
       <div>
-        <i class="button red fas fa-stop mr-1 clickable" @click="stop"></i>
-        <i class="button green fas fa-play mx-1 clickable" @click="$emit('run', program)"></i>
-        <i class="button step fas fa-step-forward mx-1 clickable"></i>
+        <i 
+          class="button red fas fa-stop mr-1 clickable" 
+          @click="stop"
+        ></i>
+        <i 
+          class="button green fas fa-play mx-1 clickable" 
+          @click="$emit('run')"
+        ></i>
+        <i 
+          class="button step fas fa-step-forward mx-1 clickable"
+          @click="$emit('step')"
+        ></i>
         <i 
           class="button terminal fas fa-terminal ml-1 clickable" 
           @click="$emit('switch')"
@@ -310,8 +319,6 @@ export default Vue.extend({
      */
     highlightExecuting: function (lines: string[]) {
       if (this.running) {
-        console.log(this.currentInstruction);
-
         let executing = lines[this.currentInstruction?.lineNumber];
 
         if (executing !== undefined) {

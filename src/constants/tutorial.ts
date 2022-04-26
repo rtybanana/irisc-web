@@ -11,7 +11,7 @@ const intro1: TTutorialPage = {
 
     <span class="irisc">iRISC</span> stands for <i>interactive reduced instruction-set computer</i>.\
     This web app is an interactive introduction to RISC computer architecture and assembly language.\
-    Specifically, <span class="irisc">ARMv7</span> assembly language.
+    Specifically, <span class="irisc">ARMv7</span> assembly language. 
 
     I have tried to write a simple tutorial which goes through some of the basics, not only of\
     writing assembly, but also some aspects of computer architecture. I aimed to keep the required\
@@ -20,6 +20,10 @@ const intro1: TTutorialPage = {
 
     Either way, I hope you find this to be a fun/useful tool!
   `
+  // TODO: maybe add
+  // Crucially, <span class="irisc">iRISC</span> is <u>not</u> a perfect simulator for an ARMv7 processor.\
+  // It is a specifically simplified demonstration simulator which remains faithful to the real processor\
+  // in just enough ways so that it can serve as a teaching aid for architectures and programming basics.
 }
 
 const intro2: TTutorialPage = {

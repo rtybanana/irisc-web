@@ -8,7 +8,8 @@
       @mouseleave="untip"
       :key="index"
     >
-      <span class="register-name">{{ regName[index] }}</span> {{ regstr(value)  }}
+      <span class="register-name">{{ regName[index] }}</span>  
+      <span class="ml-1 px-1" :class="{ 'changed': changeSet.has(index) }">{{ regstr(value) }}</span>
     </div>
 
     <!-- cpsr -->
@@ -49,6 +50,7 @@
 import Vue from 'vue';
 import { EmulatorState } from "@/state";
 import { Register, regName, regTitle, regExplain, flagName, flagTitle, flagExplain } from "@/constants"
+import { zip } from '@/assets/functions';
 
 export default Vue.extend({
   name: 'registers',
@@ -69,7 +71,9 @@ export default Vue.extend({
       cpsrExplain: "Four bits in the Current Program Status Register which are used to decide whether a conditional instruction should execute.",
 
       title: null as string | null,
-      description: null as string | null
+      description: null as string | null,
+
+      changeSet: new Set<Register>()
     };
   },
   computed: {
@@ -116,6 +120,16 @@ export default Vue.extend({
       this.title = null;
       this.description = null;
     }
+  },
+  watch: {
+    registers: function (newVal, oldVal) {
+      let changeSet = new Set<Register>();
+      zip(newVal, oldVal).forEach(([newReg, oldReg], index) => {
+        if (newReg !== oldReg) changeSet.add(index);
+      });
+
+      this.changeSet = changeSet;
+    }
   }
 })
 </script>
@@ -159,5 +173,10 @@ export default Vue.extend({
 .description {
   font-size: 14px;
   white-space: pre-line;
+}
+
+.changed {
+  border-radius: 0.15rem;
+  background-color: rgba(255, 255, 255, 0.2);
 }
 </style>

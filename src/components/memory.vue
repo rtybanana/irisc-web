@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex flex-column container text-center p-3">
     <div class="dashed mb-3 px-2 py-1">
-      <div class="d-flex align-items-end position-relative">
+      <div class="d-flex align-items-end position-relative w-100">
         <div 
           class="d-flex flex-column sector text"
           :style="`width: ${textWidth}%;`"
@@ -56,7 +56,15 @@
       </div>
 
       <div>
-        Used:  {{ used }} bytes
+        Used:  
+        <span
+          :class="{
+            'text-warning': used === memory.size,
+            'text-danger': used > memory.size
+          }"
+        >
+          {{ used }} bytes
+        </span>
       </div>
     </div>
   </div>
@@ -86,11 +94,7 @@ export default Vue.extend({
     },
 
     stackPointer: function () : number {
-      console.log(this.memory.size, this.registers[Register.SP]);
       let reversePtr = this.memory.size - this.registers[Register.SP];
-
-      console.log(reversePtr / this.memory.size);
-
       return (reversePtr / this.memory.size) * 100;
     },
 
@@ -143,7 +147,8 @@ export default Vue.extend({
 .sector.stack .label { color: #5d9455; }
 .sector.stack .region { border: 1px dashed #5d9455; }
 
-.sector.stack-pointer {
+.sector.stack-pointer,
+.sector.stack {
   position: absolute;
   right: 0;
 }

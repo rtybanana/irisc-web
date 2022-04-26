@@ -20,6 +20,7 @@ export class SingleTransferNode extends TransferNode {
   protected _addressMode: TAddressMode | undefined;
   protected _updating: boolean = false;
 
+  get transferSize() : TTransferSize { return this._transferSize; }
   get isReg() : boolean { return typeof this._Rn === 'number'; }
   get isLiteral() : boolean { return typeof this._Rn === 'string'; }
   get literal() : string { 
@@ -112,8 +113,12 @@ export class SingleTransferNode extends TransferNode {
   }
 
   parseIndexer(token: Token, alias: string) {
-    if (token.type !== "indexer" || token.alias !== alias) {
-      throw new SyntaxError(`Expected '[' to begin addressing syntax - received '${token.content}' instead.`, this.statement, this.lineNumber, this._currentToken);
+    if (token.type !== "indexer") {
+      throw new SyntaxError(`Expected '[' or ']' to bound addressing syntax - received '${token.content}' instead.`, this.statement, this.lineNumber, this._currentToken);
+    }
+
+    if (token.alias !== alias) {
+      throw new SyntaxError(`Incorrect square bracket orientation - received '${token.content}'.`, this.statement, this.lineNumber, this._currentToken);
     }
   }
 

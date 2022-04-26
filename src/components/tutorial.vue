@@ -1,5 +1,5 @@
 <template>
-  <div class="container p-2 text-left">
+  <div ref="container" class="container p-2 text-left">
     <div>
       <div class="title px-1">{{ pageData.title }}</div>
       <div class="content mt-2 mb-5 p-1" v-html="pageData.content"></div>
@@ -51,6 +51,17 @@ export default Vue.extend({
       if (this.page > 0) {
         this.page--;
       }
+    }
+  },
+  watch: {
+    page: function () {
+      this.$nextTick(() => {
+        (this.$refs.container as HTMLElement).scrollTo({
+          top: 0,
+          behavior: 'auto'
+        });
+      })
+      
     }
   }
 })

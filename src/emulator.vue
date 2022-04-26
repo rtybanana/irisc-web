@@ -30,12 +30,13 @@
               <div class="row px-0 h-100">
                 <div class="col-8 pr-1 h-100">
                   <!-- <editor @run="start($event)"></editor> -->
-
+                  <!-- @step="doStep" -->
                   <keep-alive>
                     <component 
                       :is="env" 
                       @switch="switchEnvironment"
                       @run="start"
+                      @step="doStep"
                     ></component>
                   </keep-alive>
                 </div>
@@ -83,7 +84,6 @@ import { Register, EnvironmentType } from "@/constants"
 import './assets/generic.css';
 import './assets/syntax.css';
 import { TInstructionNode } from './classes/syntax/types';
-import { BranchNode } from './classes/syntax/BranchNode';
 
 export default Vue.extend({
   name: 'emulator',
@@ -111,6 +111,9 @@ export default Vue.extend({
     step: EmulatorState.step,
   },
   methods: {
+    /**
+     * 
+     */
     switchEnvironment: function () {
       if (this.env === EnvironmentType.TERMINAL) this.env = EnvironmentType.EDITOR;
       else this.env = EnvironmentType.TERMINAL;
@@ -120,7 +123,10 @@ export default Vue.extend({
      * 
      */
     start: function () {
-      if (this.running) return;
+      if (this.running) {
+        if (!this.step) EmulatorState.resume();
+        return;
+      }
       
       // reset emulator state
       EmulatorState.reset();
@@ -140,10 +146,13 @@ export default Vue.extend({
      */
     run: async function () {
       EmulatorState.setEntryPoint();
+      EmulatorState.setStackHeight(0);
       EmulatorState.start();
 
+      // await this.sleep();
       try {
         while(this.running) {
+          EmulatorState.setStep(false);
           let node: TInstructionNode = EmulatorState.instruction(this.registers[Register.PC]);
 
           // if runtime instruction runoff
@@ -153,13 +162,7 @@ export default Vue.extend({
           }
 
           Interpreter.execute(node);
-
-          // check every 50ms to see if speed value has changed
-          let sleptfor: number = 0;
-          while ((sleptfor < this.delay || this.paused) && this.running && !this.step) {          
-            await new Promise(r => setTimeout(r, 50));
-            sleptfor += 50;
-          }
+          await this.sleep();
 
           // check for bx lr to static exit point
           if (this.registers[Register.PC] === this.memory.exitPoint) {
@@ -174,7 +177,32 @@ export default Vue.extend({
       }
     },
 
-    
+    /**
+     * Checks every 50ms to see if tick speed (delay) value has changed. If the delay has elapsed
+     * then move return so that the simulator may continue to the next instruction.
+     */
+    sleep: async function () {
+      let sleptfor: number = 0;
+      while ((sleptfor < this.delay || this.paused) && this.running && !this.step) {
+        await new Promise(r => setTimeout(r, 50));
+        sleptfor += 50;
+      }
+
+      return;
+    },
+
+    /**
+     * 
+     */
+    doStep: function () {
+      if (this.running && this.paused) {
+        EmulatorState.setStep(true);
+        return
+      }
+      
+      EmulatorState.pause();
+      if (!this.running) this.run();
+    }
   }
 })
 </script>

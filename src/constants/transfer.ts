@@ -30,6 +30,10 @@ export const transferExplain: Record<TTransfer, string> = {
   [StackTransfer.POP]:    "Shorthand for loading multiple words from the stack.",
 }
 
+export const blockTransferOperations = [
+  "ldm", "stm", "push", "pop"
+]
+
 export enum BlockAddressMode {
   IA, DA, IB, DB
 } 
@@ -39,6 +43,13 @@ export const blockAddressModeMap: Record<string, BlockAddressMode> = {
   "da": BlockAddressMode.DA,
   "ib": BlockAddressMode.IB,
   "db": BlockAddressMode.DB,
+}
+
+export const addressModeGroup = {
+  "increment": [BlockAddressMode.IB, BlockAddressMode.IA],
+  "decrement": [BlockAddressMode.DB, BlockAddressMode.DA],
+  "before": [BlockAddressMode.IB, BlockAddressMode.DB],
+  "after": [BlockAddressMode.IA, BlockAddressMode.DA]
 }
 
 const plus = "+";

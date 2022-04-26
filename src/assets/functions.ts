@@ -12,3 +12,13 @@ export function debounce(fn: Function, ms = 300) {
     timeoutId = setTimeout(() => fn.apply(this, args), ms);
   };
 }
+
+/**
+ * 
+ * @param a 
+ * @param b 
+ * @returns 
+ */
+export function zip(a: any[], b: any[]) { 
+  return a.map((k, i) => [k, b[i]]);
+}

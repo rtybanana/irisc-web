@@ -129,7 +129,13 @@ const actions = {
     data.paused = true;
   },
 
-  // step: function ()
+  resume: function () {
+    data.paused = false;
+  },
+
+  setStep: function (value: boolean) {
+    data.step = value;
+  },
 
   stop: function () {
     data.running = false;
@@ -275,6 +281,10 @@ const actions = {
     }
   },
 
+  setStackHeight: function (height: number) {
+    data.memory.stackHeight = height;
+  },
+
   validate: function () {
     data.memory.text.forEach(ins => {
       if (ins instanceof LabelNode) {
@@ -295,10 +305,6 @@ const actions = {
 
   setExitStatus: function (status: TExitStatus) {
     data.exitStatus = status;
-    if (status instanceof RuntimeError) {
-      alert(status.message); 
-    }
-
     this.stop();
   }
 }
