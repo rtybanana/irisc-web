@@ -11,6 +11,7 @@ type TExitStatus = RuntimeError | number;
 
 type TMemory = {
   size: number;
+  sizes: number[];
 
   buffer: ArrayBuffer | undefined;
   wordView: Uint32Array;
@@ -62,7 +63,8 @@ const data = Vue.observable<TEmulatorState>({
 
   // memory data
   memory: {
-    size: 128,
+    size: 256,
+    sizes: [128, 256, 512, 1024, 2048, 4096],
 
     buffer: undefined,
     wordView: new Uint32Array(),
@@ -106,9 +108,13 @@ const getters = {
 }
 
 const actions = {
-  init: function () {
-    this.reset();
-    this.initMemory();
+  init: function (memSize?: number) {
+    data.running = false;
+    data.paused = false;
+    data.step = false;
+
+    actions.initMemory(memSize);
+    actions.reset();
   },
 
   reset: function () {
@@ -140,6 +146,10 @@ const actions = {
   stop: function () {
     data.running = false;
     data.paused = false;
+  },
+
+  setDelay(delay: number) : void {
+    data.delay = delay;
   },
 
   instruction: function (offset: number) : TInstructionNode {
@@ -229,7 +239,9 @@ const actions = {
   },
 
   // memory actions
-  initMemory: function () {
+  initMemory: function (memSize?: number) {
+    if (memSize !== undefined) data.memory.size = memSize;
+    
     data.memory.text = [];
     data.memory.buffer = new ArrayBuffer(data.memory.size);
     data.memory.byteView = new Uint8Array(data.memory.buffer);
@@ -282,7 +294,6 @@ const actions = {
   },
 
   setStackHeight: function (height: number) {
-    console.log(height);
     data.memory.stackHeight = height;
   },
 

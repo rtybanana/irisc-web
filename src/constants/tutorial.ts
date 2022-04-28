@@ -85,6 +85,11 @@ const intro4: TTutorialPage = {
       <span class="token register">lr</span>, \
       <span class="token register">pc</span>) \
     have semantic roles which, in general, a defensive programmer should aim to respect.
+
+    The registers can be found in the far left fenced section of the application. The current value is displayed as\
+    an <span class="irisc">unsigned integer</span> in both hexadecimal and decimal representations. 
+    
+    Beneath the registers are the CPSR flags - more on these later.
   `
 }
 
@@ -104,7 +109,32 @@ const intro5: TTutorialPage = {
     
     The <span class="token register">program counter</span> is not considered <i>general-purpose</i> because editing the\
     contents of the <span class="token register">pc</span> during execution has side-effects. Actually, just one very\
-    important side-effect in that it alters which instruction is executed next.
+    important side-effect in that it alters which instruction is executed next. You may edit the\
+    <span class="token register">pc</span> during execution, but only with the express intent of controlling the flow\
+    of the program.
+  `
+}
+
+const intro6: TTutorialPage = {
+  title: "Introduction 5: The Memory",
+  content: // html
+  `\
+    The simulation RAM is displayed in the lower right fenced section of the application window.\
+    The <span class="token register">text</span> (instructions) and <span class="token operation">data</span>\
+    sections grow from the left, and the <span class="token line-comment">stack</span> grows from the right - mirroring\
+    how memory is structured in a typical computer.
+
+    By default, <span class="irisc">iRISC</span> simulates a system with an unrealisticaly limited amount of RAM.\
+    This is by design. Principally, <span class="irisc">iRISC</span> is a teaching aid - not a web-based ARM simulator.\
+    Limiting the memory in this way enables it to demonstrate some slightly unclear elements of
+  `
+}
+
+const intro7: TTutorialPage = {
+  title: "Introduction 6: The Assembler",
+  content: // html
+  `\
+    
   `
 }
 
@@ -304,7 +334,7 @@ const intermediate1: TTutorialPage = {
 
 
 export const pages = [
-  intro1, intro2, intro3, intro4, intro5, intro99,
+  intro1, intro2, intro3, intro4, intro5, intro6, intro7, intro99,
 
   basics1, basics2, basics3, basics4, basics5, basics6,
 

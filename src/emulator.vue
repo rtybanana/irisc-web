@@ -53,6 +53,10 @@
                 </div>
                 <div class="col-6 pl-1">
                   <memory></memory>
+
+                  <div class="settings">
+                    <i class="button fas fa-sliders-h clickable" @click="$refs.settings.show()"></i>
+                  </div>
                 </div>
               </div>
               <div class="row px-0" style="height: 24px;">
@@ -69,6 +73,47 @@
         </div>
       </div>
     </div>
+
+    <!-- size="lg" -->
+    <b-modal 
+      ref="settings" 
+      centered hide-header 
+      hide-footer hide-backdrop
+      body-class="settings-modal p-1"
+    >
+
+      <div class="px-5 py-1">
+        <h4>configuration</h4>
+        <div class="mt-3">
+          <!-- simulation speed -->
+          <div>
+            cpu tickrate
+            <span class="float-right">{{ (1000 / delay).toFixed(2) }} tps</span>
+          </div>
+          <b-form-input 
+            :value="1000 / delay"
+            @change="emulator.setDelay(1000 / $event)"
+            type="range"
+            min="0.5"
+            max="50"
+            step="0.1"
+          ></b-form-input>
+
+          <!-- memory size -->
+          <div>
+            ram size 
+            <span class="float-right">{{ memory.size }} bytes</span>
+          </div>
+          <b-form-input 
+            :value="memory.sizes.findIndex(e => e === memory.size)"
+            @change="emulator.init(memory.sizes[+$event])"
+            type="range"
+            min="0"
+            :max="memory.sizes.length - 1"
+          ></b-form-input>
+        </div>
+      </div>
+    </b-modal>
     
   </div>
 </template>
@@ -97,7 +142,8 @@ export default Vue.extend({
   },
   data() {
     return {
-      env: EnvironmentType.TERMINAL
+      env: EnvironmentType.TERMINAL,
+      emulator: EmulatorState
     }
   },
   computed: {
@@ -184,8 +230,8 @@ export default Vue.extend({
     sleep: async function () {
       let sleptfor: number = 0;
       while ((sleptfor < this.delay || this.paused) && this.running && !this.step) {
-        await new Promise(r => setTimeout(r, 50));
-        sleptfor += 50;
+        await new Promise(r => setTimeout(r, 10));
+        sleptfor += 10;
       }
 
       return;
@@ -232,5 +278,23 @@ html, body {
 
 #emulator {
   height: calc(100% - 88px);
+}
+
+.settings {
+  position: absolute;
+  bottom: 31px;
+  right: 42px;
+  border-radius: 0.3rem;
+  background-color: #191d21;
+  padding: 0.25rem 0.33rem 0.15rem 0.4rem;
+}
+
+.settings-modal {
+  font-family: 'Ubuntu Mono', monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f7f7f7;
+  border: 1px dashed #0d1117;
+  color: #171c24;
 }
 </style>

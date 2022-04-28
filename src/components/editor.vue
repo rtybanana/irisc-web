@@ -57,7 +57,7 @@
 <script lang="ts">
 import Vue, { Component } from 'vue';
 import { EmulatorState } from "@/state";
-import { parse, compile, load } from "@/classes/assembler";
+import { parse, compile, load, build } from "@/classes/assembler";
 import { debounce } from "@/assets/functions";
 import getCaretCoordinates from "textarea-caret";
 
@@ -96,6 +96,7 @@ export default Vue.extend({
     }
   },
   computed: {
+    memory: EmulatorState.memory,
     errors: EmulatorState.errors,
     running: EmulatorState.running,
     currentInstruction: EmulatorState.currentInstruction,
@@ -412,15 +413,14 @@ export default Vue.extend({
     /**
      * 
      */
-    program: debounce(function(program: string) {
-      EmulatorState.stop();
-      EmulatorState.initMemory();
+    program: debounce(build, 500),
 
-      let lines = parse(program);
-      let nodes = compile(lines);
-
-      load(nodes);
-    }, 500)
+    /**
+     * 
+     */
+    memory: function (val, old) {
+      if (val.size !== old.size) build(this.program);
+    }
   }
 })
 </script>
@@ -442,6 +442,7 @@ export default Vue.extend({
   left: 0;
   right: 0;
   overflow-x: hidden;
+  padding-bottom: 30%;
 }
 
 .controls {

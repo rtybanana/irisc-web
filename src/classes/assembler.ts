@@ -159,4 +159,18 @@ function load(nodes: (SyntaxNode | null)[]) {
   EmulatorState.validate();
 }
 
-export { parse, compile, compileOne, load }
+/**
+ * Wrapper function to perform a common set of the assembly functions.
+ * @param program 
+ */
+function build(program: string) : void {
+  EmulatorState.stop();
+  EmulatorState.initMemory();
+
+  let lines = parse(program);
+  let nodes = compile(lines);
+
+  load(nodes);
+}
+
+export { parse, compile, compileOne, load, build }
