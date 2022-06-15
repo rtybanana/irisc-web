@@ -17,7 +17,8 @@ import { BlockTransferNode } from "./syntax/transfer/BlockTransferNode";
 const state = {
   get registers() { return EmulatorState.registers(); },
   get cpsr() { return EmulatorState.cpsr(); },
-  get memory() { return EmulatorState.memory(); }
+  get memory() { return EmulatorState.memory(); },
+  get previousPC() { return EmulatorState.previousPC(); }
 }
 
 /**
@@ -401,14 +402,14 @@ function checkStore(address: number, register: Register, instruction: TInstructi
  * @param instruction 
  * @returns 
  */
-export function generateLabelOffset(instruction: SingleTransferNode): number {
-  if (instruction.literal in state.memory.heapMap) {
-    return state.memory.heapMap[instruction.literal] - state.registers[Register.PC];
+export function generateLabelOffset(label: string, instruction: TInstructionNode): number {
+  if (label in state.memory.heapMap) {
+    return (state.memory.heapMap[label] - state.previousPC) / 4;
   }
 
-  if (instruction.literal in state.memory.textMap) {
-    return state.memory.textMap[instruction.literal] - state.registers[Register.PC];
+  if (label in state.memory.textMap) {
+    return (state.memory.textMap[label] - state.previousPC) / 4;
   }
 
-  throw new ReferenceError(`Missing reference to '${instruction.literal}'`, instruction.statement, instruction.lineNumber, -1)
+  throw new ReferenceError(`Missing reference to '${label}'`, instruction.statement, instruction.lineNumber, -1)
 }

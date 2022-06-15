@@ -1,9 +1,10 @@
-import { Condition, condMap, Operation, opMap, Register } from "@/constants";
+import { condExplain, Condition, condMap, condTitle, Operation, opMap, Register, regTitle } from "@/constants";
 import { Token } from "prismjs";
 import { InstructionNode } from "./InstructionNode";
 import { SyntaxError } from "../error";
-import { TAssembled, TBranchAddress } from "./types";
-
+import { IExplanation, TAssembled, TBranchAddress } from "./types";
+import { bitset } from "@/assets/bitset";
+import { Interpreter } from "..";
 
 export class BranchNode extends InstructionNode {
   protected _op: Operation;
@@ -32,7 +33,7 @@ export class BranchNode extends InstructionNode {
     if (this.hasToken()) throw new SyntaxError(`Unexpected token '${this.peekToken().content}' after valid instruction end.`, statement, lineNumber, currentToken + 1);
   }
 
-  unpack() : [Operation, Condition, TBranchAddress] {
+  unpack(): [Operation, Condition, TBranchAddress] {
     return [
       this._op,
       this._cond,
@@ -40,7 +41,93 @@ export class BranchNode extends InstructionNode {
     ]
   }
 
-  // assemble(): TAssembled {
+  /**
+   * 
+   */
+  assemble(): TAssembled {
+    if (this._op === Operation.BX) return this.assembleBX();
 
-  // }
+    let instruction: number = 0;
+    let explanation: IExplanation[] = [];
+
+    instruction = (instruction << 4) | this._cond;
+    explanation.push({
+      title: "Condition Code", 
+      subtitle: condTitle[this._cond], 
+      detail: condExplain[this._cond], 
+      range: 4
+    });
+
+    console.log(instruction);
+
+    instruction = (instruction << 3) | 5;
+    explanation.push({
+      title: "Instruction Type", 
+      subtitle: "Branch", 
+      detail: "Indicates the organisation of bits to the processor so that the instruction can be decoded.", 
+      range: 3
+    });
+
+    console.log(instruction);
+    
+    const linkBit = this._op === Operation.BL ? 1 : 0;
+    instruction = (instruction << 1) | linkBit;
+    explanation.push({
+      title: "Link Bit", 
+      subtitle: linkBit ? "Link" : "Do not link", 
+      detail: "Tells the processor to set the link register to the instruction after the branch so that it can be returned to.", 
+      range: 1
+    });
+
+    const labelOffset = Interpreter.generateLabelOffset(this._Rd as string, this);
+    console.log(labelOffset, labelOffset & 16777215);
+
+    instruction = (instruction << 24) | (labelOffset & 16777215);
+    explanation.push({
+      title: "Offset", 
+      subtitle: `Value ${labelOffset}`, 
+      detail: "A 24 bit encoding of the offset from the current PC to the label address. This actually works a little differently in real processors, but this is the gist.", 
+      range: 24
+    });
+
+    return {
+      bitcode: bitset(32, instruction).reverse(), 
+      explanation
+    };
+  }
+
+  assembleBX(): TAssembled {
+    let instruction: number = 0;
+    let explanation: IExplanation[] = [];
+
+    instruction = (instruction << 4) | this._cond;
+    explanation.push({
+      title: "Condition Code", 
+      subtitle: condTitle[this._cond], 
+      detail: condExplain[this._cond], 
+      range: 4
+    });
+
+    // push instruction signature 000100101111111111110001 into the bitcode
+    instruction = (instruction << 24) | 1245169;
+    explanation.push({
+      title: "Instruction Type", 
+      subtitle: "Branch and exchange", 
+      detail: "Indicates the organisation of bits to the processor so that the instruction can be decoded.", 
+      range: 24
+    });
+
+    instruction = (instruction << 4) | this._Rd as Register;
+    explanation.push({
+      title: "First Operand", 
+      subtitle: regTitle[this._Rd as Register], 
+      detail: "The second operand contains the address to which the processor should branch.", 
+      range: 4
+    });
+
+    return {
+      bitcode: bitset(32, instruction).reverse(), 
+      explanation
+    };
+  }
 }

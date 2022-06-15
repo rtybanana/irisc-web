@@ -144,7 +144,7 @@ export class SingleTransferNode extends TransferNode {
   assemble(): TAssembled {
     let instruction: number = 0;
     let explanation: IExplanation[] = [];
-    let labelOffset = this.isLiteral ? Interpreter.generateLabelOffset(this) : 0;
+    let labelOffset = this.isLiteral ? Interpreter.generateLabelOffset(this.literal, this) : 0;
 
     instruction = (instruction << 4) | this._cond;
     explanation.push({
@@ -184,7 +184,7 @@ export class SingleTransferNode extends TransferNode {
     });
 
     let isUp = this._sign === "+";
-    if (this.isLiteral) isUp = labelOffset < 0;
+    if (this.isLiteral) isUp = labelOffset > 0;
 
     const upDownBit = +isUp;         
     instruction = (instruction << 1) | upDownBit;

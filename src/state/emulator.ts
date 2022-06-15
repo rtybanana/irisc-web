@@ -40,7 +40,7 @@ const data = Vue.observable<TEmulatorState>({
     stackHeight: 0,
   },
 
-  // previousPC: 0,
+  previousPC: 0,
   currentInstruction: undefined,
   wasExecuted: false,
 
@@ -64,6 +64,7 @@ const getters = {
 
   // currentInstruction: () => actions.instruction(data.previousPC),
   currentInstruction: () => data.currentInstruction,
+  previousPC: () => data.previousPC,
   wasExecuted: () => data.wasExecuted,
   errors: () => data.errors,
   hoveredError: () => data.hoveredError,
@@ -145,7 +146,7 @@ const actions = {
 
   setRegister: function (register: Register, value: number) {
     if (register === Register.PC) {
-      // data.previousPC = data.cpu.registers[Register.PC];
+      data.previousPC = data.cpu.registers[Register.PC];
       data.currentInstruction = this.instruction(data.cpu.registers[Register.PC]);
     }
     Vue.set(data.cpu.registers, register, value);

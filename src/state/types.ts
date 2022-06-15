@@ -35,7 +35,7 @@ export type TEmulatorState = {
   cpu: TCPU;
   memory: TMemory;
 
-  // previousPC: number;
+  previousPC: number;
   currentInstruction?: TInstructionNode;
   wasExecuted: boolean;
 
