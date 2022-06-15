@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { tutorialPages, TTutorialPage } from "@/constants";
+import { tutorialPages, TTutorialPage } from "@/tutorial";
 
 export default Vue.extend({
   name: 'tutorial',

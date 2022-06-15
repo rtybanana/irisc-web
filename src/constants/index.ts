@@ -5,7 +5,7 @@ export * from "./shifts";
 export * from "./flags";
 export * from "./transfer";
 export * from "./allocation";
-export { pages as tutorialPages, TTutorialPage } from "./tutorial";
+// export { pages as tutorialPages, TTutorialPage } from "../tutorial/tutorial";
 
 
 export const operations = [
