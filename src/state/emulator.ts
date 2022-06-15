@@ -5,49 +5,9 @@ import { IriscError, ReferenceError, RuntimeError } from "@/classes/error";
 import { TInstructionNode } from '@/classes/syntax/types';
 import { AllocationNode, LabelNode } from '@/classes/syntax';
 import { SingleTransferNode } from '@/classes/syntax/transfer/SingleTransferNode';
-import { EmulatorState } from '.';
-
-type TExitStatus = RuntimeError | number;
-
-type TMemory = {
-  size: number;
-  sizes: number[];
-
-  buffer: ArrayBuffer | undefined;
-  wordView: Uint32Array;
-  byteView: Uint8Array;
-
-  heapHeight: number;
-  heapMap: Record<string, number>;
-  
-  text: TInstructionNode[];
-  textHeight: number;
-  textMap: Record<string, number>;
-
-  stackHeight: number;
-}
-
-type TCPU = {
-  registers: Uint32Array;
-  observableRegisters: number[];
-  cpsr: boolean[];
-}
-
-type TEmulatorState = {
-  running: boolean;
-  paused: boolean;
-  step: boolean;
-  delay: number;
-
-  cpu: TCPU;
-  memory: TMemory;
-
-  previousPC: number;
-
-  errors: IriscError[];
-  hoveredError: IriscError | null;
-  exitStatus: TExitStatus | undefined;
-}
+// import { EmulatorState } from '.';
+import { TEmulatorState, TExitStatus } from './types';
+import { TransferNode } from '@/classes/syntax/transfer/TransferNode';
 
 const data = Vue.observable<TEmulatorState>({
   running: false,
@@ -80,7 +40,9 @@ const data = Vue.observable<TEmulatorState>({
     stackHeight: 0,
   },
 
-  previousPC: 0,
+  // previousPC: 0,
+  currentInstruction: undefined,
+  wasExecuted: false,
 
   errors: [],
   hoveredError: null,
@@ -100,7 +62,9 @@ const getters = {
     exitPoint: data.memory.size + 4
   }),
 
-  currentInstruction: () => actions.instruction(data.previousPC),
+  // currentInstruction: () => actions.instruction(data.previousPC),
+  currentInstruction: () => data.currentInstruction,
+  wasExecuted: () => data.wasExecuted,
   errors: () => data.errors,
   hoveredError: () => data.hoveredError,
 
@@ -180,7 +144,10 @@ const actions = {
   },
 
   setRegister: function (register: Register, value: number) {
-    if (register === Register.PC) data.previousPC = data.cpu.registers[Register.PC];
+    if (register === Register.PC) {
+      // data.previousPC = data.cpu.registers[Register.PC];
+      data.currentInstruction = this.instruction(data.cpu.registers[Register.PC]);
+    }
     Vue.set(data.cpu.registers, register, value);
 
     this.observeRegisters();
@@ -293,6 +260,14 @@ const actions = {
     }
   },
 
+  setCurrentInstruction: function (instruction: TInstructionNode) {
+    data.currentInstruction = instruction;
+  },
+
+  setExecuted: function (executed: boolean) {
+    data.wasExecuted = executed;
+  },
+
   setStackHeight: function (height: number) {
     data.memory.stackHeight = height;
   },
@@ -301,12 +276,12 @@ const actions = {
     data.memory.text.forEach(ins => {
       if (ins instanceof LabelNode) {
         if (data.memory.textMap[ins.identifier] === undefined) {
-          EmulatorState.addError(new ReferenceError(`Missing reference to '${ins.identifier}'`, ins.statement, ins.lineNumber, -1));
+          this.addError(new ReferenceError(`Missing reference to '${ins.identifier}'`, ins.statement, ins.lineNumber, -1));
         }
       }
       else if (ins instanceof SingleTransferNode && ins.isLiteral) {
         if (data.memory.heapMap[ins.literal] === undefined) {
-          EmulatorState.addError(new ReferenceError(`Missing reference to '${ins.literal}'`, ins.statement, ins.lineNumber, -1));
+          this.addError(new ReferenceError(`Missing reference to '${ins.literal}'`, ins.statement, ins.lineNumber, -1));
         }
       }
       // else if (instruction instanceof BlockTransferNode) {
@@ -315,6 +290,7 @@ const actions = {
     });
   },
 
+  // on simulation finish
   setExitStatus: function (status: TExitStatus) {
     data.exitStatus = status;
     this.stop();

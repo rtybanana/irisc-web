@@ -2,6 +2,7 @@ import { Token } from 'prismjs';
 import { Register, Condition, condMap, transferMap, BlockAddressMode, BlockTransfer, operations, blockTransferOperations, blockAddressModeMap } from '@/constants';
 import { SyntaxError } from '@/classes/error';
 import { TransferNode } from './TransferNode';
+import { TAssembled } from '../types';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */
@@ -144,4 +145,11 @@ export class BlockTransferNode extends TransferNode {
       this._updating
     ]
   }
+
+  /**
+   * TODO: implement for explanation section
+   */
+  // assemble(): TAssembled {
+
+  // }
 }

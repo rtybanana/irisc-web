@@ -1,7 +1,7 @@
 import { Token } from 'prismjs';
 import { SyntaxNode } from "./SyntaxNode";
 import { Operation, Condition, opMap, operations } from '@/constants';
-import { TOperation } from './types';
+import { TAssembled, TOperation } from './types';
 
 /** Ancestor class for all instruction-type syntax nodes (Bi/TriOperandNode etc.) */
 export abstract class InstructionNode extends SyntaxNode {
@@ -13,6 +13,12 @@ export abstract class InstructionNode extends SyntaxNode {
   get op(): TOperation { return this._op; }
   get cond(): Condition { return this._cond; }
   get setFlags(): boolean { return this._setFlags; }
+  get text(): string { 
+    return this.statement
+      .map(e => e.content)
+      .join(" ")
+      .replaceAll(/( (,|!|}|\]))|(({|\[|-) )/g, (match) => match.trim()); 
+    }
 
   /**
    * 
@@ -38,5 +44,17 @@ export abstract class InstructionNode extends SyntaxNode {
     if (forceFlags.includes(operation)) modifier = "s";
 
     return [operation, modifier, condition];
+  }
+
+  assemble(): TAssembled {
+    return {
+      bitcode: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      explanation: [{
+        title: "Unsupported Instruction",
+        subtitle: "Cannot assemble this instruction",
+        detail: "The assembler is currently work-in-progress. Support for this instruction type is coming soon.",
+        range: 32
+      }]
+    }
   }
 }

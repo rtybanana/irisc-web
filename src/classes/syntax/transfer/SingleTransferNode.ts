@@ -1,10 +1,12 @@
 import { Token } from 'prismjs';
 import { InstructionNode } from '../InstructionNode';
 import { FlexOperand } from '../FlexOperand';
-import { Register, Operation, Condition, opMap, condMap, TTransfer, transferMap, TTransferSize, TSign, TAddressMode, SingleTransfer } from '@/constants';
-import { TBranchAddress } from '../types';
+import { Register, Operation, Condition, opMap, condMap, TTransfer, transferMap, TTransferSize, TSign, TAddressMode, SingleTransfer, condTitle, condExplain, regTitle } from '@/constants';
+import { IExplanation, TAssembled, TBranchAddress } from '../types';
 import { SyntaxError, ReferenceError, IriscError } from '@/classes/error';
 import { TransferNode } from './TransferNode';
+import { bitset } from '@/assets/bitset';
+import { Interpreter } from '@/classes';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */
@@ -16,7 +18,7 @@ export class SingleTransferNode extends TransferNode {
   protected _Rd: Register;
   protected _Rn!: TBranchAddress;
   protected _sign: TSign = "+";
-  protected _flex: FlexOperand | undefined;
+  protected _flex!: FlexOperand;
   protected _addressMode: TAddressMode | undefined;
   protected _updating: boolean = false;
 
@@ -134,5 +136,175 @@ export class SingleTransferNode extends TransferNode {
       this._addressMode,
       this._updating
     ]
+  }
+
+  /**
+   * TODO: implement for explanation section
+   */
+  assemble(): TAssembled {
+    let instruction: number = 0;
+    let explanation: IExplanation[] = [];
+    let labelOffset = this.isLiteral ? Interpreter.generateLabelOffset(this) : 0;
+
+    instruction = (instruction << 4) | this._cond;
+    explanation.push({
+      title: "Condition Code", 
+      subtitle: condTitle[this._cond], 
+      detail: condExplain[this._cond], 
+      range: 4
+    });
+
+    instruction = (instruction << 2) | 1;     // push 01 onto the machine code
+    explanation.push({
+      title: "Instruction Type", 
+      subtitle: "Single Transfer", 
+      detail: "Indicates the organisation of bits to the processor so that the instruction can be decoded.", 
+      range: 2
+    });
+    
+
+    console.log(this._flex?.isImm, this.isLiteral, +!(this._flex?.isImm ?? this.isLiteral));
+
+    const immBit = +!(this._flex?.isImm ?? this.isLiteral);        // negated unary operator (0 if boolean is true)
+    instruction = (instruction << 1) | immBit;
+    explanation.push({
+      title: "FlexOperand Type", 
+      subtitle: immBit ? "Register" : "Immediate", 
+      detail: "Tells the processor if the flexible operand is an immediate value (0) or a register (1).", 
+      range: 1
+    });
+
+    const addressBit = this._addressMode === "pre" ? 1 : 0;         
+    instruction = (instruction << 1) | addressBit;
+    explanation.push({
+      title: "Pre/Post Indexing Bit", 
+      subtitle: addressBit ? "Pre-indexed addressing" : "Post-indexed addressing", 
+      detail: "Tells the processor to use pre- (1) or post-index addressing mode for the transfer.", 
+      range: 1
+    });
+
+    let isUp = this._sign === "+";
+    if (this.isLiteral) isUp = labelOffset < 0;
+
+    const upDownBit = +isUp;         
+    instruction = (instruction << 1) | upDownBit;
+    explanation.push({
+      title: "Up/Down Bit", 
+      subtitle: upDownBit ? "Up" : "Down", 
+      detail: "Tells the processor to add (up, 1) or subtract (down, 0) the offset from the base register.", 
+      range: 1
+    });
+    
+    const sizeBit = this._transferSize === "byte" ? 1 : 0;         
+    instruction = (instruction << 1) | upDownBit;
+    explanation.push({
+      title: "Byte/Word Bit", 
+      subtitle: sizeBit ? "Byte" : "Word", 
+      detail: "Tells the processor to index memory by bytes (1) or words (0).", 
+      range: 1
+    });
+
+    const writeBackBit = +this._updating;         
+    instruction = (instruction << 1) | writeBackBit;
+    explanation.push({
+      title: "Write-back Bit", 
+      subtitle: writeBackBit ? "Updating" : "Not updating", 
+      detail: "Tells the processor whether (1) or not (0) to update the base register after transfering the data.", 
+      range: 1
+    });
+
+    const loadStoreBit = this._op === SingleTransfer.LDR ? 1 : 0;         
+    instruction = (instruction << 1) | loadStoreBit;
+    explanation.push({
+      title: "Load/Store Bit", 
+      subtitle: loadStoreBit ? "Load" : "Store", 
+      detail: "Tells the processor whether we are loading (1) or storing (0) data from/to memory.", 
+      range: 1
+    });
+
+    if (this.isReg) {
+      console.log("address is an expression");
+
+      instruction = (instruction << 4) | this._Rn as Register;
+      explanation.push({
+        title: "Second Operand", 
+        subtitle: regTitle[this._Rn as Register], 
+        detail: "The second operand in a transfer instruction is often referred to as the 'base' register.", 
+        range: 4
+      });
+
+      instruction = (instruction << 4) | this._Rd;
+      explanation.push({
+        title: "First Operand", 
+        subtitle: regTitle[this._Rd], 
+        detail: "The first operand is often referred to as the 'destination' register.", 
+        range: 4
+      });
+
+      if (this._flex) {
+        const [flexInstruction, flexExplanation] = this._flex.assemble();
+        instruction = (instruction << 12) | flexInstruction;
+        Array.prototype.push.apply(explanation, flexExplanation);
+      }
+      else  {
+        instruction <<= 12;
+        explanation.push({
+          title: "Flex Operand", 
+          subtitle: "No offset", 
+          detail: "These bits are left unset because the base address has not been offset in any way.", 
+          range: 12
+        })
+      }
+    }
+    else {
+      console.log("address is a label");
+
+      instruction = (instruction << 4) | Register.PC;
+      explanation.push({
+        title: "Second Operand", 
+        subtitle: regTitle[Register.PC], 
+        detail: "The second operand is often referred to as a 'source' register.", 
+        range: 4
+      });
+
+      instruction = (instruction << 4) | this._Rd;
+      explanation.push({
+        title: "First Operand", 
+        subtitle: regTitle[this._Rd], 
+        detail: "The first operand is often referred to as the 'destination' register.", 
+        range: 4
+      });
+
+      // TODO: not very robust, needs to be able to generate more complex flexoperand values to
+      // reference labels which out of the 255 range.
+      // const labelOffset = Interpreter.generateLabelOffset(this);
+
+      // empty barrel shifter - could try to reference more distance addresses 
+      instruction = (instruction << 4); 
+      explanation.push({
+        title: "Barrel Shifter", 
+        // subtitle: (immShift == 0 ? "Not Shifted" : `Rotated Right By ${immShift}`), 
+        subtitle: "Not shifted",
+        detail: "The amount by which the eight bit immediate value is rotated right.", 
+        range: 4
+      });
+      
+      instruction = (instruction << 8) | Math.abs(labelOffset);
+      explanation.push({
+        title: "Immediate", 
+        subtitle: `Value ${labelOffset}`, 
+        detail: "An eight bit immediate value. This value, along with the barrel shift, forms the second operand.", 
+        range: 8
+      });
+    }
+
+
+    // TODO: finish implementation
+    // instruction <<= 20;
+
+    return {
+      bitcode: bitset(32, instruction).reverse(), 
+      explanation
+    };
   }
 }

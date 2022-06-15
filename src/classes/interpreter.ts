@@ -3,7 +3,7 @@ import { Operation, Register, Shift, Flag, SingleTransfer, TTransfer, TTransferS
 import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode } from "./syntax";
 import { TInstructionNode } from "./syntax/types";
 import { EmulatorState } from "@/state";
-import { RuntimeError } from "./error";
+import { RuntimeError, ReferenceError } from "./error";
 import { BranchNode } from "./syntax/BranchNode";
 import { SingleTransferNode } from "./syntax/transfer/SingleTransferNode";
 import { TransferNode } from "./syntax/transfer/TransferNode";
@@ -28,6 +28,7 @@ const state = {
  */
 export function execute(instruction: TInstructionNode, incPC: boolean = true) : boolean {
   let executed: boolean = false;
+  EmulatorState.setCurrentInstruction(instruction);
 
   if (instruction instanceof BranchNode) {
     executed = executeBranch(instruction);
@@ -46,6 +47,7 @@ export function execute(instruction: TInstructionNode, incPC: boolean = true) : 
     if (instruction instanceof BlockTransferNode) executed = executeBlockTransfer(instruction);
   }
 
+  EmulatorState.setExecuted(executed);
   return executed;
 }
 
@@ -54,7 +56,7 @@ export function execute(instruction: TInstructionNode, incPC: boolean = true) : 
  * @param flex 
  * @returns 
  */
-function deflex(flex: FlexOperand) : number {
+export function deflex(flex: FlexOperand) : number {
   let deflex: number;
 
   let [Rm, shift, Rs, immShift] = flex.unpack();
@@ -351,7 +353,7 @@ function executeBlockTransfer(instruction: BlockTransferNode) : boolean {
 
   if (wb) EmulatorState.setRegister((base as Register), address);
 
-  return false;
+  return true;
 }
 
 /**
@@ -392,4 +394,21 @@ function checkStore(address: number, register: Register, instruction: TInstructi
   else if (address <= state.memory.textHeight || address >= state.memory.size) {
     throw new RuntimeError("SIGSEG: Segmentation fault.", instruction.statement, instruction.lineNumber);
   }
+}
+
+/**
+ * 
+ * @param instruction 
+ * @returns 
+ */
+export function generateLabelOffset(instruction: SingleTransferNode): number {
+  if (instruction.literal in state.memory.heapMap) {
+    return state.memory.heapMap[instruction.literal] - state.registers[Register.PC];
+  }
+
+  if (instruction.literal in state.memory.textMap) {
+    return state.memory.textMap[instruction.literal] - state.registers[Register.PC];
+  }
+
+  throw new ReferenceError(`Missing reference to '${instruction.literal}'`, instruction.statement, instruction.lineNumber, -1)
 }

@@ -203,7 +203,7 @@ export default Vue.extend({
 
           // if runtime instruction runoff
           if (node === undefined) {
-            let last: TInstructionNode = EmulatorState.currentInstruction();
+            let last: TInstructionNode = EmulatorState.currentInstruction()!;
             throw new RuntimeError("SIGSEG: Segmentation fault.", last.statement, last.lineNumber);
           }
 

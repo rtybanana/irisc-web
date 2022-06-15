@@ -2,7 +2,7 @@ import { Condition, condMap, Operation, opMap, Register } from "@/constants";
 import { Token } from "prismjs";
 import { InstructionNode } from "./InstructionNode";
 import { SyntaxError } from "../error";
-import { TBranchAddress } from "./types";
+import { TAssembled, TBranchAddress } from "./types";
 
 
 export class BranchNode extends InstructionNode {
@@ -39,4 +39,8 @@ export class BranchNode extends InstructionNode {
       this._Rd
     ]
   }
+
+  // assemble(): TAssembled {
+
+  // }
 }

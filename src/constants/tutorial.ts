@@ -41,8 +41,11 @@ const intro2: TTutorialPage = {
     
     Type the string 'error' into the terminal and press enter to produce an error.
 
-    You can use ':clear' (or ':c' shorthand) to clear the terminal and ':reset' (or ':r') to reset\
-    the simulator.
+    <div class="hmm">\
+      <div class="token label mb-1">Hint</div>\
+      You can use ':clear' (or ':c' shorthand) to clear the terminal and ':reset' (':r') to reset\
+      the simulator.\
+    </div>
   `
 }
 

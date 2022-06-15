@@ -320,10 +320,10 @@ export default Vue.extend({
      */
     highlightExecuting: function (lines: string[]) {
       if (this.running) {
-        let executing = lines[this.currentInstruction?.lineNumber];
+        let executing = lines[this.currentInstruction!.lineNumber];
 
         if (executing !== undefined) {
-          lines[this.currentInstruction.lineNumber] = `<span class="line executing">${executing}</span>`;
+          lines[this.currentInstruction!.lineNumber] = `<span class="line executing">${executing}</span>`;
         }
       }
     },

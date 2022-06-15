@@ -3,7 +3,7 @@ import { InstructionNode } from './InstructionNode';
 import { FlexOperand } from './FlexOperand';
 import { SyntaxError } from '../error';
 import { Register, Operation, Condition, opMap, condMap, OperandType, Shift, shiftMap } from '@/constants';
-import { TRegOrImm } from './types';
+import { TAssembled, TRegOrImm } from './types';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */
@@ -86,5 +86,7 @@ export class ShiftNode extends InstructionNode {
   /**
    * TODO: implement for explanation section
    */
-  assemble() {}
+  // assemble(): TAssembled {
+    
+  // }
 }
