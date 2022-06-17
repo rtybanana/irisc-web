@@ -122,7 +122,7 @@ export class BranchNode extends InstructionNode {
     explanation.push({
       title: "First Operand", 
       subtitle: regTitle[this._Rd as Register], 
-      detail: "The second operand contains the address to which the processor should branch.", 
+      detail: "The first operand contains the address to which the processor should branch.", 
       range: 4
     });
 
