@@ -1,8 +1,9 @@
 import { Token } from 'prismjs';
-import { Register, Condition, condMap, transferMap, BlockAddressMode, BlockTransfer, operations, blockTransferOperations, blockAddressModeMap } from '@/constants';
+import { Register, Condition, condMap, transferMap, BlockAddressMode, BlockTransfer, operations, blockTransferOperations, blockAddressModeMap, condTitle, condExplain, addressModeGroup, regTitle } from '@/constants';
 import { SyntaxError } from '@/classes/error';
 import { TransferNode } from './TransferNode';
-import { TAssembled } from '../types';
+import { IExplanation, TAssembled } from '../types';
+import { bitset } from '@/assets/bitset';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */
@@ -149,7 +150,98 @@ export class BlockTransferNode extends TransferNode {
   /**
    * TODO: implement for explanation section
    */
-  // assemble(): TAssembled {
+  assemble(): TAssembled {
+    let instruction: number = 0;
+    let explanation: IExplanation[] = [];
 
-  // }
+    instruction = (instruction << 4) | this._cond;
+    explanation.push({
+      title: "Condition Code", 
+      subtitle: condTitle[this._cond], 
+      detail: condExplain[this._cond], 
+      range: 4
+    });
+
+    instruction = (instruction << 3) | 4;     // push 01 onto the machine code
+    explanation.push({
+      title: "Instruction Type", 
+      subtitle: "Block Transfer", 
+      detail: "Indicates the organisation of bits to the processor so that the instruction can be decoded.", 
+      range: 3
+    });
+
+    const addressBit = addressModeGroup.before.includes(this._addressMode) ? 1 : 0;   
+    instruction = (instruction << 1) | addressBit;
+    explanation.push({
+      title: "Pre/Post Indexing Bit", 
+      subtitle: addressBit ? "Pre-indexed addressing" : "Post-indexed addressing", 
+      detail: "Tells the processor to use pre- (1) or post- (0) indexed addressing mode for the transfer.", 
+      range: 1
+    });
+
+    const upDownBit = addressModeGroup.increment.includes(this._addressMode) ? 1 : 0;         
+    instruction = (instruction << 1) | upDownBit;
+    explanation.push({
+      title: "Up/Down Bit", 
+      subtitle: upDownBit ? "Up" : "Down", 
+      detail: "Tells the processor to add (up, 1) or subtract (down, 0) the offset from the base register.", 
+      range: 1
+    });
+
+    const sBit = 0;
+    instruction = (instruction << 1) | sBit;
+    explanation.push({
+      title: "PSR & Force User Bit", 
+      subtitle: "Do not load PSR or force user mode", 
+      // TODO: add html functionality to description to add link
+      detail: "If you would like to learn more about this bit, go to https://iitd-plos.github.io/col718/ref/arm-instructionset.pdf", 
+      range: 1
+    });
+
+    const writeBackBit = +this._updating;         
+    instruction = (instruction << 1) | writeBackBit;
+    explanation.push({
+      title: "Write-back Bit", 
+      subtitle: writeBackBit ? "Updating" : "Not updating", 
+      detail: "Tells the processor whether (1) or not (0) to update the base register after transfering the data.", 
+      range: 1
+    });
+
+    const loadStoreBit = this._op === BlockTransfer.LDM ? 1 : 0;         
+    instruction = (instruction << 1) | loadStoreBit;
+    explanation.push({
+      title: "Load/Store Bit", 
+      subtitle: loadStoreBit ? "Load" : "Store", 
+      detail: "Tells the processor whether we are loading (1) or storing (0) data from/to memory.", 
+      range: 1
+    });
+
+    instruction = (instruction << 4) | this._Rn as Register;
+    explanation.push({
+      title: "First Operand", 
+      subtitle: regTitle[this._Rn as Register], 
+      detail: "The first operand in a transfer instruction is often referred to as the 'base' register.", 
+      range: 4
+    });
+
+    const registers = Object.values(Register).filter((v) => !isNaN(Number(v)));
+    registers.forEach(reg => {
+      console.log(reg);
+
+      const include = this._Rlist.includes(reg as Register) ? 1 : 0;
+   
+      instruction = (instruction << 1) | include;
+      explanation.push({
+        title: "Register List Item", 
+        subtitle: regTitle[reg as Register], 
+        detail: `Indicates whether (1) or not (0) ${regTitle[reg as Register]} should be included in the block transfer.`, 
+        range: 1
+      });
+    });
+
+    return {
+      bitcode: bitset(32, instruction).reverse(), 
+      explanation
+    };
+  }
 }

@@ -50,7 +50,7 @@
       </div>
     </div>
 
-    <div class="flex-grow-1 dashed info px-2 py-1">
+    <div class="flex-grow-1 dashed info px-2 py-1" style="overflow: auto;">
       <div>
         Total: {{ memory.size }} bytes
       </div>

@@ -86,6 +86,7 @@ export class BranchNode extends InstructionNode {
     explanation.push({
       title: "Offset", 
       subtitle: `Value ${labelOffset}`, 
+      // TODO: add html functionality to description to add link
       detail: "A 24 bit encoding of the offset from the current PC to the label address. This actually works a little differently in real processors, but this is the gist.", 
       range: 24
     });

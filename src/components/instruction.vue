@@ -18,13 +18,27 @@
       </span>
     </div>
 
-    <div class="fenced flex-grow-1">
-      
-      <div>{{ computedTooltip.title }}</div>
-      <div style="font-size: 14px;">
-        <div v-show="computedTooltip.subtitle.length > 0">{{ computedTooltip.subtitle }}</div>
-        <div>{{ computedTooltip.detail }}</div>
-      </div>
+    <div class="fenced flex-grow-1" style="overflow: auto;">
+      <template v-if="computedTooltip.type === TipType.INSTRUCTION">
+        <div v-html="computedTooltip.title"></div>
+        <div style="font-size: 14px;">
+          <div v-show="computedTooltip.subtitle.length > 0" >
+            <span :class="computedTooltip.subtitle === 'Executed' ? 'executed' : 'not-executed'">
+              {{ computedTooltip.subtitle }}
+            </span>
+          </div>
+
+          <div>{{ computedTooltip.detail }}</div>
+        </div>
+      </template>
+
+      <template v-else>
+        <div>{{ computedTooltip.title }}</div>
+        <div style="font-size: 14px;">
+          <div v-show="computedTooltip.subtitle.length > 0">{{ computedTooltip.subtitle }}</div>
+          <div>{{ computedTooltip.detail }}</div>
+        </div>
+      </template>
      
     </div>
   </div>
@@ -35,6 +49,7 @@ import { InstructionNode } from '@/classes/syntax';
 import { TAssembled, IExplanation } from '@/classes/syntax/types';
 import { EmulatorState } from '@/state';
 import Vue from 'vue';
+import { highlight, languages } from 'prismjs';
 
 /**
  * Extends IExplanation interface to include a portion of the instruction bitcode,
@@ -44,10 +59,17 @@ interface ISection extends IExplanation {
   bits: number[];
 }
 
+enum TipType {
+  INSTRUCTION = "instruction",
+  SECTION = "section",
+  DEFAULT = "default"
+}
+
 type TTip = {
   title: string;
   subtitle: string;
   detail: string;
+  type: TipType;
 }
 
 export default Vue.extend({
@@ -60,7 +82,7 @@ export default Vue.extend({
           title: "No Instruction",
           subtitle: "",
           detail: "Execute an instruction to examine its machine code.",
-          range: 32
+          range: 32,
         }]
       } as TAssembled,
 
@@ -70,6 +92,7 @@ export default Vue.extend({
   computed: {
     currentInstruction: EmulatorState.currentInstruction,
     wasExecuted: EmulatorState.wasExecuted,
+    TipType: () => TipType,
 
     sections: function (): ISection[] {
       const assembled = this.currentInstruction?.assemble() ?? this.default;
@@ -89,19 +112,26 @@ export default Vue.extend({
 
     computedTooltip: function (): TTip {
       if (this.tooltip) return this.tooltip;
-      if (!this.currentInstruction) return this.default.explanation[0];
+      if (!this.currentInstruction) return {
+        ...this.default.explanation[0],
+        type: TipType.DEFAULT
+      }
 
       return {
-        title: this.currentInstruction.text,
+        title: highlight(this.currentInstruction.text, languages.armv7, 'ARMv7'),
         subtitle: this.wasExecuted ? "Executed" : "Not Executed",
-        detail: "This is the assembled machine code for the last instruction. Hover over the different sections to see what they mean."
+        detail: "This is the assembled machine code for the last instruction. Hover over the different sections to see what they mean.",
+        type: TipType.INSTRUCTION
       }
       
     }
   },
   methods: {
     tip: function (section: ISection) {
-      this.tooltip = section;
+      this.tooltip = {
+        ...section,
+        type: TipType.SECTION
+      };
     },
 
     untip: function () {
@@ -143,6 +173,20 @@ export default Vue.extend({
   font-size: 16px;
   padding: 0 2px;
   display: inline-block;
+}
+
+.executed {
+  background-color: #5d9455;
+  color: #101821;
+  padding: 0 0.25rem;
+  border-radius: 0.15rem;
+}
+
+.not-executed {
+  background-color: #ff5555;
+  color: #101821;
+  padding: 0 0.25rem;
+  border-radius: 0.15rem;
 }
 
 </style>

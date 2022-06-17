@@ -48,10 +48,10 @@
               
 
               <div class="row px-0 pt-2" style="height: 210px;">
-                <div class="col-6 pr-1">
+                <div class="col-6 pr-1" style="max-height: 100%;">
                   <instruction></instruction>
                 </div>
-                <div class="col-6 pl-1">
+                <div class="col-6 pl-1" style="max-height: 100%;">
                   <memory></memory>
 
                   <div class="settings">
