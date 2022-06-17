@@ -44,6 +44,25 @@ export const regTitle: Record<Register, string> = {
   [Register.PC]: "Program"  
 };
 
+export const regShortTitle: Record<Register, string> = {
+  [Register.R0]: "r0", 
+  [Register.R1]: "r1",   
+  [Register.R2]: "r2",   
+  [Register.R3]: "r3",
+  [Register.R4]: "r4",   
+  [Register.R5]: "r5",   
+  [Register.R6]: "r6",   
+  [Register.R7]: "r7",
+  [Register.R8]: "r8",   
+  [Register.R9]: "r9",  
+  [Register.R10]: "r10",  
+  [Register.R11]: "r11", 
+  [Register.R12]: "r12",   
+  [Register.SP]: "sp",   
+  [Register.LR]: "lr",   
+  [Register.PC]: "pc"  
+};
+
 export const regExplain: Record<Register, string> = {
   [Register.R0]: "General Purpose Register.", 
   [Register.R1]: "General Purpose Register.", 

@@ -1,5 +1,5 @@
 import { Token } from 'prismjs';
-import { Register, Condition, condMap, transferMap, BlockAddressMode, BlockTransfer, operations, blockTransferOperations, blockAddressModeMap, condTitle, condExplain, addressModeGroup, regTitle } from '@/constants';
+import { Register, Condition, condMap, transferMap, BlockAddressMode, BlockTransfer, operations, blockTransferOperations, blockAddressModeMap, condTitle, condExplain, addressModeGroup, regTitle, regShortTitle } from '@/constants';
 import { SyntaxError } from '@/classes/error';
 import { TransferNode } from './TransferNode';
 import { IExplanation, TAssembled } from '../types';
@@ -226,17 +226,21 @@ export class BlockTransferNode extends TransferNode {
 
     const registers = Object.values(Register).filter((v) => !isNaN(Number(v)));
     registers.forEach(reg => {
-      console.log(reg);
-
       const include = this._Rlist.includes(reg as Register) ? 1 : 0;
-   
       instruction = (instruction << 1) | include;
-      explanation.push({
-        title: "Register List Item", 
-        subtitle: regTitle[reg as Register], 
-        detail: `Indicates whether (1) or not (0) ${regTitle[reg as Register]} should be included in the block transfer.`, 
-        range: 1
-      });
+      // explanation.push({
+      //   title: "Register List Item", 
+      //   subtitle: regTitle[reg as Register], 
+      //   detail: `Indicates whether (1) or not (0) ${regTitle[reg as Register]} should be included in the block transfer.`, 
+      //   range: 1
+      // });
+    });
+
+    explanation.push({
+      title: "Register List", 
+      subtitle: this._Rlist.map(reg => regShortTitle[reg]).join(", "), 
+      detail: `This section is made up of 16 bits, each referring to one of the registers r0 -> pc arranged in order from left to right. A set bit indicates that the register should be included in the transfer.`, 
+      range: 16
     });
 
     return {
