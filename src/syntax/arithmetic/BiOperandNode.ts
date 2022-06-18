@@ -104,7 +104,7 @@ export class BiOperandNode extends InstructionNode {
     explanation.push({
       title: "Second Operand", 
       subtitle: "Unused", 
-      detail: "These bits are left unset because the instruction only has two operands.", 
+      detail: "These bits are left unset because the instruction only has two operands. The first, and the flexible operand.", 
       range: 4
     });
   

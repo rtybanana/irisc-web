@@ -97,6 +97,8 @@ const intro5: TTutorialPage = {
   title: "Introduction 4: The Registers 1",
   content: // html
   `\
+    On the previous page, I mentioned the semantic roles of the final three registers.
+
     The <span class="token register">sp</span> is the <span class="token register">stack pointer</span>. This register\
     is a memory address (or <span class="irisc">pointer</span>) to the top of the stack; temporary local storage in RAM.
 
@@ -135,24 +137,55 @@ const intro6: TTutorialPage = {
 }
 
 const intro7: TTutorialPage = {
-  title: "Introduction 6: The Assembler",
+  title: "Introduction 6: The Assembler 0",
   content: // html
   `\
+    The <span class="irisc">assembler</span> is located in the lower central fenced section of the application window.\
+    The most recently interpreted instruction is assembled into machine code and displayed in the upper fenced section\
+    of the assembler component. Extra information about the instruction is displayed in the fenced section below it.
+
+    In a modern computer, code that you write is compiled into assembly language and then further assembled into machine\
+    code. This machine code is then decoded and processed by the CPU where it is used to decide which action needs to be\
+    taken. 
     
+    Machine code is the lowest level programming language. The language spoken by actual hardware. You will most certainly\
+    never have to write it, but it can be beneficial (and interesting!) to understand how it works.
+  `
+}
+
+const intro8: TTutorialPage = {
+  title: "Introduction 7: The Assembler 1",
+  content: // html
+  `\
+    Switch back to the terminal view using the <i class="fas fa-terminal fa-sm irisc"></i> button and enter the following\
+    command.\
+
+    <div class="ml-5">
+      <span class="token operation">mov</span>\
+      <span class="token register">r0</span>, \
+      <span class="token immediate">#1</span>
+    </div>\
+
+    Press enter and you should see that the assembler section has been populated! Both the bitcode and text versions of the\
+    instruction are displayed, along with the execution status. 
+    
+    You will notice that the machine code for the instruction has been divided into many different sections. Each of these\
+    sections has a particular meaning which the the CPU uses to understand which action it needs to take. You can hover\
+    over any one of these areas to learn more about how the computer is able to decode your instruction.
   `
 }
 
 const intro99: TTutorialPage = {
-  title: "Introduction n: Outro",
+  title: "Introduction 8: Outro",
   content: // html
   `\
     Now that we've gone through the app interface and some computer architecture basics, it's time to get into writing\
     some actual assembly language and seeing what affect it has on the simulator.
 
-    Continue to the next page to start learning some ASM basics!
+    Continue to the next page to start learning some <span class="irisc">ASM</span> basics!
   `
 }
 
 export default [
-  intro1, intro2, intro3, intro4, intro5, intro6, intro7, intro99
+  intro1, intro2, intro3, intro4, intro5, intro6, intro7, intro8, intro99
 ]

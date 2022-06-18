@@ -120,7 +120,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { editor, terminal, registers, memory, instruction, tutorial } from "@/components";
+import { editor, terminal, registers, memory, instruction, tutorial } from "@/vue";
 import { SimulatorState } from "@/state";
 import { Interpreter, RuntimeError } from '@/interpreter';
 import { Register, EnvironmentType } from "@/constants"

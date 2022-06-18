@@ -53,8 +53,15 @@ export default Vue.extend({
       }
     }
   },
+
+  created: function () {
+    this.page = JSON.parse(localStorage.getItem('tutorial') ?? "0");
+  },
+
   watch: {
     page: function () {
+      localStorage.setItem('tutorial', JSON.stringify(this.page));
+
       this.$nextTick(() => {
         (this.$refs.container as HTMLElement).scrollTo({
           top: 0,
@@ -93,6 +100,13 @@ export default Vue.extend({
 }
 
 .content >>> .hmm {
+  background-color: #191d21;
+  border-radius: 0.3rem;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
+.content >>> .code {
   background-color: #191d21;
   border-radius: 0.3rem;
   padding-left: 0.25rem;
