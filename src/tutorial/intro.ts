@@ -146,7 +146,7 @@ const intro7: TTutorialPage = {
 
     In a modern computer, code that you write is compiled into assembly language and then further assembled into machine\
     code. This machine code is then decoded and processed by the CPU where it is used to decide which action needs to be\
-    taken. 
+    taken. In the case of the ARMv7 family of processors, all assembled instructions fit into 32 bits of space.
     
     Machine code is the lowest level programming language. The language spoken by actual hardware. You will most certainly\
     never have to write it, but it can be beneficial (and interesting!) to understand how it works.

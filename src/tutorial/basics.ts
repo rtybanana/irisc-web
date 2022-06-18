@@ -22,6 +22,41 @@ const basics1: TTutorialPage = {
 
     Click the <i class="fas fa-terminal fa-sm irisc"></i> button to switch back to the terminal environment and experiment with the\
     <span class="token operation">mov</span> instruction!
+
+    <div class="hmm">\
+      <div class="token label mb-1">Hmm...</div>\
+      Try using a <span class="token register">register</span> as a source value. How does this change the assembled machine code?\
+    </div>
+  `
+}
+
+const subroutine1: TTutorialPage = {
+  title: "Subroutine 0: The Flex Operand",
+  content: // html
+  `\
+    On the previous page, I mentioned a concept called the <span class="irisc">flexible operand</span>. The flexible operand is just\
+    that, <span class="irisc">flexible</span>. It can be a <span class="token register">register</span>; a\
+    <span class="token register">register</span> with an additional, optional shift; or an <span class="token immediate">immediate</span>\
+    value. 
+    
+    After assembling the rest of the required information for the <span class="token operation">mov</span> instruction into machine code,\
+    we have just 12 bits left over.
+
+    In the case of a <span class="token register">register</span>, the final 12 bits of the instruction are arranged [8, 4]. The first eight\
+    are used to describe the shift and the final four identify the <span class="token register">register</span>.
+
+    In the case of an <span class="token immediate">immediate</span> value, the 12 bits are arranged [4, 8]. The last eight bits describe\
+    an 8-bit number (0 - 255). The first four are where things get clever. These four bits are the <span class="irisc">barrel shifter</span>.
+
+    Continue to the next page to learn more.
+  `
+}
+
+const subroutine2: TTutorialPage = {
+  title: "Subroutine 1: The Barrel Shifter",
+  content: // html
+  `\
+    Explanation incoming I promise - stay tuned!
   `
 }
 
@@ -168,5 +203,5 @@ const basics6: TTutorialPage = {
 }
 
 export default [
-  basics1, basics2, basics3, basics4, basics5, basics6
+  basics1, subroutine1, subroutine2, basics2, basics3, basics4, basics5, basics6
 ];

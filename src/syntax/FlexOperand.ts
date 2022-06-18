@@ -107,11 +107,11 @@ export class FlexOperand extends SyntaxNode {
 
     const [Rm, shift, Rs, immShift] = this.unpack();
     if (this.isImm) {                                                                          // operand is immediate
-      instruction = (instruction << 4) | immShift;
+      instruction = (instruction << 4) | (immShift / 2);
       explanation.push({
         title: "Barrel Shifter", 
         subtitle: (immShift == 0 ? "Not Shifted" : `Rotated Right By ${immShift}`), 
-        detail: "The amount by which the eight bit immediate value is rotated right.", 
+        detail: "The amount by which the eight bit immediate value is rotated right, divided by two.", 
         range: 4
       });
       

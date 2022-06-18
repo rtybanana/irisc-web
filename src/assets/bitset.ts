@@ -19,7 +19,7 @@ export function ffs(n: number) : number {
  */
 export function fls(n: number) : number {
   n = 0xffffffff & n;
-  return Math.round(Math.log2(n));
+  return Math.ceil(Math.log2(n));
 }
 
 /** Rotate right (rotr)
