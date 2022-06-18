@@ -1,9 +1,9 @@
 import { Token } from 'prismjs';
-import { InstructionNode } from './InstructionNode';
-import { FlexOperand } from './FlexOperand';
-import { Register, Operation, Condition, opMap, condMap, condTitle, condExplain, opTitle, flagExplain, opExplain, setFlagsExplain, regTitle, Shift, shiftTitle } from '@/constants';
-import { AssemblyError, SyntaxError } from '../error';
-import { IExplanation, TAssembled } from './types';
+import { InstructionNode } from '../InstructionNode';
+import { FlexOperand } from '../FlexOperand';
+import { Register, Operation, Condition, opMap, condMap, condTitle, condExplain, opTitle, opExplain, setFlagsExplain, regTitle } from '@/constants';
+import { SyntaxError } from '@/interpreter';
+import { IExplanation, TAssembled } from '../types';
 import { bitset } from '@/assets/bitset';
 
 

@@ -1,10 +1,9 @@
 import { condExplain, Condition, condMap, condTitle, Operation, opMap, Register, regTitle } from "@/constants";
 import { Token } from "prismjs";
-import { InstructionNode } from "./InstructionNode";
-import { SyntaxError } from "../error";
-import { IExplanation, TAssembled, TBranchAddress } from "./types";
+import { InstructionNode } from "../InstructionNode";
+import { IExplanation, TAssembled, TBranchAddress } from "../types";
 import { bitset } from "@/assets/bitset";
-import { Interpreter } from "..";
+import { Interpreter, SyntaxError } from "@/interpreter";
 
 export class BranchNode extends InstructionNode {
   protected _op: Operation;

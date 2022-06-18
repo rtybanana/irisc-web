@@ -120,15 +120,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { editor, terminal, registers, memory, instruction, tutorial } from "./components";
-import { Interpreter } from "@/classes";
-import { EmulatorState } from "@/state";
-import { RuntimeError } from '@/classes/error';
+import { editor, terminal, registers, memory, instruction, tutorial } from "@/components";
+import { SimulatorState } from "@/state";
+import { Interpreter, RuntimeError } from '@/interpreter';
 import { Register, EnvironmentType } from "@/constants"
 
 import './assets/generic.css';
 import './assets/syntax.css';
-import { TInstructionNode } from './classes/syntax/types';
+import { TInstructionNode } from '@/syntax/types';
 
 export default Vue.extend({
   name: 'emulator',
@@ -143,18 +142,18 @@ export default Vue.extend({
   data() {
     return {
       env: EnvironmentType.TERMINAL,
-      emulator: EmulatorState
+      emulator: SimulatorState
     }
   },
   computed: {
-    registers: EmulatorState.registers,
-    memory: EmulatorState.memory,
-    errors: EmulatorState.errors,
+    registers: SimulatorState.registers,
+    memory: SimulatorState.memory,
+    errors: SimulatorState.errors,
     
-    running: EmulatorState.running,
-    paused: EmulatorState.paused,
-    delay: EmulatorState.delay,
-    step: EmulatorState.step,
+    running: SimulatorState.running,
+    paused: SimulatorState.paused,
+    delay: SimulatorState.delay,
+    step: SimulatorState.step,
   },
   methods: {
     /**
@@ -163,6 +162,8 @@ export default Vue.extend({
     switchEnvironment: function () {
       if (this.env === EnvironmentType.TERMINAL) this.env = EnvironmentType.EDITOR;
       else this.env = EnvironmentType.TERMINAL;
+
+      localStorage.setItem('environment', this.env);
     },
 
     /**
@@ -170,12 +171,12 @@ export default Vue.extend({
      */
     start: function () {
       if (this.running) {
-        if (!this.step) EmulatorState.resume();
+        if (!this.step) SimulatorState.resume();
         return;
       }
       
       // reset emulator state
-      EmulatorState.reset();
+      SimulatorState.reset();
 
       // report errors (alert is temporary)
       if (this.errors.length > 0) {
@@ -191,19 +192,19 @@ export default Vue.extend({
      * 
      */
     run: async function () {
-      EmulatorState.setEntryPoint();
-      EmulatorState.setStackHeight(0);
-      EmulatorState.start();
+      SimulatorState.setEntryPoint();
+      SimulatorState.setStackHeight(0);
+      SimulatorState.start();
 
       // await this.sleep();
       try {
         while(this.running) {
-          EmulatorState.setStep(false);
-          let node: TInstructionNode = EmulatorState.instruction(this.registers[Register.PC]);
+          SimulatorState.setStep(false);
+          let node: TInstructionNode = SimulatorState.instruction(this.registers[Register.PC]);
 
           // if runtime instruction runoff
           if (node === undefined) {
-            let last: TInstructionNode = EmulatorState.currentInstruction()!;
+            let last: TInstructionNode = SimulatorState.currentInstruction()!;
             throw new RuntimeError("SIGSEG: Segmentation fault.", last.statement, last.lineNumber);
           }
 
@@ -212,13 +213,13 @@ export default Vue.extend({
 
           // check for bx lr to static exit point
           if (this.registers[Register.PC] === this.memory.exitPoint) {
-            EmulatorState.setExitStatus(0);
+            SimulatorState.setExitStatus(0);
           }
         }
       }
       catch (e) {
         if (e instanceof RuntimeError) {
-          EmulatorState.setExitStatus(e);
+          SimulatorState.setExitStatus(e);
         }
       }
     },
@@ -242,16 +243,20 @@ export default Vue.extend({
      */
     doStep: function () {
       if (this.running && this.paused) {
-        EmulatorState.setStep(true);
+        SimulatorState.setStep(true);
         return
       }
       
-      EmulatorState.pause();
+      SimulatorState.pause();
       if (!this.running) {
-        EmulatorState.reset();
+        SimulatorState.reset();
         this.run();
       }
     }
+  },
+
+  created: function () {
+    this.env = (localStorage.getItem('environment') as EnvironmentType) ?? EnvironmentType.TERMINAL;
   }
 })
 </script>

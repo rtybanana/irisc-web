@@ -1,5 +1,5 @@
 import { Token } from 'prismjs';
-import { SyntaxError, NumericalError } from '../error'
+import { SyntaxError, NumericalError } from '../interpreter/error'
 import { Register, regMap } from '@/constants';
 import { ffs, fls, rotr } from '@/assets/bitset';
 

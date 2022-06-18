@@ -1,5 +1,5 @@
 import { SyntaxNode } from "./SyntaxNode";
-import { SyntaxError } from "../error";
+import { SyntaxError } from "../interpreter/error";
 import { Token } from "prismjs";
 import { DataType, dataTypeMap } from '@/constants';
 import { bitset } from "@/assets/bitset";

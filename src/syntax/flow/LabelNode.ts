@@ -1,5 +1,5 @@
-import { SyntaxNode } from "./SyntaxNode";
-import { SyntaxError } from "../error";
+import { SyntaxNode } from "../SyntaxNode";
+import { SyntaxError } from "@/interpreter";
 import { Token } from "prismjs";
 
 export class LabelNode extends SyntaxNode {

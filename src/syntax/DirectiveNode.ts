@@ -1,7 +1,7 @@
 import { SyntaxNode } from "./SyntaxNode";
 import { Directive, directiveMap } from "@/constants/directives";
 import { Token } from "prismjs";
-import { SyntaxError } from "../error";
+import { SyntaxError } from "../interpreter/error";
 
 export class DirectiveNode extends SyntaxNode {
   private directive: Directive;

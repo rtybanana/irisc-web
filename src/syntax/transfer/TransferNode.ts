@@ -3,7 +3,7 @@ import { InstructionNode } from '../InstructionNode';
 import { FlexOperand } from '../FlexOperand';
 import { Register, Operation, Condition, opMap, condMap, TTransfer, transferMap, TTransferSize } from '@/constants';
 import { TBranchAddress } from '../types';
-import { SyntaxError, ReferenceError } from '@/classes/error';
+import { SyntaxError, ReferenceError } from '@/interpreter/error';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */

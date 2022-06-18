@@ -38,12 +38,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import { highlight, languages } from 'prismjs';
-import { EmulatorState } from "@/state";
-import { parse, compileOne } from '@/classes/assembler';
-import { Interpreter } from "@/classes";
-import { InstructionNode } from '@/classes/syntax';
-import { InteractiveError, IriscError } from '@/classes/error';
-import { BranchNode } from '@/classes/syntax/BranchNode';
+import { SimulatorState } from "@/state";
+import { Assembler } from '@/interpreter';
+import { Interpreter } from "@/interpreter";
+import { InstructionNode } from '@/syntax';
+import { InteractiveError, IriscError } from '@/interpreter';
+import { BranchNode } from '@/syntax/flow/BranchNode';
 import { replWelcome } from "@/constants";
 
 export default Vue.extend({
@@ -64,7 +64,7 @@ export default Vue.extend({
     }
   },
   computed: {
-    errors: EmulatorState.errors,
+    errors: SimulatorState.errors,
 
     highlitInput: function () : string {
       let line = this.input.replace(/(\r\n|\n|\r)/gm, "");
@@ -147,7 +147,7 @@ export default Vue.extend({
     execute: function (input: string) {
       try {
         if (input === ":reset" || input === ":r") {
-          EmulatorState.reset();
+          SimulatorState.reset();
           return;
         }
 
@@ -156,8 +156,8 @@ export default Vue.extend({
           return;
         }
 
-        let line = parse(input)[0];
-        let node = compileOne(line, 0);
+        let line = Assembler.parse(input)[0];
+        let node = Assembler.compileOne(line, 0);
 
         if (node instanceof InstructionNode) {
           if (node instanceof BranchNode) {

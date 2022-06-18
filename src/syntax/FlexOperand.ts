@@ -1,6 +1,6 @@
 import { Token } from 'prismjs';
 import { SyntaxNode } from "./SyntaxNode";
-import { AssemblyError, SyntaxError } from '../error';
+import { AssemblyError, SyntaxError } from '../interpreter/error';
 import { Register, Operation, Condition, Shift, regMap, opMap, condMap, shiftMap, OperandType, regTitle, shiftTitle } from '@/constants';
 import { bitset, ffs, fls, rotr } from '@/assets/bitset';
 import { IExplanation, TAssembled, TRegOrImm } from './types';

@@ -1,13 +1,13 @@
 import { rotr } from "@/assets/bitset";
 import { Operation, Register, Shift, Flag, SingleTransfer, TTransfer, TTransferSize, BlockTransfer, BlockAddressMode, addressModeGroup } from "@/constants";
-import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode } from "./syntax";
-import { TInstructionNode } from "./syntax/types";
-import { EmulatorState } from "@/state";
+import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode } from "../syntax";
+import { TInstructionNode } from "../syntax/types";
+import { SimulatorState } from "@/state";
 import { RuntimeError, ReferenceError } from "./error";
-import { BranchNode } from "./syntax/BranchNode";
-import { SingleTransferNode } from "./syntax/transfer/SingleTransferNode";
-import { TransferNode } from "./syntax/transfer/TransferNode";
-import { BlockTransferNode } from "./syntax/transfer/BlockTransferNode";
+import { BranchNode } from "../syntax/flow/BranchNode";
+import { SingleTransferNode } from "../syntax/transfer/SingleTransferNode";
+import { TransferNode } from "../syntax/transfer/TransferNode";
+import { BlockTransferNode } from "../syntax/transfer/BlockTransferNode";
 
 /**
  * Local declaration of useful EmulatorState getters with the js object getter
@@ -15,10 +15,10 @@ import { BlockTransferNode } from "./syntax/transfer/BlockTransferNode";
  * the function execution brackets (()).
  */
 const state = {
-  get registers() { return EmulatorState.registers(); },
-  get cpsr() { return EmulatorState.cpsr(); },
-  get memory() { return EmulatorState.memory(); },
-  get previousPC() { return EmulatorState.previousPC(); }
+  get registers() { return SimulatorState.registers(); },
+  get cpsr() { return SimulatorState.cpsr(); },
+  get memory() { return SimulatorState.memory(); },
+  get previousPC() { return SimulatorState.previousPC(); }
 }
 
 /**
@@ -29,16 +29,16 @@ const state = {
  */
 export function execute(instruction: TInstructionNode, incPC: boolean = true) : boolean {
   let executed: boolean = false;
-  EmulatorState.setCurrentInstruction(instruction);
+  SimulatorState.setCurrentInstruction(instruction);
 
   if (instruction instanceof BranchNode) {
     executed = executeBranch(instruction);
 
     // only increment to the next instruction if branch didn't already (not executed)
-    if (!executed && incPC) EmulatorState.setRegister(Register.PC, state.registers[Register.PC] + 4);
+    if (!executed && incPC) SimulatorState.setRegister(Register.PC, state.registers[Register.PC] + 4);
   }
   else {
-    if (incPC) EmulatorState.setRegister(Register.PC, state.registers[Register.PC] + 4);
+    if (incPC) SimulatorState.setRegister(Register.PC, state.registers[Register.PC] + 4);
 
     if (instruction instanceof BiOperandNode) executed = executeBiOperand(instruction);
     if (instruction instanceof TriOperandNode) executed = executeTriOperand(instruction);
@@ -48,7 +48,7 @@ export function execute(instruction: TInstructionNode, incPC: boolean = true) : 
     if (instruction instanceof BlockTransferNode) executed = executeBlockTransfer(instruction);
   }
 
-  EmulatorState.setExecuted(executed);
+  SimulatorState.setExecuted(executed);
   return executed;
 }
 
@@ -104,29 +104,29 @@ function applyFlexShift(shift: Shift, value: number, amount: number) : number {
  */
 function executeBiOperand(instruction: BiOperandNode) : boolean {
   let [op, cond, set, dest, flex] = instruction.unpack();             // unpack the instruction
-  if (!EmulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
+  if (!SimulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
 
   let src: number = deflex(flex);                                     // deflex the flex operand into a single value
   switch(op) {                                                        // check opcode and execute instruction
     case Operation.MOV:
-      if (set) EmulatorState.setFlags(state.registers[dest], src, src);
-      EmulatorState.setRegister(dest, src);
+      if (set) SimulatorState.setFlags(state.registers[dest], src, src);
+      SimulatorState.setRegister(dest, src);
       break;
     case Operation.MVN:
-      if (set) EmulatorState.setFlags(state.registers[dest], -src, -src);
-      EmulatorState.setRegister(dest, -src);
+      if (set) SimulatorState.setFlags(state.registers[dest], -src, -src);
+      SimulatorState.setRegister(dest, -src);
       break;
     case Operation.CMP:
-      EmulatorState.setFlags(state.registers[dest], src, state.registers[dest] - src, '-');
+      SimulatorState.setFlags(state.registers[dest], src, state.registers[dest] - src, '-');
       break;
     case Operation.CMN:
-      EmulatorState.setFlags(state.registers[dest], src, state.registers[dest] + src, '+');
+      SimulatorState.setFlags(state.registers[dest], src, state.registers[dest] + src, '+');
       break;
     case Operation.TST:
-      EmulatorState.setFlags(state.registers[dest], src, state.registers[dest] & src);
+      SimulatorState.setFlags(state.registers[dest], src, state.registers[dest] & src);
       break;
     case Operation.TEQ:
-      EmulatorState.setFlags(state.registers[dest], src, state.registers[dest] ^ src);
+      SimulatorState.setFlags(state.registers[dest], src, state.registers[dest] ^ src);
       break;
   }
 
@@ -140,51 +140,51 @@ function executeBiOperand(instruction: BiOperandNode) : boolean {
  */
 function executeTriOperand(instruction: TriOperandNode) : boolean {
   let [op, cond, set, dest, src, flex] = instruction.unpack();        // unpack the instruction
-  if (!EmulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
+  if (!SimulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
 
   let n = state.registers[src];
   let m = deflex(flex);                                               // deflex the flex operand into a value
   let result: number | undefined;
   switch (op) {                                                       // check opcode and execute instruction
     case Operation.AND:
-      if (set) EmulatorState.setFlags(n, m, n & m);
+      if (set) SimulatorState.setFlags(n, m, n & m);
       result = n & m;
       break;
     case Operation.EOR:
-      if (set) EmulatorState.setFlags(n, m, n ^ m);
+      if (set) SimulatorState.setFlags(n, m, n ^ m);
       result = n ^ m;
       break;
     case Operation.ORR:
-      if (set) EmulatorState.setFlags(n, m, n | m);
+      if (set) SimulatorState.setFlags(n, m, n | m);
       result = n | m;
       break;
     case Operation.ADD:
-      if (set) EmulatorState.setFlags(n, m, n + m, '+');
+      if (set) SimulatorState.setFlags(n, m, n + m, '+');
       result = n + m;
       break;
     case Operation.SUB:
-      if (set) EmulatorState.setFlags(n, m, n - m, '-');
+      if (set) SimulatorState.setFlags(n, m, n - m, '-');
       result = n - m;
       break;
     case Operation.RSB:
-      if (set) EmulatorState.setFlags(m, n, m - n, '-');
+      if (set) SimulatorState.setFlags(m, n, m - n, '-');
       result = m - n;
       break;
     case Operation.BIC:
-      if (set) EmulatorState.setFlags(m, n, n & (~m));
+      if (set) SimulatorState.setFlags(m, n, n & (~m));
       result = n & (~m);
       break;
     case Operation.ADC:
       result = n + m + (state.cpsr[Flag.C] ? 1 : 0);
-      if (set) EmulatorState.setFlags(n, m, n + m + (state.cpsr[Flag.C] ? 1 : 0), '+');
+      if (set) SimulatorState.setFlags(n, m, n + m + (state.cpsr[Flag.C] ? 1 : 0), '+');
       break;
     case Operation.SBC:
       result = n - m - (state.cpsr[Flag.C] ? 0 : 1);
-      if (set) EmulatorState.setFlags(n, m, n - m - (state.cpsr[Flag.C] ? 0 : 1), '-');
+      if (set) SimulatorState.setFlags(n, m, n - m - (state.cpsr[Flag.C] ? 0 : 1), '-');
       break;
     case Operation.RSC:
       result = m - n - (state.cpsr[Flag.C] ? 0 : 1);
-      if (set) EmulatorState.setFlags(n, m, m - n - (state.cpsr[Flag.C] ? 0 : 1), '-');
+      if (set) SimulatorState.setFlags(n, m, m - n - (state.cpsr[Flag.C] ? 0 : 1), '-');
       break;
   } 
 
@@ -193,7 +193,7 @@ function executeTriOperand(instruction: TriOperandNode) : boolean {
     throw new RuntimeError("While attempting to perform a an instruction.", [], -1);
   }
 
-  EmulatorState.setRegister(dest, result);
+  SimulatorState.setRegister(dest, result);
 
   return true;
 }
@@ -205,7 +205,7 @@ function executeTriOperand(instruction: TriOperandNode) : boolean {
  */
 function executeShift(instruction: ShiftNode) : boolean {
   let [op, cond, set, dest, src1, src2] = instruction.unpack();       // unpack the instruction
-  if (!EmulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
+  if (!SimulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
 
   let n = state.registers[src1];
   let m;
@@ -215,23 +215,23 @@ function executeShift(instruction: ShiftNode) : boolean {
   let result;
   switch (op) {                                                        // check opcode and execute instruction
     case Shift.LSL:
-      if (set) EmulatorState.setFlags(n, m, n << m);
+      if (set) SimulatorState.setFlags(n, m, n << m);
       result = n << m;
       break;
     case Shift.LSR:
-      if (set) EmulatorState.setFlags(n, m, n >> m);
+      if (set) SimulatorState.setFlags(n, m, n >> m);
       result = n >>> m;
       break;
     case Shift.ASR:
     case Shift.ROR:
-      if (set) EmulatorState.setFlags(n, m, rotr(n, m));
+      if (set) SimulatorState.setFlags(n, m, rotr(n, m));
       result = rotr(n, m);
       break;
     default:
       throw new RuntimeError("While attempting to perform a shift operation.", instruction.statement, instruction.lineNumber);
   }
 
-  EmulatorState.setRegister(dest, result);
+  SimulatorState.setRegister(dest, result);
 
   return true;
 }
@@ -243,20 +243,20 @@ function executeShift(instruction: ShiftNode) : boolean {
  */
 function executeBranch(instruction: BranchNode) : boolean {
   let [op, cond, addr] = instruction.unpack();
-  if (!EmulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
+  if (!SimulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
   let address: number;
-  if (typeof addr === 'string') address = EmulatorState.label(addr as string);
+  if (typeof addr === 'string') address = SimulatorState.label(addr as string);
   else address = state.registers[addr as Register];
   
   switch (op) {
     case Operation.B:
     case Operation.BX:
-      EmulatorState.setRegister(Register.PC, address);
+      SimulatorState.setRegister(Register.PC, address);
       break;
     case Operation.BL:
-      EmulatorState.setRegister(Register.LR, state.registers[Register.PC] + 4);
-      EmulatorState.setRegister(Register.PC, address);
+      SimulatorState.setRegister(Register.LR, state.registers[Register.PC] + 4);
+      SimulatorState.setRegister(Register.PC, address);
       break;
   }
 
@@ -265,16 +265,16 @@ function executeBranch(instruction: BranchNode) : boolean {
 
 function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
   let [op, cond, size, reg, addr, sign, flex, mode, wb] = instruction.unpack();
-  if (!EmulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
+  if (!SimulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
   let address: number;
   let postAddress: number;
   let data: number;
   if (typeof addr === "string") {
-    address = EmulatorState.dataLabel(addr as string);
+    address = SimulatorState.dataLabel(addr as string);
 
     if (op === SingleTransfer.LDR) {
-      EmulatorState.setRegister(reg, address);
+      SimulatorState.setRegister(reg, address);
       return true;
     }
 
@@ -293,7 +293,7 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
 
   checkAlignment(address, size, instruction);
   if (wb) {
-    EmulatorState.setRegister((addr as Register), postAddress);
+    SimulatorState.setRegister((addr as Register), postAddress);
   }
 
   switch (op) {
@@ -301,7 +301,7 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
       if (size === "word") data = state.memory.wordView[address / 4];
       else data = state.memory.byteView[address];
 
-      EmulatorState.setRegister(reg, data);
+      SimulatorState.setRegister(reg, data);
       break;
     case SingleTransfer.STR:
       checkStore(postAddress, addr, instruction);
@@ -309,7 +309,7 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
       if (size === "word") data = state.registers[reg];
       else data = state.registers[reg] & 0xff;
 
-      EmulatorState.store(data, address, size);
+      SimulatorState.store(data, address, size);
       break;
   }
 
@@ -318,7 +318,7 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
 
 function executeBlockTransfer(instruction: BlockTransferNode) : boolean {
   let [op, cond, base, reglist, mode, wb] = instruction.unpack();
-  if (!EmulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
+  if (!SimulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
   let address = state.registers[base as Register];
   let increment = addressModeGroup.increment.includes(mode);
@@ -331,10 +331,10 @@ function executeBlockTransfer(instruction: BlockTransferNode) : boolean {
     case BlockTransfer.LDM:
       reglist.forEach(reg => {
         if (before) increment ? address += 4 : address -= 4;
-        EmulatorState.setRegister(reg, state.memory.wordView[address / 4]);
+        SimulatorState.setRegister(reg, state.memory.wordView[address / 4]);
 
         if (!before) increment ? address += 4 : address -= 4;
-        if (base === Register.SP) EmulatorState.setStackHeight(state.memory.size - address);
+        if (base === Register.SP) SimulatorState.setStackHeight(state.memory.size - address);
       });
 
       break;
@@ -342,9 +342,9 @@ function executeBlockTransfer(instruction: BlockTransferNode) : boolean {
       reglist.forEach(reg => {
         if (before) increment ? address += 4 : address -= 4;
         
-        if (base === Register.SP) EmulatorState.setStackHeight(state.memory.size - address);
+        if (base === Register.SP) SimulatorState.setStackHeight(state.memory.size - address);
         checkStore(address, base, instruction);
-        EmulatorState.store(state.registers[reg], address, "word");
+        SimulatorState.store(state.registers[reg], address, "word");
         
         if (!before) increment ? address += 4 : address -= 4;
       });
@@ -352,7 +352,7 @@ function executeBlockTransfer(instruction: BlockTransferNode) : boolean {
       break;
   }
 
-  if (wb) EmulatorState.setRegister((base as Register), address);
+  if (wb) SimulatorState.setRegister((base as Register), address);
 
   return true;
 }

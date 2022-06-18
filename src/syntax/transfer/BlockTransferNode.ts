@@ -1,6 +1,6 @@
 import { Token } from 'prismjs';
 import { Register, Condition, condMap, transferMap, BlockAddressMode, BlockTransfer, operations, blockTransferOperations, blockAddressModeMap, condTitle, condExplain, addressModeGroup, regTitle, regShortTitle } from '@/constants';
-import { SyntaxError } from '@/classes/error';
+import { SyntaxError } from '@/interpreter/error';
 import { TransferNode } from './TransferNode';
 import { IExplanation, TAssembled } from '../types';
 import { bitset } from '@/assets/bitset';

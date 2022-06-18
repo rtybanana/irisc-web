@@ -1,9 +1,5 @@
 import { Operation, Register, Shift, TTransfer } from "@/constants";
-import { BiOperandNode } from "./BiOperandNode";
-import { BranchNode } from "./BranchNode";
-import { InstructionNode } from "./InstructionNode";
-import { LabelNode } from "./LabelNode";
-import { TriOperandNode } from "./TriOperandNode";
+import { InstructionNode, BiOperandNode, TriOperandNode, BranchNode } from ".";
 
 export type TOperation = Operation | Shift | TTransfer;
 export type TRegOrImm = Register | number;

@@ -1,5 +1,5 @@
-import { TInstructionNode } from '@/classes/syntax/types';
-import { IriscError, RuntimeError } from "@/classes/error";
+import { TInstructionNode } from '@/syntax/types';
+import { IriscError, RuntimeError } from "@/interpreter/error";
 
 type TMemory = {
   size: number;
@@ -26,7 +26,7 @@ type TCPU = {
 }
 
 export type TExitStatus = RuntimeError | number;
-export type TEmulatorState = {
+export type TSimulatorState = {
   running: boolean;
   paused: boolean;
   step: boolean;

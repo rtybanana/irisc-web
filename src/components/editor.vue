@@ -15,6 +15,7 @@
       :tab-size="1" 
       :insert-spaces="false" 
       line-numbers
+      @input="save"
     ></prism-editor>
 
     <div class="controls">
@@ -55,23 +56,18 @@
 </template>
 
 <script lang="ts">
-import Vue, { Component } from 'vue';
-import { EmulatorState } from "@/state";
-import { parse, compile, load, build } from "@/classes/assembler";
+import Vue from 'vue';
+import { SimulatorState } from "@/state";
+import { Assembler } from "@/interpreter";
 import { debounce } from "@/assets/functions";
 import getCaretCoordinates from "textarea-caret";
 
 import { PrismEditor } from 'vue-prism-editor'
 import 'vue-prism-editor/dist/prismeditor.min.css';
 
-
 import { highlight, languages } from 'prismjs';
-// import '../assets/prism-armv7';
 import 'prismjs/themes/prism.css'; // import syntax highlighting styles
-import { IriscError, RuntimeError } from '@/classes/error';
-import { TInstructionNode } from '@/classes/syntax/types';
-import { Register } from '@/constants';
-import { ExtendedVue } from 'vue/types/vue';
+import { RuntimeError } from '@/interpreter';
 
 type TPoint = {
   x: number;
@@ -96,11 +92,11 @@ export default Vue.extend({
     }
   },
   computed: {
-    memory: EmulatorState.memory,
-    errors: EmulatorState.errors,
-    running: EmulatorState.running,
-    currentInstruction: EmulatorState.currentInstruction,
-    exitStatus: EmulatorState.exitStatus,
+    memory: SimulatorState.memory,
+    errors: SimulatorState.errors,
+    running: SimulatorState.running,
+    currentInstruction: SimulatorState.currentInstruction,
+    exitStatus: SimulatorState.exitStatus,
 
     computedTooltip: function () : TTooltip {
       if (this.tooltip.title !== "") return this.tooltip;
@@ -124,7 +120,7 @@ export default Vue.extend({
   },
   methods: {
     stop: function () {
-      EmulatorState.stop();
+      SimulatorState.stop();
     },
 
     /**
@@ -384,7 +380,29 @@ export default Vue.extend({
         
         return Math.sqrt(x * x + y * y);
       }
+    },
+
+    /**
+     * Save editor content to local storage so that it persists on this device
+     */
+    save: debounce((program: string) => {
+      // console.log("save now", program);
+      localStorage.setItem('program', program);
+    }),
+
+    /**
+     * Load editor content from local storage so that it persists on this device
+     */
+    load: function () {
+      this.program = localStorage.getItem('program') ?? "";
     }
+  },
+
+  /**
+   * 
+   */
+  created: function () {
+    this.load();
   },
 
   /**
@@ -413,13 +431,13 @@ export default Vue.extend({
     /**
      * 
      */
-    program: debounce(build, 500),
+    program: debounce(Assembler.build, 500),
 
     /**
      * 
      */
     memory: function (val, old) {
-      if (val.size !== old.size) build(this.program);
+      if (val.size !== old.size) Assembler.build(this.program);
     }
   }
 })

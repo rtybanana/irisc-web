@@ -45,9 +45,8 @@
 </template>
 
 <script lang="ts">
-import { InstructionNode } from '@/classes/syntax';
-import { TAssembled, IExplanation } from '@/classes/syntax/types';
-import { EmulatorState } from '@/state';
+import { TAssembled, IExplanation } from '@/syntax/types';
+import { SimulatorState } from '@/state';
 import Vue from 'vue';
 import { highlight, languages } from 'prismjs';
 
@@ -90,8 +89,8 @@ export default Vue.extend({
     }
   },
   computed: {
-    currentInstruction: EmulatorState.currentInstruction,
-    wasExecuted: EmulatorState.wasExecuted,
+    currentInstruction: SimulatorState.currentInstruction,
+    wasExecuted: SimulatorState.wasExecuted,
     TipType: () => TipType,
 
     sections: function (): ISection[] {

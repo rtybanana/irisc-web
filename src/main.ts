@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import emulator from './emulator.vue'
+import app from './app.vue'
 
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
 
@@ -15,5 +15,5 @@ Vue.use(BootstrapVueIcons)
 Vue.config.productionTip = false
 
 new Vue({
-  render: h => h(emulator),
+  render: h => h(app),
 }).$mount('#app')

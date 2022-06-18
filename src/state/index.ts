@@ -1,1 +1,1 @@
-export { default as EmulatorState } from "./emulator";
+export { default as SimulatorState } from "./simulator";

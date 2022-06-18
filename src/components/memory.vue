@@ -72,14 +72,14 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { EmulatorState } from "@/state";
+import { SimulatorState } from "@/state";
 import { Register } from '@/constants';
 
 export default Vue.extend({
   name: 'memory',
   computed: {
-    memory: EmulatorState.memory,
-    registers: EmulatorState.registers,
+    memory: SimulatorState.memory,
+    registers: SimulatorState.registers,
 
     textWidth: function () : number {
       return this.memory.textHeight / this.memory.size * 100;

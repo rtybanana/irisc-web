@@ -3,10 +3,10 @@ import { InstructionNode } from '../InstructionNode';
 import { FlexOperand } from '../FlexOperand';
 import { Register, Operation, Condition, opMap, condMap, TTransfer, transferMap, TTransferSize, TSign, TAddressMode, SingleTransfer, condTitle, condExplain, regTitle } from '@/constants';
 import { IExplanation, TAssembled, TBranchAddress } from '../types';
-import { SyntaxError, ReferenceError, IriscError } from '@/classes/error';
+import { SyntaxError, ReferenceError, IriscError } from '@/interpreter/error';
 import { TransferNode } from './TransferNode';
 import { bitset } from '@/assets/bitset';
-import { Interpreter } from '@/classes';
+import { Interpreter } from '@/interpreter';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */

@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { EmulatorState } from "@/state";
+import { SimulatorState } from "@/state";
 import { Register, regName, regTitle, regExplain, flagName, flagTitle, flagExplain } from "@/constants"
 import { zip } from '@/assets/functions';
 
@@ -77,8 +77,8 @@ export default Vue.extend({
     };
   },
   computed: {
-    registers: EmulatorState.registers,
-    cpsr: EmulatorState.cpsr,
+    registers: SimulatorState.registers,
+    cpsr: SimulatorState.cpsr,
 
     computedTitle() : string {
       return this.title ?? "Registers";

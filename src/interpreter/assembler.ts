@@ -1,13 +1,10 @@
 import { languages, Token, tokenize } from 'prismjs';
-import { AllocationNode, BiOperandNode, BranchNode, DirectiveNode, InstructionNode, LabelNode, ShiftNode, SyntaxNode, TriOperandNode } from './syntax';
+import { AllocationNode, BiOperandNode, BranchNode, DirectiveNode, InstructionNode, LabelNode, ShiftNode, SyntaxNode, TriOperandNode, SingleTransferNode, BlockTransferNode } from '@/syntax';
 import { AssemblyError, IriscError, SyntaxError } from './error';
-import { EmulatorState } from '@/state';
-import { Register } from '@/constants';
-import { SingleTransferNode } from './syntax/transfer/SingleTransferNode';
-import { BlockTransferNode } from './syntax/transfer/BlockTransferNode';
+import { SimulatorState } from '@/state';
 
 const state = {
-  get memory() { return EmulatorState.memory(); }
+  get memory() { return SimulatorState.memory(); }
 }
 
 /**
@@ -47,7 +44,7 @@ function compile(lines: Token[][]): SyntaxNode[] {
     }
     catch (e) {
       if (e instanceof IriscError) {
-        EmulatorState.addError(e);
+        SimulatorState.addError(e);
       }
     }
     
@@ -126,7 +123,7 @@ function load(nodes: (SyntaxNode | null)[]) {
     // TODO: memory allocation validation
     else if (node instanceof AllocationNode) {
       if (mode !== Mode.Data) {
-        EmulatorState.addError(new AssemblyError("Cannot declare data allocations outside of the .data section.", node.statement, node.lineNumber, -1));
+        SimulatorState.addError(new AssemblyError("Cannot declare data allocations outside of the .data section.", node.statement, node.lineNumber, -1));
       }
 
       heap.set(node.data, heapHeight);
@@ -136,27 +133,27 @@ function load(nodes: (SyntaxNode | null)[]) {
 
     else if (node instanceof LabelNode) {
       if (mode !== Mode.Text) {
-        EmulatorState.addError(new AssemblyError("Cannot declare branchable labels outside of the .text section.", node.statement, node.lineNumber, -1));
+        SimulatorState.addError(new AssemblyError("Cannot declare branchable labels outside of the .text section.", node.statement, node.lineNumber, -1));
       }
 
-      if (EmulatorState.hasLabel(node.identifier)) {
-        EmulatorState.addError(new AssemblyError(`Cannot declare multiple labels with the same name: '${node.identifier}'.`, node.statement, node.lineNumber, 0));
+      if (SimulatorState.hasLabel(node.identifier)) {
+        SimulatorState.addError(new AssemblyError(`Cannot declare multiple labels with the same name: '${node.identifier}'.`, node.statement, node.lineNumber, 0));
       }
-      else EmulatorState.addLabel(node.identifier, instructions.length * 4);
+      else SimulatorState.addLabel(node.identifier, instructions.length * 4);
     }
 
     else if (node instanceof InstructionNode) {
       if (mode !== Mode.Text) {
-        EmulatorState.addError(new AssemblyError("Cannot declare instructions outside of the .text section.", node.statement, node.lineNumber, -1));
+        SimulatorState.addError(new AssemblyError("Cannot declare instructions outside of the .text section.", node.statement, node.lineNumber, -1));
       }
 
       instructions.push(node);
     }
   });
 
-  EmulatorState.setInstructions(instructions);
-  EmulatorState.allocateHeap(heap, heapHeight, heapMap);
-  EmulatorState.validate();
+  SimulatorState.setInstructions(instructions);
+  SimulatorState.allocateHeap(heap, heapHeight, heapMap);
+  SimulatorState.validate();
 }
 
 /**
@@ -164,8 +161,8 @@ function load(nodes: (SyntaxNode | null)[]) {
  * @param program 
  */
 function build(program: string) : void {
-  EmulatorState.stop();
-  EmulatorState.initMemory();
+  SimulatorState.stop();
+  SimulatorState.initMemory();
 
   let lines = parse(program);
   let nodes = compile(lines);

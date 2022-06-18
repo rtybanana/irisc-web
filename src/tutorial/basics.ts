@@ -114,7 +114,7 @@ const basics5: TTutorialPage = {
       <span class="token immediate">#1</span>
     </div>\
 
-    Takes the first source value <span class="token register">r1</span>, subtracts it from the first source value\
+    Takes the first source value <span class="token register">r1</span>, subtracts it from the second source value\
     <span class="token immediate">#1</span> (the number 1), and places the result into the destination register\
     <span class="token register">r0</span>.
 

@@ -1,9 +1,8 @@
 import { Token } from 'prismjs';
-import { InstructionNode } from './InstructionNode';
-import { FlexOperand } from './FlexOperand';
-import { SyntaxError } from '../error';
-import { Register, Operation, Condition, opMap, condMap, OperandType, Shift, shiftMap } from '@/constants';
-import { TAssembled, TRegOrImm } from './types';
+import { InstructionNode } from '../InstructionNode';
+import { SyntaxError } from '@/interpreter';
+import { Register, Condition, condMap, OperandType, Shift, shiftMap } from '@/constants';
+import { TRegOrImm } from '../types';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */

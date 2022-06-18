@@ -125,8 +125,12 @@ const intro6: TTutorialPage = {
     how memory is structured in a typical computer.
 
     By default, <span class="irisc">iRISC</span> simulates a system with an unrealisticaly limited amount of RAM.\
-    This is by design. Principally, <span class="irisc">iRISC</span> is a teaching aid - not a web-based ARM simulator.\
-    Limiting the memory in this way enables it to demonstrate some slightly unclear elements of
+    This is by design. Principally, <span class="irisc">iRISC</span> is a teaching aid - not a web-based ARM emulator.\
+    Limiting the memory in this way enables it to demonstrate some slightly unclear aspects of how the software and\
+    hardware interact under the hood. 
+    
+    If you wish to increase the amount of RAM available, you can do so using the\
+    <i class="fas fa-sliders-h fa-sm"></i> button in the bottom right corner.
   `
 }
 
