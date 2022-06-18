@@ -19,19 +19,49 @@
     ></prism-editor>
 
     <div class="controls">
-      <div>
+      <div class="d-inline-block">
         <i 
           class="button red fas fa-stop mr-1 clickable" 
           @click="stop"
         ></i>
+
+        <!-- run / pause / resume -->
+        <template>
+          <i 
+            v-show="!running"
+            class="button green fas fa-play mx-1 clickable" 
+            @click="$emit('run')"
+          ></i>
+          <i 
+            v-show="running && !paused"
+            class="button fas fa-pause mx-1 clickable" 
+            @click="pause"
+          ></i>
+          <i 
+            v-show="running && paused"
+            class="button green fas fa-play mx-1 clickable" 
+            @click="resume"
+          ></i>
+        </template>
+
         <i 
-          class="button green fas fa-play mx-1 clickable" 
-          @click="$emit('run')"
-        ></i>
-        <i 
-          class="button step fas fa-step-forward mx-1 clickable"
+          class="button amber step fas fa-step-forward mx-1 clickable"
           @click="$emit('step')"
         ></i>
+
+        <div class="d-inline-block mx-1" style="width: 60px;">
+          <b-form-input 
+            style="margin-bottom: -5px;" 
+            type="range" 
+            inline
+            :value="1000 / delay"
+            min="0.5"
+            max="50"
+            step="0.1"
+            @input="setDelay"
+          ></b-form-input>
+        </div>
+
         <i 
           class="button terminal fas fa-terminal ml-1 clickable" 
           @click="$emit('switch')"
@@ -94,6 +124,8 @@ export default Vue.extend({
     memory: SimulatorState.memory,
     errors: SimulatorState.errors,
     running: SimulatorState.running,
+    paused: SimulatorState.paused,
+    delay: SimulatorState.delay,
     currentInstruction: SimulatorState.currentInstruction,
     exitStatus: SimulatorState.exitStatus,
 
@@ -120,6 +152,18 @@ export default Vue.extend({
   methods: {
     stop: function () {
       SimulatorState.stop();
+    },
+
+    pause: function () {
+      SimulatorState.pause();
+    },
+
+    resume: function () {
+      SimulatorState.resume();
+    },
+
+    setDelay: function (delay: number) {
+      SimulatorState.setDelay(1000 / delay)
     },
 
     /**
@@ -484,6 +528,10 @@ export default Vue.extend({
 
 .button.green {
   color:#1d8f46;
+}
+
+.button.amber {
+  color: #f9e1b3
 }
 
 .button.terminal {

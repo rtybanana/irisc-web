@@ -87,7 +87,7 @@ export default Vue.extend({
         .substring(this.prompt.length)
         .replace(/(\r\n|\n|\r)/gm, "");
 
-      if (this.history[0] !== input) this.history.unshift(input);
+      this.addHistory(input)
       this.historyIndex = -1;
 
       this.$nextTick(() => {
@@ -107,10 +107,18 @@ export default Vue.extend({
       e.preventDefault();
     },
 
+    addHistory: function (input: string) {
+      if (this.history[0] === input) return;
+      if (input === "") return;
+      
+      this.history.unshift(input);
+    },
+
     upHistory: function (e: any) {
       this.historyIndex = Math.min(this.historyIndex + 1, this.history.length - 1);
-      let input = this.history[this.historyIndex];
+      if (this.historyIndex < 0) return;
 
+      let input = this.history[this.historyIndex];
       this.insertInput(e.target, input);
     },
 
@@ -131,14 +139,16 @@ export default Vue.extend({
       this.$nextTick(() => {
         target.focus();
 
-        // set caret position to end
-        let range = document.createRange();
-        range.setStart(target.firstChild, input.length);
-        range.collapse(true);
+        // set caret position to end - if there is any text in this history item
+        if (target.firstChild) {
+          let range = document.createRange();
+          range.setStart(target.firstChild, input.length);
+          range.collapse(true);
 
-        let sel = window.getSelection() as Selection;
-        sel.removeAllRanges();
-        sel.addRange(range);
+          let sel = window.getSelection() as Selection;
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
       });
     },
 
@@ -180,10 +190,25 @@ export default Vue.extend({
         <span class="error-type">${e.type}</span>: ${e.message}\
       `
       //<span class="ml-5">${e.statement}</span>\
+    },
+
+    loadHistory: function () {
+      this.history = JSON.parse(localStorage.getItem("history") ?? "[]");
     }
   },
+
+  created: function () {
+    this.loadHistory();
+  },
+
   mounted: function () {
     this.input = this.prompt;
+  },
+
+  watch: {
+    history: function (value) {
+      localStorage.setItem("history", JSON.stringify(value));
+    }
   }
 })
 </script>
