@@ -1,9 +1,9 @@
+import { bitset } from "@/assets/bitset";
 import { condExplain, Condition, condMap, condTitle, Operation, opMap, Register, regTitle } from "@/constants";
+import { Interpreter, SyntaxError } from "@/interpreter";
 import { Token } from "prismjs";
 import { InstructionNode } from "../InstructionNode";
 import { IExplanation, TAssembled, TBranchAddress } from "../types";
-import { bitset } from "@/assets/bitset";
-import { Interpreter, SyntaxError } from "@/interpreter";
 
 export class BranchNode extends InstructionNode {
   protected _op: Operation;

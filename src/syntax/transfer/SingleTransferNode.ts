@@ -1,12 +1,11 @@
-import { Token } from 'prismjs';
-import { InstructionNode } from '../InstructionNode';
-import { FlexOperand } from '../FlexOperand';
-import { Register, Operation, Condition, opMap, condMap, TTransfer, transferMap, TTransferSize, TSign, TAddressMode, SingleTransfer, condTitle, condExplain, regTitle } from '@/constants';
-import { IExplanation, TAssembled, TBranchAddress } from '../types';
-import { SyntaxError, ReferenceError, IriscError } from '@/interpreter/error';
-import { TransferNode } from './TransferNode';
 import { bitset } from '@/assets/bitset';
+import { condExplain, Condition, condMap, condTitle, Register, regTitle, SingleTransfer, TAddressMode, transferMap, TSign, TTransferSize } from '@/constants';
 import { Interpreter } from '@/interpreter';
+import { ReferenceError, SyntaxError } from '@/interpreter/error';
+import { Token } from 'prismjs';
+import { FlexOperand } from '../FlexOperand';
+import { IExplanation, TAssembled, TBranchAddress } from '../types';
+import { TransferNode } from './TransferNode';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */

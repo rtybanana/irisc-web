@@ -36,15 +36,13 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { highlight, languages } from 'prismjs';
-import { SimulatorState } from "@/state";
-import { Assembler } from '@/interpreter';
-import { Interpreter } from "@/interpreter";
-import { InstructionNode } from '@/syntax';
-import { InteractiveError, IriscError } from '@/interpreter';
-import { BranchNode } from '@/syntax/flow/BranchNode';
 import { replWelcome } from "@/constants";
+import { Assembler, InteractiveError, Interpreter, IriscError } from '@/interpreter';
+import { SimulatorState } from "@/state";
+import { InstructionNode } from '@/syntax';
+import { BranchNode } from '@/syntax/flow/BranchNode';
+import { highlight, languages } from 'prismjs';
+import Vue from 'vue';
 
 export default Vue.extend({
   name: 'terminal',

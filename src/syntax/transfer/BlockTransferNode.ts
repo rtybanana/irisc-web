@@ -1,9 +1,9 @@
-import { Token } from 'prismjs';
-import { Register, Condition, condMap, transferMap, BlockAddressMode, BlockTransfer, operations, blockTransferOperations, blockAddressModeMap, condTitle, condExplain, addressModeGroup, regTitle, regShortTitle } from '@/constants';
-import { SyntaxError } from '@/interpreter/error';
-import { TransferNode } from './TransferNode';
-import { IExplanation, TAssembled } from '../types';
 import { bitset } from '@/assets/bitset';
+import { addressModeGroup, BlockAddressMode, blockAddressModeMap, BlockTransfer, blockTransferOperations, condExplain, Condition, condMap, condTitle, Register, regShortTitle, regTitle, transferMap } from '@/constants';
+import { SyntaxError } from '@/interpreter/error';
+import { Token } from 'prismjs';
+import { IExplanation, TAssembled } from '../types';
+import { TransferNode } from './TransferNode';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */

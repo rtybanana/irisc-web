@@ -1,7 +1,7 @@
-import { languages, Token, tokenize } from 'prismjs';
-import { AllocationNode, BiOperandNode, BranchNode, DirectiveNode, InstructionNode, LabelNode, ShiftNode, SyntaxNode, TriOperandNode, SingleTransferNode, BlockTransferNode } from '@/syntax';
-import { AssemblyError, IriscError, SyntaxError } from './error';
 import { SimulatorState } from '@/state';
+import { AllocationNode, BiOperandNode, BlockTransferNode, BranchNode, DirectiveNode, InstructionNode, LabelNode, ShiftNode, SingleTransferNode, SyntaxNode, TriOperandNode } from '@/syntax';
+import { languages, Token, tokenize } from 'prismjs';
+import { AssemblyError, IriscError, SyntaxError } from './error';
 
 const state = {
   get memory() { return SimulatorState.memory(); }
@@ -170,4 +170,4 @@ function build(program: string) : void {
   load(nodes);
 }
 
-export { parse, compile, compileOne, load, build }
+export { parse, compile, compileOne, load, build };

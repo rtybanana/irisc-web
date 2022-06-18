@@ -24,8 +24,8 @@
 </template>
 
 <script lang="ts">
+import { TTutorialPage, tutorialPages } from "@/tutorial";
 import Vue from 'vue';
-import { tutorialPages, TTutorialPage } from "@/tutorial";
 
 export default Vue.extend({
   name: 'tutorial',

@@ -1,6 +1,6 @@
+import { Condition, operations } from '@/constants';
 import { Token } from 'prismjs';
 import { SyntaxNode } from "./SyntaxNode";
-import { Operation, Condition, opMap, operations } from '@/constants';
 import { TAssembled, TOperation } from './types';
 
 /** Ancestor class for all instruction-type syntax nodes (Bi/TriOperandNode etc.) */

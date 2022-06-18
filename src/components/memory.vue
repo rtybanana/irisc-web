@@ -71,9 +71,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { SimulatorState } from "@/state";
 import { Register } from '@/constants';
+import { SimulatorState } from "@/state";
+import Vue from 'vue';
 
 export default Vue.extend({
   name: 'memory',

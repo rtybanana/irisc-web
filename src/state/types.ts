@@ -1,5 +1,5 @@
-import { TInstructionNode } from '@/syntax/types';
 import { IriscError, RuntimeError } from "@/interpreter/error";
+import { TInstructionNode } from '@/syntax/types';
 
 type TMemory = {
   size: number;

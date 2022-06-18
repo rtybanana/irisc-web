@@ -1,8 +1,8 @@
-import { SyntaxNode } from "./SyntaxNode";
-import { SyntaxError } from "../interpreter/error";
-import { Token } from "prismjs";
-import { DataType, dataTypeMap } from '@/constants';
 import { bitset } from "@/assets/bitset";
+import { DataType, dataTypeMap } from '@/constants';
+import { Token } from "prismjs";
+import { SyntaxError } from "../interpreter/error";
+import { SyntaxNode } from "./SyntaxNode";
 
 export class AllocationNode extends SyntaxNode {
   protected _identifier: string;

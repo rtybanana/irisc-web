@@ -56,18 +56,17 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { SimulatorState } from "@/state";
-import { Assembler } from "@/interpreter";
 import { debounce } from "@/assets/functions";
-import getCaretCoordinates from "textarea-caret";
-
-import { PrismEditor } from 'vue-prism-editor'
-import 'vue-prism-editor/dist/prismeditor.min.css';
-
+import { Assembler, RuntimeError } from "@/interpreter";
+import { SimulatorState } from "@/state";
 import { highlight, languages } from 'prismjs';
 import 'prismjs/themes/prism.css'; // import syntax highlighting styles
-import { RuntimeError } from '@/interpreter';
+import getCaretCoordinates from "textarea-caret";
+import Vue from 'vue';
+import { PrismEditor } from 'vue-prism-editor';
+import 'vue-prism-editor/dist/prismeditor.min.css';
+
+
 
 type TPoint = {
   x: number;

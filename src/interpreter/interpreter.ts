@@ -1,13 +1,12 @@
 import { rotr } from "@/assets/bitset";
-import { Operation, Register, Shift, Flag, SingleTransfer, TTransfer, TTransferSize, BlockTransfer, BlockAddressMode, addressModeGroup } from "@/constants";
-import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode } from "../syntax";
-import { TInstructionNode } from "../syntax/types";
+import { addressModeGroup, BlockTransfer, Flag, Operation, Register, Shift, SingleTransfer, TTransferSize } from "@/constants";
 import { SimulatorState } from "@/state";
-import { RuntimeError, ReferenceError } from "./error";
+import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode } from "../syntax";
 import { BranchNode } from "../syntax/flow/BranchNode";
-import { SingleTransferNode } from "../syntax/transfer/SingleTransferNode";
-import { TransferNode } from "../syntax/transfer/TransferNode";
 import { BlockTransferNode } from "../syntax/transfer/BlockTransferNode";
+import { SingleTransferNode } from "../syntax/transfer/SingleTransferNode";
+import { TInstructionNode } from "../syntax/types";
+import { ReferenceError, RuntimeError } from "./error";
 
 /**
  * Local declaration of useful EmulatorState getters with the js object getter

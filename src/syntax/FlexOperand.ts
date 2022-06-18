@@ -1,9 +1,8 @@
+import { OperandType, Register, regTitle, Shift, shiftMap, shiftTitle } from '@/constants';
 import { Token } from 'prismjs';
-import { SyntaxNode } from "./SyntaxNode";
 import { AssemblyError, SyntaxError } from '../interpreter/error';
-import { Register, Operation, Condition, Shift, regMap, opMap, condMap, shiftMap, OperandType, regTitle, shiftTitle } from '@/constants';
-import { bitset, ffs, fls, rotr } from '@/assets/bitset';
-import { IExplanation, TAssembled, TRegOrImm } from './types';
+import { SyntaxNode } from "./SyntaxNode";
+import { IExplanation, TRegOrImm } from './types';
 
 export class FlexOperand extends SyntaxNode {
   protected _Rm: TRegOrImm;

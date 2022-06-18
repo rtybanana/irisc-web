@@ -1,6 +1,6 @@
-import { SyntaxNode } from "../SyntaxNode";
 import { SyntaxError } from "@/interpreter";
 import { Token } from "prismjs";
+import { SyntaxNode } from "../SyntaxNode";
 
 export class LabelNode extends SyntaxNode {
   protected _identifier: string;

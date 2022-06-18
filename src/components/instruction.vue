@@ -45,10 +45,10 @@
 </template>
 
 <script lang="ts">
-import { TAssembled, IExplanation } from '@/syntax/types';
 import { SimulatorState } from '@/state';
-import Vue from 'vue';
+import { IExplanation, TAssembled } from '@/syntax/types';
 import { highlight, languages } from 'prismjs';
+import Vue from 'vue';
 
 /**
  * Extends IExplanation interface to include a portion of the instruction bitcode,

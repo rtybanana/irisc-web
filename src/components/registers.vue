@@ -47,10 +47,10 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { SimulatorState } from "@/state";
-import { Register, regName, regTitle, regExplain, flagName, flagTitle, flagExplain } from "@/constants"
 import { zip } from '@/assets/functions';
+import { flagExplain, flagName, flagTitle, regExplain, Register, regName, regTitle } from "@/constants";
+import { SimulatorState } from "@/state";
+import Vue from 'vue';
 
 export default Vue.extend({
   name: 'registers',

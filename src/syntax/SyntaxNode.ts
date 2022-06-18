@@ -1,7 +1,7 @@
-import { Token } from 'prismjs';
-import { SyntaxError, NumericalError } from '../interpreter/error'
-import { Register, regMap } from '@/constants';
 import { ffs, fls, rotr } from '@/assets/bitset';
+import { Register, regMap } from '@/constants';
+import { Token } from 'prismjs';
+import { NumericalError, SyntaxError } from '../interpreter/error';
 
 /** Ancestor class which defines common functions for all child syntax nodes */
 export class SyntaxNode {

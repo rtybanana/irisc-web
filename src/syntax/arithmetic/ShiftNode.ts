@@ -1,7 +1,7 @@
+import { Condition, condMap, OperandType, Register, Shift, shiftMap } from '@/constants';
+import { SyntaxError } from '@/interpreter';
 import { Token } from 'prismjs';
 import { InstructionNode } from '../InstructionNode';
-import { SyntaxError } from '@/interpreter';
-import { Register, Condition, condMap, OperandType, Shift, shiftMap } from '@/constants';
 import { TRegOrImm } from '../types';
 
 

@@ -1,13 +1,11 @@
-import Vue from 'vue';
-import { Condition, Register, Flag, TTransferSize } from "@/constants";
 import { bitset } from "@/assets/bitset";
+import { Condition, Flag, Register, TTransferSize } from "@/constants";
 import { IriscError, ReferenceError, RuntimeError } from "@/interpreter/error";
-import { TInstructionNode } from '@/syntax/types';
-import { AllocationNode, LabelNode } from '@/syntax';
+import { LabelNode } from '@/syntax';
 import { SingleTransferNode } from '@/syntax/transfer/SingleTransferNode';
-// import { EmulatorState } from '.';
-import { TSimulatorState, TExitStatus } from './types';
-import { TransferNode } from '@/syntax/transfer/TransferNode';
+import { TInstructionNode } from '@/syntax/types';
+import Vue from 'vue';
+import { TExitStatus, TSimulatorState } from './types';
 
 const data = Vue.observable<TSimulatorState>({
   running: false,
