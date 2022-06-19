@@ -57,8 +57,6 @@ export class BranchNode extends InstructionNode {
       range: 4
     });
 
-    console.log(instruction);
-
     instruction = (instruction << 3) | 5;
     explanation.push({
       title: "Instruction Type", 
@@ -66,8 +64,6 @@ export class BranchNode extends InstructionNode {
       detail: "Indicates the organisation of bits to the processor so that the instruction can be decoded.", 
       range: 3
     });
-
-    console.log(instruction);
     
     const linkBit = this._op === Operation.BL ? 1 : 0;
     instruction = (instruction << 1) | linkBit;
@@ -79,7 +75,6 @@ export class BranchNode extends InstructionNode {
     });
 
     const labelOffset = Interpreter.generateLabelOffset(this._Rd as string, this);
-    console.log(labelOffset, labelOffset & 16777215);
 
     instruction = (instruction << 24) | (labelOffset & 16777215);
     explanation.push({

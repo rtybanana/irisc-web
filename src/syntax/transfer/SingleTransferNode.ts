@@ -161,9 +161,6 @@ export class SingleTransferNode extends TransferNode {
       range: 2
     });
     
-
-    console.log(this._flex?.isImm, this.isLiteral, +!(this._flex?.isImm ?? this.isLiteral));
-
     const immBit = +!(this._flex?.isImm ?? this.isLiteral);        // negated unary operator (0 if boolean is true)
     instruction = (instruction << 1) | immBit;
     explanation.push({
@@ -222,8 +219,6 @@ export class SingleTransferNode extends TransferNode {
     });
 
     if (this.isReg) {
-      console.log("address is an expression");
-
       instruction = (instruction << 4) | this._Rn as Register;
       explanation.push({
         title: "Second Operand", 
@@ -256,8 +251,6 @@ export class SingleTransferNode extends TransferNode {
       }
     }
     else {
-      console.log("address is a label");
-
       instruction = (instruction << 4) | Register.PC;
       explanation.push({
         title: "Second Operand", 

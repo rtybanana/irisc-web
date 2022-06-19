@@ -429,7 +429,6 @@ export default Vue.extend({
      * Save editor content to local storage so that it persists on this device
      */
     save: debounce((program: string) => {
-      // console.log("save now", program);
       localStorage.setItem('program', program);
     }),
 

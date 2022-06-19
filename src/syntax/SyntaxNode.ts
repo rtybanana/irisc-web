@@ -140,20 +140,15 @@ export class SyntaxNode {
     let bottombit: number = ffs(imm);
     let topbit: number = fls(imm);
 
-    console.log(bottombit, topbit);
-
     if (topbit > 31)
       throw new NumericalError(`IMMEDIATE value '${token.content}' (decimal ${imm}) cannot be represented in 32 bits.`, this._statement, this._lineNumber, this._currentToken);
     if ((topbit - bottombit) > bits)
       throw new NumericalError(`IMMEDIATE value '${token.content}' (decimal ${imm}) cannot be implicitly represented with a maximum set-bit width of ${bits}.`, this._statement, this._lineNumber, this._currentToken);
     
-    console.log(topbit, bits);
     if (topbit > bits - 1) { 
       imm = rotr(imm, topbit - 7);
       shift = 32 - (topbit - 7);
     }
-
-    console.log(shift);
 
     // if shift amount is odd
     if (shift % 2 !== 0) {

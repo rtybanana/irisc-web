@@ -95,7 +95,6 @@ export default Vue.extend({
 
     sections: function (): ISection[] {
       const assembled = this.currentInstruction?.assemble() ?? this.default;
-      console.log(assembled);
 
       let startIdx = 0;
       return assembled.explanation.map(explanation => {
