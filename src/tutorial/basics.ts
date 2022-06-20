@@ -62,7 +62,7 @@ const subroutine2: TTutorialPage = {
     Because the maximum number that can be represented in 4 bits is 15, this value is first multiplied by two before applying the rotation,\
     allowing for a full range of even rotations [0, 2, ..., 28, 30].
 
-    In this way, ARM enabled many of the more useful constants to be represented rather than just any number with a maximum bit-width of 12\
+    In this way, ARM enables many of the more useful constants to be represented rather than just any number with a maximum bit-width of 12\
     (up to 4095). For instance, all powers of 2 up to a full word width (32 bits). 
 
     <div class="hmm">\
