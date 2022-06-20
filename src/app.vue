@@ -171,8 +171,6 @@ export default Vue.extend({
     step: SimulatorState.step,
 
     isTooSmall: function (): boolean {
-      console.log(this.windowSize);
-
       return this.windowSize < 1000;
     }
   },
@@ -276,7 +274,6 @@ export default Vue.extend({
     },
 
     windowSizeListener: function () {
-      console.log("here");
       this.windowSize = window.innerWidth;
     }
   },

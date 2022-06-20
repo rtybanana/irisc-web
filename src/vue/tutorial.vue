@@ -99,6 +99,14 @@ export default Vue.extend({
   color: #e02f72;
 }
 
+.content >>> .green {
+  color: #1d8f46;
+}
+
+.content >>> .amber {
+  color: #f9e1b3
+}
+
 .content >>> .hmm {
   background-color: #191d21;
   border-radius: 0.3rem;

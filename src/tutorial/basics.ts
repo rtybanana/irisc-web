@@ -67,14 +67,15 @@ const subroutine2: TTutorialPage = {
 
     <div class="hmm">\
       <div class="token label mb-1">Hint</div>\
-      You can experiment with this concept by using the binary (#0b...), octal (#0...), and hexadecimal (#0x...) immediate representations in\
-      your instructions.\
+      You can experiment with this concept by using the binary (<span class="token immediate">#0b...</span>), octal\
+      (<span class="token immediate">#0...</span>), and hexadecimal (<span class="token immediate">#0x...</span>) immediate representations\
+      in your instructions.\
 
       <div class="ml-5">
         <span class="token operation">mov</span>\
         <span class="token register">r0</span>, \
         <span class="token immediate">#0xff00</span>
-      </div>
+      </div>\
     </div>    
   `
 }
