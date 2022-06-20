@@ -114,6 +114,19 @@
         </div>
       </div>
     </b-modal>
+
+    <b-modal 
+      centered hide-header 
+      hide-footer
+      :visible="isTooSmall"
+      body-class="settings-modal p-1"
+    >
+      <h4>oh no!</h4>
+      <div class="mt-3">
+        It looks like the device you're using is too small to properly interact with iRISC. <br><br>
+        I recommend retrying on a larger, desktop or laptop device for the best experience.
+      </div>
+    </b-modal>
     
   </div>
 </template>
@@ -142,7 +155,9 @@ export default Vue.extend({
   data() {
     return {
       env: EnvironmentType.TERMINAL,
-      emulator: SimulatorState
+      emulator: SimulatorState,
+
+      windowSize: 0
     }
   },
   computed: {
@@ -154,6 +169,12 @@ export default Vue.extend({
     paused: SimulatorState.paused,
     delay: SimulatorState.delay,
     step: SimulatorState.step,
+
+    isTooSmall: function (): boolean {
+      console.log(this.windowSize);
+
+      return this.windowSize < 1000;
+    }
   },
   methods: {
     /**
@@ -252,11 +273,23 @@ export default Vue.extend({
         SimulatorState.reset();
         this.run();
       }
+    },
+
+    windowSizeListener: function () {
+      console.log("here");
+      this.windowSize = window.innerWidth;
     }
   },
 
   created: function () {
     this.env = (localStorage.getItem('environment') as EnvironmentType) ?? EnvironmentType.TERMINAL;
+
+    window.addEventListener("resize", this.windowSizeListener);
+    this.windowSizeListener();
+  },
+
+  destroyed: function () {
+    window.removeEventListener("resize", this.windowSizeListener);
   }
 })
 </script>
