@@ -35,6 +35,18 @@ describe("assembling immediates, simple", () => {
     expect(assemble("#0xff")).toStrictEqual([255, 0]);
     expect(assemble("#0x64")).toStrictEqual([100, 0]);
   });
+
+  test("invalid, too wide", () => {
+    expect(() => assemble("#0xfff")).toThrow("maximum set-bit width");
+    expect(() => assemble("#0x101")).toThrow("maximum set-bit width");
+    expect(() => assemble("#0x700d")).toThrow("maximum set-bit width");
+  });
+
+  test("invalid, way too wide", () => {
+    expect(() => assemble("#0xfffffffff")).toThrow("represented in 32 bits");
+    expect(() => assemble("#0x100000000000")).toThrow("represented in 32 bits");
+    expect(() => assemble("#0x1239faedc810b")).toThrow("represented in 32 bits");
+  });
 });
 
 /**
@@ -68,7 +80,7 @@ describe("assembling immediates, rolled corner edge case", () => {
   });
 
   test("invalid, odd rotation", () => {
-    expect(assemble("#0x80000040")).toThrow("even number of bits");
+    expect(() => assemble("#0x80000040")).toThrow("even number of bits");
   })
 });
 
