@@ -47,7 +47,7 @@ export class BranchNode extends InstructionNode {
     if (this._op === Operation.BX) return this.assembleBX();
 
     let instruction: number = 0;
-    let explanation: IExplanation[] = [];
+    const explanation: IExplanation[] = [];
 
     instruction = (instruction << 4) | this._cond;
     explanation.push({
@@ -93,7 +93,7 @@ export class BranchNode extends InstructionNode {
 
   assembleBX(): TAssembled {
     let instruction: number = 0;
-    let explanation: IExplanation[] = [];
+    const explanation: IExplanation[] = [];
 
     instruction = (instruction << 4) | this._cond;
     explanation.push({

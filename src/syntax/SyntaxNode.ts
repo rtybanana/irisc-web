@@ -1,4 +1,4 @@
-import { ffs, fls, rotr } from '@/assets/bitset';
+import { bitset, ffs, fls, rotr } from '@/assets/bitset';
 import { Register, regMap } from '@/constants';
 import { Token } from 'prismjs';
 import { NumericalError, SyntaxError } from '../interpreter/error';
@@ -94,7 +94,7 @@ export class SyntaxNode {
   parseImm(token: Token, bits?: number) : number {
     let base: number = 0;
     let start: number;
-    let reveresedToken = [...(token.content as string)].reverse();
+    const reveresedToken = [...(token.content as string)].reverse();
 
     if (token.alias == "bin") {
       base = 2;
@@ -118,7 +118,7 @@ export class SyntaxNode {
     start = start === -1 ? reveresedToken.length : start;
     
     start = reveresedToken.length - start;
-    let imm: number = parseInt((token.content as string).slice(start), base);
+    const imm: number = parseInt((token.content as string).slice(start), base);
 
     if (!bits || imm < Math.pow(2, bits)) return imm;
     else throw new NumericalError("IMMEDIATE value '" + token.content + "' (decimal " + imm + ") is greater than the " + bits + "-bit maximum.", this._statement, this._lineNumber, this._currentToken)
@@ -136,18 +136,46 @@ export class SyntaxNode {
     let shift = 0;
 
     if (imm == 0) return [imm, shift];    // return [0, 0] if imm == 0 (short circuit)
+    if (imm > 0xffffffff) {
+      throw new NumericalError(
+        `IMMEDIATE value '${token.content}' (decimal ${imm}) cannot be represented in 32 bits.`, 
+        this._statement, 
+        this._lineNumber, 
+        this._currentToken
+      );
+    }
 
-    let bottombit: number = ffs(imm);
-    let topbit: number = fls(imm);
+    const bottombit: number = ffs(imm);
+    const topbit: number = fls(imm);
 
-    if (topbit > 31)
-      throw new NumericalError(`IMMEDIATE value '${token.content}' (decimal ${imm}) cannot be represented in 32 bits.`, this._statement, this._lineNumber, this._currentToken);
-    if ((topbit - bottombit) > bits)
-      throw new NumericalError(`IMMEDIATE value '${token.content}' (decimal ${imm}) cannot be implicitly represented with a maximum set-bit width of ${bits}.`, this._statement, this._lineNumber, this._currentToken);
-    
-    if (topbit > bits - 1) { 
-      imm = rotr(imm, topbit - 7);
-      shift = 32 - (topbit - 7);
+    if (topbit > 31) {
+      throw new NumericalError(
+        `IMMEDIATE value '${token.content}' (decimal ${imm}) cannot be represented in 32 bits.`, 
+        this._statement, 
+        this._lineNumber, 
+        this._currentToken
+      );
+    }
+
+    if ((topbit - bottombit) > bits - 1) {
+      const validRolledCorner = this.isValidRolledCorner(imm, bits);
+
+      if (!validRolledCorner) {
+        throw new NumericalError(
+          `IMMEDIATE value '${token.content}' (decimal ${imm}) cannot be implicitly represented with a maximum set-bit width of ${bits}.`, 
+          this._statement, 
+          this._lineNumber, 
+          this._currentToken
+        );
+      }
+
+      [imm, shift] = validRolledCorner as [number, number];
+    }
+    else {
+      if (topbit > bits - 1) { 
+        imm = rotr(imm, Math.floor((topbit - (bits - 2)) / 2) * 2);
+        shift = 32 - (Math.floor((topbit - (bits - 2)) / 2) * 2);
+      }
     }
 
     // if shift amount is odd
@@ -155,7 +183,44 @@ export class SyntaxNode {
       throw new NumericalError(`The barrel shifter can only rotate an IMMEDIATE value by an even number of bits.`, this._statement, this._lineNumber, this._currentToken);
     }
       
-    return [imm, shift];
+    return [(imm & 0xff) >>> 0, shift];
+  }
+
+  /**
+   * This checks a specific edge case where a rotated immediate value is halfway through rolling round
+   * the corner of the word. For example: 0xf000000f, where the valid 8-bit number 0xff has been rotated
+   * by the equally valid value 4, but the immediate representation is disallowed because the distance
+   * between the maximum set-bit (31) and the minimum set-bit (0) is greater than 8.
+   * 
+   * @param imm 
+   * @param bits 
+   */
+  isValidRolledCorner(imm: number, bits: number): boolean | [number, number] {
+    const bottomBits = (imm & 0xff) >>> 0;
+    console.log(bitset(8, bottomBits).reverse());
+
+    const correctiveRotation = fls(bottomBits) + 1;
+    console.log(correctiveRotation);
+
+    const testImm = rotr((imm >>> 0), correctiveRotation);
+    console.log(bitset(32, testImm).reverse());
+
+    const bottombit: number = ffs(testImm);
+    const topbit: number = fls(testImm);
+
+    console.log(topbit, bottombit);
+
+    if ((topbit - bottombit) > bits - 1) return false;
+
+    /**
+     * return [imm, shift] where
+     *    imm is the corrected immediate expressed as an 8 bit number
+     *    shift is the smallest even rotation to move the immediate into the first 8 bits of the word
+     */
+    return [
+      (rotr(testImm, 24) & 0xff) >>> 0, 
+      Math.floor((bits - correctiveRotation) / 2) *2
+    ];
   }
 
 }

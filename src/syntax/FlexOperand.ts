@@ -31,7 +31,7 @@ export class FlexOperand extends SyntaxNode {
     super(statement, lineNumber, currentToken);
 
     // this.parseComma(this.nextToken());
-    let [value, type] = this.parseRegOrImm();      // parse immediate with default 8 bits (with extended 4 bit shift)
+    const [value, type] = this.parseRegOrImm();      // parse immediate with default 8 bits (with extended 4 bit shift)
     this._Rm = value;
     this._type = type;
 
@@ -87,7 +87,7 @@ export class FlexOperand extends SyntaxNode {
     }
     else throw new SyntaxError(`The comma after the final operand indicates an optional shift, but no shift was found.`, this._statement, this._lineNumber, this._currentToken);
     
-    let [value, type] = this.parseRegOrImm(5);     // parse immediate with a max length of 5 bits
+    const [value, type] = this.parseRegOrImm(5);     // parse immediate with a max length of 5 bits
     this._Rs = value;
     this._shiftType = type;
   }
@@ -103,7 +103,7 @@ export class FlexOperand extends SyntaxNode {
 
   assemble(): [number, IExplanation[]] {
     let instruction: number = 0;
-    let explanation: IExplanation[] = [];
+    const explanation: IExplanation[] = [];
 
     const [Rm, shift, Rs, immShift] = this.unpack();
     if (this.isImm) {                                                                          // operand is immediate

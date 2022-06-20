@@ -43,7 +43,7 @@ export class BlockTransferNode extends TransferNode {
     let addressMode: string = "";
     let condition: string = "";
 
-    let op = blockTransferOperations.find(e => (token.content as string).slice(0, e.length) === e) ?? "";
+    const op = blockTransferOperations.find(e => (token.content as string).slice(0, e.length) === e) ?? "";
     let suffix: string = (token.content as string).substring(op.length);
 
     switch (op) {
@@ -89,7 +89,7 @@ export class BlockTransferNode extends TransferNode {
   parseRegList() : void {
     this.parseBrace(this.nextToken(), 'start');
 
-    let subStatement = this._statement.slice(this._currentToken);
+    const subStatement = this._statement.slice(this._currentToken);
     let index = 0;
     for (;;) {
       try {
@@ -152,7 +152,7 @@ export class BlockTransferNode extends TransferNode {
    */
   assemble(): TAssembled {
     let instruction: number = 0;
-    let explanation: IExplanation[] = [];
+    const explanation: IExplanation[] = [];
 
     instruction = (instruction << 4) | this._cond;
     explanation.push({

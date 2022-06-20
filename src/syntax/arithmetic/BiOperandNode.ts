@@ -56,7 +56,7 @@ export class BiOperandNode extends InstructionNode {
    */
   assemble(): TAssembled {
     let instruction: number = 0;
-    let explanation: IExplanation[] = [];
+    const explanation: IExplanation[] = [];
   
     instruction = (instruction << 4) | this._cond;
     explanation.push({
@@ -74,7 +74,7 @@ export class BiOperandNode extends InstructionNode {
       range: 2
     });
 
-    let immBit = +this._flex.isImm;          // unary operator (1 if boolean is true)
+    const immBit = +this._flex.isImm;          // unary operator (1 if boolean is true)
     instruction = (instruction << 1) | immBit;
     explanation.push({
       title: "FlexOperand Type", 

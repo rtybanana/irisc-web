@@ -57,7 +57,7 @@ export class TriOperandNode extends InstructionNode {
 
   assemble(): TAssembled {
     let instruction: number = 0;
-    let explanation: IExplanation[] = [];
+    const explanation: IExplanation[] = [];
 
     instruction = (instruction << 4) | this._cond;
     explanation.push({
@@ -75,7 +75,7 @@ export class TriOperandNode extends InstructionNode {
       range: 2
     });
 
-    let immBit = +this._flex.isImm;          // unary operator (1 if boolean is true)
+    const immBit = +this._flex.isImm;          // unary operator (1 if boolean is true)
     instruction = (instruction << 1) | immBit;
     explanation.push({
       title: "FlexOperand Type", 
@@ -92,7 +92,7 @@ export class TriOperandNode extends InstructionNode {
       range: 4
     });
     
-    let setFlagsBit = +this._setFlags;
+    const setFlagsBit = +this._setFlags;
     instruction = (instruction << 1) | setFlagsBit;
     explanation.push({
       title: "CPSR Flags", 

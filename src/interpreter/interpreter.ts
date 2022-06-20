@@ -59,7 +59,7 @@ export function execute(instruction: TInstructionNode, incPC: boolean = true) : 
 export function deflex(flex: FlexOperand) : number {
   let deflex: number;
 
-  let [Rm, shift, Rs, immShift] = flex.unpack();
+  const [Rm, shift, Rs, immShift] = flex.unpack();
   if (flex.isImm) return rotr(Rm as number, immShift);            // return value of immediate (short circuit)
   else deflex = state.registers[Rm as Register];               // get value in register
 
@@ -102,10 +102,10 @@ function applyFlexShift(shift: Shift, value: number, amount: number) : number {
  * @returns 
  */
 function executeBiOperand(instruction: BiOperandNode) : boolean {
-  let [op, cond, set, dest, flex] = instruction.unpack();             // unpack the instruction
+  const [op, cond, set, dest, flex] = instruction.unpack();             // unpack the instruction
   if (!SimulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
 
-  let src: number = deflex(flex);                                     // deflex the flex operand into a single value
+  const src: number = deflex(flex);                                     // deflex the flex operand into a single value
   switch(op) {                                                        // check opcode and execute instruction
     case Operation.MOV:
       if (set) SimulatorState.setFlags(state.registers[dest], src, src);
@@ -138,11 +138,11 @@ function executeBiOperand(instruction: BiOperandNode) : boolean {
  * @returns 
  */
 function executeTriOperand(instruction: TriOperandNode) : boolean {
-  let [op, cond, set, dest, src, flex] = instruction.unpack();        // unpack the instruction
+  const [op, cond, set, dest, src, flex] = instruction.unpack();        // unpack the instruction
   if (!SimulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
 
-  let n = state.registers[src];
-  let m = deflex(flex);                                               // deflex the flex operand into a value
+  const n = state.registers[src];
+  const m = deflex(flex);                                               // deflex the flex operand into a value
   let result: number | undefined;
   switch (op) {                                                       // check opcode and execute instruction
     case Operation.AND:
@@ -203,10 +203,10 @@ function executeTriOperand(instruction: TriOperandNode) : boolean {
  * @returns 
  */
 function executeShift(instruction: ShiftNode) : boolean {
-  let [op, cond, set, dest, src1, src2] = instruction.unpack();       // unpack the instruction
+  const [op, cond, set, dest, src1, src2] = instruction.unpack();       // unpack the instruction
   if (!SimulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
 
-  let n = state.registers[src1];
+  const n = state.registers[src1];
   let m;
   if (instruction.isReg) m = state.registers[src2 as Register];
   else m = src2 as number;
@@ -241,7 +241,7 @@ function executeShift(instruction: ShiftNode) : boolean {
  * @returns 
  */
 function executeBranch(instruction: BranchNode) : boolean {
-  let [op, cond, addr] = instruction.unpack();
+  const [op, cond, addr] = instruction.unpack();
   if (!SimulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
   let address: number;
@@ -263,7 +263,7 @@ function executeBranch(instruction: BranchNode) : boolean {
 }
 
 function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
-  let [op, cond, size, reg, addr, sign, flex, mode, wb] = instruction.unpack();
+  const [op, cond, size, reg, addr, sign, flex, mode, wb] = instruction.unpack();
   if (!SimulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
   let address: number;
@@ -283,7 +283,7 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
   }
   else {
     address = state.registers[addr as Register];
-    let m = flex ? deflex(flex) : 0;
+    const m = flex ? deflex(flex) : 0;
     postAddress = sign === "+" ? address + m : address - m;
 
     if (mode === "pre") address = postAddress;
@@ -320,8 +320,8 @@ function executeBlockTransfer(instruction: BlockTransferNode) : boolean {
   if (!SimulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
   let address = state.registers[base as Register];
-  let increment = addressModeGroup.increment.includes(mode);
-  let before = addressModeGroup.before.includes(mode);
+  const increment = addressModeGroup.increment.includes(mode);
+  const before = addressModeGroup.before.includes(mode);
 
   checkAlignment(address, "word", instruction);
 

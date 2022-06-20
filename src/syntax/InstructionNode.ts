@@ -30,7 +30,7 @@ export abstract class InstructionNode extends SyntaxNode {
     let modifier: string = "";
     let condition: string = "";
 
-    let forceFlags: string[] = [ "cmp", "cmn", "tst", "teq" ];
+    const forceFlags: string[] = [ "cmp", "cmn", "tst", "teq" ];
 
     operation = operations.find(e => (token.content as string).slice(0, e.length) === e) ?? "";
 

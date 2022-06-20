@@ -40,8 +40,8 @@ export class AllocationNode extends SyntaxNode {
     }
 
     // string length + 1 because null (0) terminated
-    let data = new Uint8Array(new ArrayBuffer(token.length + 1));
-    let string = (token.content as string).slice(1, -1);
+    const data = new Uint8Array(new ArrayBuffer(token.length + 1));
+    const string = (token.content as string).slice(1, -1);
 
     for (let i = 0; i < string.length; i++) data[i] = string.charCodeAt(i);
 
@@ -49,33 +49,33 @@ export class AllocationNode extends SyntaxNode {
   }
 
   parseByte(token: Token) : Uint8Array {
-    let data = new Uint8Array(new ArrayBuffer(1));
-    let bits = bitset(8, this.parseImm(token));
+    const data = new Uint8Array(new ArrayBuffer(1));
+    const bits = bitset(8, this.parseImm(token));
     data[0] = parseInt(bits.join(''), 2);
 
     return data;
   }
 
   parseHWord(token: Token) : Uint8Array {
-    let buffer = new ArrayBuffer(2);
-    let data = new Uint16Array(buffer);
-    let bits = bitset(16, this.parseImm(token));
+    const buffer = new ArrayBuffer(2);
+    const data = new Uint16Array(buffer);
+    const bits = bitset(16, this.parseImm(token));
     data[0] = parseInt(bits.join(''), 2);
 
     return new Uint8Array(buffer);
   }
 
   parseWord(token: Token) : Uint8Array {
-    let buffer = new ArrayBuffer(4);
-    let data = new Uint32Array(buffer);
-    let bits = bitset(32, this.parseImm(token));
+    const buffer = new ArrayBuffer(4);
+    const data = new Uint32Array(buffer);
+    const bits = bitset(32, this.parseImm(token));
     data[0] = parseInt(bits.join(''), 2);
 
     return new Uint8Array(buffer);
   }
 
   parseSkip(token: Token) : Uint8Array {
-    let length = this.parseImm(token);
+    const length = this.parseImm(token);
     
     return new Uint8Array(new ArrayBuffer(length));
   }

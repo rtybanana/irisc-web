@@ -47,8 +47,6 @@ const subroutine1: TTutorialPage = {
 
     In the case of an <span class="token immediate">immediate</span> value, the 12 bits are arranged [4, 8]. The last eight bits describe\
     an 8-bit number (0 - 255). The first four are where things get clever. These four bits are the <span class="irisc">barrel shifter</span>.
-
-    Continue to the next page to learn more.
   `
 }
 
@@ -56,7 +54,28 @@ const subroutine2: TTutorialPage = {
   title: "Subroutine 1: The Barrel Shifter",
   content: // html
   `\
-    Explanation incoming I promise - stay tuned!
+    In computer hardware, a <span class="irisc">barrel shifter</span> is a circuit which can shift data by a specified number of bits.\
+    In an ARMv7 processor the barrel shift is employed in a clever way to maximise the number of useful immediates that can be represented\
+    in 12 bits without the need for extra instructions.
+
+    The first four bits of the 12 bits of space specify the number of bits by which the remaining 8-bit number should be rotated right.\
+    Because the maximum number that can be represented in 4 bits is 15, this value is first multiplied by two before applying the rotation,\
+    allowing for a full range of even rotations [0, 2, ..., 28, 30].
+
+    In this way, ARM enabled many of the more useful constants to be represented rather than just any number with a maximum bit-width of 12\
+    (up to 4095). For instance, all powers of 2 up to a full word width (32 bits). 
+
+    <div class="hmm">\
+      <div class="token label mb-1">Hint</div>\
+      You can experiment with this concept by using the binary (#0b...), octal (#0...), and hexadecimal (#0x...) immediate representations in\
+      your instructions.\
+
+      <div class="ml-5">
+        <span class="token operation">mov</span>\
+        <span class="token register">r0</span>, \
+        <span class="token immediate">#0xff00</span>
+      </div>
+    </div>    
   `
 }
 

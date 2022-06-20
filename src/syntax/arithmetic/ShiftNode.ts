@@ -40,7 +40,7 @@ export class ShiftNode extends InstructionNode {
     this._Rn = this.parseReg(this.nextToken());
     this.parseComma(this.nextToken());
 
-    let [value, type] = this.parseRegOrImm();         
+    const [value, type] = this.parseRegOrImm();         
     this._Rs = value;
     this._type = type;
   }

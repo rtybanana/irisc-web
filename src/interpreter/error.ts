@@ -9,7 +9,6 @@ type TErrorColour = typeof red | typeof blue | typeof amber;
  * Base error class which provides the basis for catching specific syntax errors
  */
 export class IriscError extends Error {
-  message: string;
   statement: Token[];
   lineNumber: number;
   tokenIndex: number;

@@ -82,7 +82,7 @@ export class SingleTransferNode extends TransferNode {
 
       this.peekToken();
       if (this.peekToken().type === "sign") {
-        let sign = this.nextToken();
+        const sign = this.nextToken();
         this._sign = sign.content as TSign;
       }
       this._flex = new FlexOperand(this.statement, this.lineNumber, this._currentToken);          // parsing delegated to FlexOperand constructor
@@ -142,8 +142,8 @@ export class SingleTransferNode extends TransferNode {
    */
   assemble(): TAssembled {
     let instruction: number = 0;
-    let explanation: IExplanation[] = [];
-    let labelOffset = this.isLiteral ? Interpreter.generateLabelOffset(this.literal, this) : 0;
+    const explanation: IExplanation[] = [];
+    const labelOffset = this.isLiteral ? Interpreter.generateLabelOffset(this.literal, this) : 0;
 
     instruction = (instruction << 4) | this._cond;
     explanation.push({

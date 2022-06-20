@@ -39,7 +39,7 @@ function parse(program: string) : Token[][] {
 function compile(lines: Token[][]): SyntaxNode[] {
   return lines.reduce((a: SyntaxNode[], e: Token[], i: number) => {
     try {
-      let node: SyntaxNode | null = compileOne(e, i);
+      const node: SyntaxNode | null = compileOne(e, i);
       if (node !== null) a.push(node);
     }
     catch (e) {
@@ -108,10 +108,10 @@ function compileOne(line: Token[], lineNumber: number) : SyntaxNode | null {
 function load(nodes: (SyntaxNode | null)[]) {
   enum Mode { Text, Data }
 
-  let instructions: InstructionNode[] = [];
-  let heap = new Uint8Array(new ArrayBuffer(state.memory.size)); 
+  const instructions: InstructionNode[] = [];
+  const heap = new Uint8Array(new ArrayBuffer(state.memory.size)); 
   let heapHeight: number = 0;
-  let heapMap: Record<string, number> = {};
+  const heapMap: Record<string, number> = {};
 
   let mode: Mode = Mode.Text;
   nodes.forEach((node, index) => {
@@ -164,8 +164,8 @@ function build(program: string) : void {
   SimulatorState.stop();
   SimulatorState.initMemory();
 
-  let lines = parse(program);
-  let nodes = compile(lines);
+  const lines = parse(program);
+  const nodes = compile(lines);
 
   load(nodes);
 }

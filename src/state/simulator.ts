@@ -157,8 +157,8 @@ const actions = {
   },
 
   checkFlags: function (cond: Condition) : boolean {
-    let bits = bitset(4, cond);
-    let cpsr = data.cpu.cpsr;
+    const bits = bitset(4, cond);
+    const cpsr = data.cpu.cpsr;
 
     let result: boolean = false;
     switch(cond) {
@@ -186,10 +186,10 @@ const actions = {
   },
   
   setFlags: function (op1: number, op2: number, result: number, operator: string = " ") {
-    let sign1: number = bitset(32, op1)[31];             // sign of left hand operand
-    let sign2: number = bitset(32, op2)[31];             // sign of right hand operand
-    let signr: number = bitset(32, result)[31];          // sign of result
-    let result_ext: number[] = bitset(33, result);                    // msb = carry bit
+    const sign1: number = bitset(32, op1)[31];             // sign of left hand operand
+    const sign2: number = bitset(32, op2)[31];             // sign of right hand operand
+    const signr: number = bitset(32, result)[31];          // sign of result
+    const result_ext: number[] = bitset(33, result);                    // msb = carry bit
 
     Vue.set(data.cpu.cpsr, Flag.N, result_ext[31] === 1);             // msb = 1
     Vue.set(data.cpu.cpsr, Flag.Z, (result & 0xffffffff) === 0);      // first 32 bits are 0 
@@ -242,7 +242,7 @@ const actions = {
     data.memory.byteView?.set(heap.slice(0, height), data.memory.textHeight);
     data.memory.heapHeight = height;
 
-    for (let label in map) map[label] = map[label] + data.memory.textHeight;
+    for (const label in map) map[label] = map[label] + data.memory.textHeight;
     data.memory.heapMap = map;
   },
 
