@@ -31,7 +31,7 @@ const basics1: TTutorialPage = {
 }
 
 const subroutine1: TTutorialPage = {
-  title: "Subroutine 0: The Flex Operand",
+  title: "Subroutine 0-0: The Flex Operand",
   content: // html
   `\
     On the previous page, I mentioned a concept called the <span class="irisc">flexible operand</span>. The flexible operand is just\
@@ -51,7 +51,7 @@ const subroutine1: TTutorialPage = {
 }
 
 const subroutine2: TTutorialPage = {
-  title: "Subroutine 1: The Barrel Shifter",
+  title: "Subroutine 0-1: The Barrel Shifter",
   content: // html
   `\
     In computer hardware, a <span class="irisc">barrel shifter</span> is a circuit which can shift data by a specified number of bits.\

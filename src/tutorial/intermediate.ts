@@ -113,15 +113,90 @@ const intermediate4: TTutorialPage = {
 }
 
 const subroutine1: TTutorialPage = {
-  title: "Subroutine 2: The CPSR",
+  title: "Subroutine 1-0: The CPSR",
   content: // html
   `\
     The <span class="irisc">cpsr</span> stands for the 'current program status register' and is one of the\
     <i>non</i> general-purpose registers in the ARMv7 CPU. Four bits of this register are dedicated to the\
     condition code flags: boolean values most often used to evaluate the result of comparisons in the context\
-    of <span class="irisc">conditional operations</span>.
+    of <span class="irisc">conditional operations</span>. 
+    
+    The four flags are as follows:
 
-    &lt;more coming soon&gt;
+    <div class="ml-5">\
+      <span class="irisc">N</span> - result is negative
+      <span class="irisc">Z</span> - result is equal to zero
+      <span class="irisc">C</span> - result did carry
+      <span class="irisc">V</span> - result did overflow
+    </div>\
+
+    The first two should be fairly self explanatory, but <span class="irisc">C</span> and\
+    <span class="irisc">V</span> are a little more nebulous. Let's revisit them in more detail.
+  `
+}
+
+const subroutine2: TTutorialPage = {
+  title: "Subroutine 1-1: Signed Overflow",
+  content: // html
+  `\
+    <span class="irisc">V</span>, the overflow condition, triggers when an operation results a sign change in\
+    an unexpected way. For example, if an addition of two positive <span class="irisc">addends</span> results\
+    in a sign change from positive to negative.
+
+    The <span class="irisc">sign</span> of an integer is stored using a truly beautiful concept called\
+    <span class="irisc">two's complement</span>. The important thing to know about two's complement number\
+    representation is that if the most significant bit (msb) is set, then the number is\
+    <span class="irisc">negative</span>, and the absolute value of the signed number is read by inverting the\
+    bits and adding 1.
+
+    Imagine a computer with only four bits of space (called a <span class="irisc">nibble</span>, by the way)\
+    in each of its registers. Consider this binary add for both signed and unsigned representations.
+
+    <div class="ml-5">\
+      b | <span class="token register">0111</span> + <span class="token register">0001</span> = <span class="token register">1000</span>
+      u | &nbsp;&nbsp;&nbsp;7 + &nbsp;&nbsp;&nbsp;1 = &nbsp;&nbsp;&nbsp;8 &nbsp;<span class="irisc">&#10003;</span>
+      s | &nbsp;&nbsp;&nbsp;7 + &nbsp;&nbsp;&nbsp;1 = &nbsp;&nbsp;-8 &nbsp;<span class="irisc">???</span>
+    </div>\
+
+    It's important to note that the computer doesn't care whether you as the programmer are treating this data\
+    as signed or unsigned, it just applies the rules of binary maths. The overflow flag will be set to indicate\
+    that a signed overflow has occurred, but it's up to you to decide whether or not that matters. 
+  `
+}
+
+const subroutine3: TTutorialPage = {
+  title: "Subroutine 1-2: Unsigned Carry",
+  content: // html
+  `\
+    <span class="irisc">C</span>, the carry condition, triggers when an operation results in a carry out or borrow\
+    into the most significant bit. This is a little difficult to explain, but effectively what this flag tells you\
+    is that the result would have been different if the computer had an extra bit of space to store the result.
+
+    Imagine again a computer that has only a nibble of space in its registers, and a phantom 5th bit which doesn't\
+    physically exist, but we know it's there.
+
+    <div class="ml-5">\
+      <span class="token immediate">0</span><span class="token register">1111</span> +\
+      <span class="token immediate">0</span><span class="token register">0001</span> =\
+      <span class="token immediate">1</span><span class="token register">0000</span>
+    </div>\
+
+    The 5th set-bit cannot be represented in the <span class="irisc">nibble</span> so, in unsigned arithmetic, the\
+    largest number we can represent has wrapped round to the smallest, setting the flag in the process. This is the\
+    <span class="irisc">carry</span> condition.
+    
+    Similarly, the flag can also be set by a subtraction causing a wrap in the opposite direction, resulting in a\
+    <span class="irisc">borrow</span> condition.
+
+    <div class="ml-5">\
+      <span class="token immediate">1</span><span class="token register">0000</span> -\
+      <span class="token immediate">0</span><span class="token register">0001</span> =\
+      <span class="token immediate">0</span><span class="token register">1111</span>
+    </div>\
+
+    To confuse matters just a little more though, just in case you were starting to get it, ARM uses an\
+    <span class="irisc">inverted</span> carry flag for the borrow condition, but not for the carry. This means that,\
+    when subtracting, the carry flag will be unset if the borrow condition is met, and set if not.
   `
 }
 
@@ -138,5 +213,5 @@ const intermediate5: TTutorialPage = {
 
 
 export default [
-  intermediate1, intermediate2, intermediate3, intermediate4, subroutine1, intermediate5
+  intermediate1, intermediate2, intermediate3, intermediate4, subroutine1, subroutine2, subroutine3, intermediate5
 ];

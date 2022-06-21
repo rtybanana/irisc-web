@@ -189,7 +189,7 @@ const actions = {
     const sign1: number = bitset(32, op1)[31];             // sign of left hand operand
     const sign2: number = bitset(32, op2)[31];             // sign of right hand operand
     const signr: number = bitset(32, result)[31];          // sign of result
-    const result_ext: number[] = bitset(33, result);                    // msb = carry bit
+    const result_ext: number[] = bitset(33, result);       // msb = carry bit
 
     Vue.set(data.cpu.cpsr, Flag.N, result_ext[31] === 1);             // msb = 1
     Vue.set(data.cpu.cpsr, Flag.Z, (result & 0xffffffff) === 0);      // first 32 bits are 0 
