@@ -94,7 +94,7 @@ const intermediate4: TTutorialPage = {
   content: // html
   `\
     If you answered <span class="irisc">an infinite loop</span> to the question at the end of the last\
-    step then you'd be right. 
+    step then you'd be right.
     
     Infinite loops are cool, but, on their own, not particularly useful in the context of a full program.\
     At the very least we need some way of breaking out of this loop if some condition is met so that our\
@@ -146,7 +146,7 @@ const subroutine2: TTutorialPage = {
     The <span class="irisc">sign</span> of an integer is stored using a truly beautiful concept called\
     <span class="irisc">two's complement</span>. The important thing to know about two's complement number\
     representation is that if the most significant bit (msb) is set, then the number is\
-    <span class="irisc">negative</span>, and the absolute value of the signed number is read by inverting the\
+    <span class="irisc">negative</span>, and the absolute value of a negative number is read by inverting the\
     bits and adding 1.
 
     Imagine a computer with only four bits of space (called a <span class="irisc">nibble</span>, by the way)\
@@ -155,7 +155,7 @@ const subroutine2: TTutorialPage = {
     <div class="ml-5">\
       b | <span class="token register">0111</span> + <span class="token register">0001</span> = <span class="token register">1000</span>
       u | &nbsp;&nbsp;&nbsp;7 + &nbsp;&nbsp;&nbsp;1 = &nbsp;&nbsp;&nbsp;8 &nbsp;<span class="irisc">&#10003;</span>
-      s | &nbsp;&nbsp;&nbsp;7 + &nbsp;&nbsp;&nbsp;1 = &nbsp;&nbsp;-8 &nbsp;<span class="irisc">???</span>
+      s | &nbsp;&nbsp;&nbsp;7 + &nbsp;&nbsp;&nbsp;1 = &nbsp;&nbsp;-8 &nbsp;<span class="irisc">??</span>
     </div>\
 
     It's important to note that the computer doesn't care whether you as the programmer are treating this data\
