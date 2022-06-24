@@ -55,6 +55,7 @@
                   <memory></memory>
 
                   <div class="settings">
+                    <!-- <i class="button fas fa-info clickable" @click="$refs.settings.show()"></i> -->
                     <i class="button fas fa-sliders-h clickable" @click="$refs.settings.show()"></i>
                   </div>
                 </div>
@@ -64,7 +65,10 @@
                   <h5 class="mb-0">assembler</h5>
                 </div>
                 <div class="col-6 pl-1 text-left">
-                  <h5 class="mb-0">memory</h5>
+                  <h5 class="mb-0 d-inline-block">memory</h5>
+                  <div class="d-inline-block float-right">
+                    created by <a href="https://polysoftit.co.uk/" class="text-white">polysoft it</a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -111,6 +115,20 @@
             min="0"
             :max="memory.sizes.length - 1"
           ></b-form-input>
+        </div>
+      </div>
+    </b-modal>
+
+    <b-modal 
+      ref="about" 
+      centered hide-header 
+      hide-footer hide-backdrop
+      body-class="settings-modal p-1"
+    >
+
+      <div class="px-5 py-1">
+        <div class="mt-4">
+          created by polysoft it
         </div>
       </div>
     </b-modal>
