@@ -103,6 +103,10 @@ export default Vue.extend({
   color: #1d8f46;
 }
 
+.content >>> .red {
+  color: #d9484c;
+}
+
 .content >>> .amber {
   color: #f9e1b3
 }
@@ -119,6 +123,13 @@ export default Vue.extend({
   border-radius: 0.3rem;
   padding-left: 0.25rem;
   padding-right: 0.25rem;
+}
+
+.content >>> .not-executed {
+  background-color: #ff5555;
+  color: #101821;
+  padding: 0 0.25rem;
+  border-radius: 0.15rem;
 }
 
 .controls {

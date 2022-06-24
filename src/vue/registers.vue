@@ -22,14 +22,14 @@
         cpsr
       </div>
       <div
-        v-for="(flag, index) in flagName"
+        v-for="(flag, index) in cpsr"
         class="flag"
         @mouseover="tip(flagTitle[index], flagExplain[index])"
         @mouseleave="untip"
         :key="index"
-      >
+      > 
         <span class="flag-name">{{ flagName[index] }}</span>
-        {{ flagstr(cpsr[index]) }}
+        <span :class="{ 'changed': flagChangeSet.has(index) }">{{ flagstr(cpsr[index]) }}</span>
       </div>
     </div>
     
@@ -73,7 +73,8 @@ export default Vue.extend({
       title: null as string | null,
       description: null as string | null,
 
-      changeSet: new Set<Register>()
+      changeSet: new Set<Register>(),
+      flagChangeSet: new Set<number>()
     };
   },
   computed: {
@@ -129,6 +130,19 @@ export default Vue.extend({
       });
 
       this.changeSet = changeSet;
+    },
+
+    cpsr: function (newVal, oldVal) {
+      console.log(newVal, oldVal);
+
+      let changeSet = new Set<number>();
+      zip(newVal, oldVal).forEach(([newFlag, oldFlag], index) => {
+        if (newFlag !== oldFlag) changeSet.add(index);
+      });
+
+      this.$set(this, 'flagChangeSet', changeSet);
+      // this.flagChangeSet = changeSet;
+      // console.log(this.flagChangeSet);
     }
   }
 })
@@ -178,5 +192,6 @@ export default Vue.extend({
 .changed {
   border-radius: 0.15rem;
   background-color: rgba(255, 255, 255, 0.2);
+  /* color: #e02f72; */
 }
 </style>

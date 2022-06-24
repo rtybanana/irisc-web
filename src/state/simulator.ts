@@ -1,5 +1,5 @@
 import { bitset } from "@/assets/bitset";
-import { Condition, Flag, Register, TTransferSize } from "@/constants";
+import { Condition, Flag, flagExplain, Register, TTransferSize } from "@/constants";
 import { IriscError, ReferenceError, RuntimeError } from "@/interpreter/error";
 import { LabelNode } from '@/syntax';
 import { SingleTransferNode } from '@/syntax/transfer/SingleTransferNode';
@@ -190,18 +190,34 @@ const actions = {
     const sign2: number = bitset(32, op2)[31];             // sign of right hand operand
     const signr: number = bitset(32, result)[31];          // sign of result
     const result_ext: number[] = bitset(33, result);       // msb = carry bit
-
-    Vue.set(data.cpu.cpsr, Flag.N, result_ext[31] === 1);             // msb = 1
-    Vue.set(data.cpu.cpsr, Flag.Z, (result & 0xffffffff) === 0);      // first 32 bits are 0 
+    
+    let cpsr = [false, false, false, false];
+    
+    cpsr[Flag.N] = result_ext[31] === 1;                    // msb = 1
+    cpsr[Flag.Z] = (result & 0xffffffff) === 0              // first 32 bits are 0 
 
     if (operator === '+') {
-      Vue.set(data.cpu.cpsr, Flag.C, result_ext[32] === 1);                     // unsigned overflow           
-      Vue.set(data.cpu.cpsr, Flag.V, sign1 === sign2 && sign1 !== signr);       // two operands of the same sign result in changed sign
+      cpsr[Flag.C] = result_ext[32] === 1                   // unsigned overflow
+      cpsr[Flag.V] = sign1 === sign2 && sign1 !== signr     // two operands of the same sign result in changed sign
     }
     else if (operator === '-') {
-      Vue.set(data.cpu.cpsr, Flag.C, !(result_ext[32] === 1));                  // unsigned underflow           
-      Vue.set(data.cpu.cpsr, Flag.V, sign1 !== sign2 && sign2 === signr);       // signs different and result sign same as subtrahend 
+      cpsr[Flag.C] = !(result_ext[32] === 1)                // unsigned underflow    
+      cpsr[Flag.V] = sign1 !== sign2 && sign2 === signr     // signs different and result sign same as subtrahend 
     }
+
+    Vue.set(data.cpu, 'cpsr', cpsr);
+
+    // Vue.set(data.cpu.cpsr, Flag.N, result_ext[31] === 1);             // msb = 1
+    // Vue.set(data.cpu.cpsr, Flag.Z, (result & 0xffffffff) === 0);      // first 32 bits are 0 
+
+    // if (operator === '+') {
+    //   Vue.set(data.cpu.cpsr, Flag.C, result_ext[32] === 1);                     // unsigned overflow           
+    //   Vue.set(data.cpu.cpsr, Flag.V, sign1 === sign2 && sign1 !== signr);       // two operands of the same sign result in changed sign
+    // }
+    // else if (operator === '-') {
+    //   Vue.set(data.cpu.cpsr, Flag.C, !(result_ext[32] === 1));                  // unsigned underflow           
+    //   Vue.set(data.cpu.cpsr, Flag.V, sign1 !== sign2 && sign2 === signr);       // signs different and result sign same as subtrahend 
+    // }
   },
 
   // memory actions

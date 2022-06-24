@@ -27,6 +27,10 @@ const intermediate2: TTutorialPage = {
     control the flow of the program. Labels are a vital aspect of writing assembly, necessary to\
     implement loops, functions and even conditions in some cases.
 
+    You can <span class="token label">label</span> any instruction in the text section of the program.\
+    In actual ARM, you can put a label and an instruction on the same line. To keep parsing simple,\
+    this is not supported by <span class="irisc">iRISC</span>, a label must be on its own line.
+
     Let's start with the entry point. Add the <span class="token label">main:</span> label and add\
     some of the instructions you learnt in the previous chapter to execute in order. Leave off the\
     <span class="token operation">bx</span> <span class="token register">lr</span> for now.\
@@ -74,14 +78,35 @@ const intermediate3: TTutorialPage = {
     The <span class="token operation">b</span> instruction is as simple as branches get. You provide\
     a single operand, the label that you would like to branch to, and the assembler handles the rest.
 
-    Under the hood during the assembly process, the text label is translated into an\
+    Under the hood, during the assembly process, the text label is translated into an\
     <span class="irisc">offset</span> from the branch instruction to the provided label.\
     If the label is three instructions before the branch, then the offset would be -3.
 
-    Add a <span class="token operation">b</span> <span class="token label">main</span> instruction to\
-    the end of your program (before the <span class="token operation">bx</span>\
-    <span class="token register">lr</span> if you have one!) and try running again.
+    Add a <span class="token label">label:</span> to the end of your program and some more instructions\
+    of your choice afterward. Finally, add a <span class="token operation">b</span>\
+    <span class="token label">label</span> instruction. You can name the <span class="token label">label</span>\
+    whatever you want.
 
+    <div class="hmm">\
+      <div class="token label mb-1">Remember</div>\
+      At this stage, the <span class="token operation">bx</span> <span class="token register">lr</span>\
+      instruction will end the program, so this should be the last instruction executed by the simulator.
+    </div>\
+
+    Your program should now look something like this:
+
+    <div class="ml-5">\
+      <span class="token label">main:</span>
+        <div class="ml-5">...</div>
+      <span class="token label">label:</span>
+        <div class="ml-5">\
+          ...
+          <span class="token operation">b</span> <span class="token label">label</span>
+
+          <span class="token operation">bx</span> <span class="token register">lr</span>
+        </div>\
+    </div>\
+    
     <div class="hmm">\
       <div class="token label mb-1">Hmm...</div>\
       What have we created? How would you write this same construct in a higher level language?
@@ -94,7 +119,7 @@ const intermediate4: TTutorialPage = {
   content: // html
   `\
     If you answered <span class="irisc">an infinite loop</span> to the question at the end of the last\
-    step then you'd be right.
+    step then you'd be absolutely right.
     
     Infinite loops are cool, but, on their own, not particularly useful in the context of a full program.\
     At the very least we need some way of breaking out of this loop if some condition is met so that our\
@@ -109,6 +134,11 @@ const intermediate4: TTutorialPage = {
     this process, the result of the operation is discarded after the flags are set.
 
     Continue to the next page to learn more about the <span class="irisc">cpsr</span> and its flags.
+
+    <div class="hmm">\
+      <div class="token label mb-1">Remember</div>\
+      Stop the infinite loop with the <i class="red fas fa-stop"></i> button.
+    </div>\
   `
 }
 
@@ -158,6 +188,11 @@ const subroutine2: TTutorialPage = {
       s | &nbsp;&nbsp;&nbsp;7 + &nbsp;&nbsp;&nbsp;1 = &nbsp;&nbsp;-8 &nbsp;<span class="irisc">??</span>
     </div>\
 
+    <div class="hmm">\
+      <div class="token label mb-1">Remember</div>\
+      You need to invert the bits and add one to get the absolute signed value from the binary.
+    </div>\
+
     It's important to note that the computer doesn't care whether you as the programmer are treating this data\
     as signed or unsigned, it just applies the rules of binary maths. The overflow flag will be set to indicate\
     that a signed overflow has occurred, but it's up to you to decide whether or not that matters. 
@@ -194,24 +229,132 @@ const subroutine3: TTutorialPage = {
       <span class="token immediate">0</span><span class="token register">1111</span>
     </div>\
 
-    To confuse matters just a little more though, just in case you were starting to get it, ARM uses an\
-    <span class="irisc">inverted</span> carry flag for the borrow condition, but not for the carry. This means that,\
-    when subtracting, the carry flag will be unset if the borrow condition is met, and set if not.
+    To confuse matters just a little more though (just in case you were starting to get it), ARM uses an\
+    <span class="irisc">inverted</span> carry flag for the <i>borrow</i> condition, but not for the <i>carry</i>. This means that,\
+    when subtracting, the carry flag will be <u>unset</u> if the borrow condition is met, and set if not.
   `
 }
 
 const intermediate5: TTutorialPage = {
-  title: "Intermediate 4: Conditions",
+  title: "Intermediate 4: Conditions 0",
   content: // html
   `\
-    &lt;coming soon&gt;
+    Now that we've gone over the flags and how to set them, we can start to work in constructs that read those flags\
+    and decide whether or not to execute the associated instruction. These are called <span class="irisc">conditions</span>.
+
+    We have a 15 different condition suffixes available to us in ARM assembly, each of which inspect the value of one\
+    or more of the cpsr flags to evaluate some scenario, some of which may be familiar to you.
+
+    <div class="ml-5">\
+      <div><span class="irisc">al</span> : always</div>\
+      <div><span class="irisc">eq</span> : equal</div>\
+      <div><span class="irisc">ne</span> : not equal</div>\
+      <div><span class="irisc">mi</span> : negative</div>\
+      <div><span class="irisc">pl</span> : positive or zero</div>\
+      <div><span class="irisc">vs</span> : overflow</div>\
+      <div><span class="irisc">vc</span> : no overflow</div>\
+
+      <div>signed</div>\
+      <div><span class="irisc">gt</span> : greater than</div>\
+      <div><span class="irisc">ge</span> : greater than or equal</div>\
+      <div><span class="irisc">lt</span> : less than</div>\
+      <div><span class="irisc">le</span> : less than or equal</div>\
+
+      <div>unsigned</div>\
+      <div><span class="irisc">hi</span> : greater than</div>\
+      <div><span class="irisc">cs</span> : greater than or equal</div>\
+      <div><span class="irisc">cc</span> : less than</div>\
+      <div><span class="irisc">ls</span> : less than or equal</div>\
+    </div>\
+
+    Continue to the next step to learn how to use these condition suffixes.
   `
-  // Remove your code from before the <span class="token operation">b</span> <span class="token label">main</span>\
-  // instruction and add an instruction to set <span class="token register">r0</span> equal to\
-  // <span class="token immediate">0</span>.
+}
+
+const intermediate6: TTutorialPage = {
+  title: "Intermediate 5: Conditions 1",
+  content: // html
+  `\
+    You can place any of the condition suffixes mentioned on the previous page after nearly any instruction in\
+    ARMv7 assembly in order to conditionally execute it. Click the <i class="fas fa-terminal fa-sm irisc"></i>\
+    button to switch back to the terminal and we'll try some out.
+
+    First let's reset the simulator. Enter ':r' into the terminal.
+
+    Now use the <span class="token operation">cmp</span> instruction to compare the value in\
+    <span class="token register">r0</span> to the immediate value <span class="token immediate">#1</span>.\
+    Remember, only the flexible operand can contain an immediate value. Check the reported flag values underneath\
+    the registers marked <span class="irisc">cpsr</span>.
+
+    <div class="hmm">\
+      <div class="token label mb-1">Hint</div>\
+      You should see that only the <span class="irisc">negative</span> (N) condition flag has been set. If you're\
+      seeing something different, check that your <span class="token operation">cmp</span> instruction is correct.
+    </div>\
+
+    Now try using the <span class="token operation">eq</span> condition suffix on an instruction of your choosing.\
+    Your instuction should take the following form:
+
+    <div class="ml-5">\
+      <span class="token operation">mov<u>eq</u></span> ...\
+    </div>\
+
+    In the <span class="irisc">assembler</span> window, you should see that the instruction has been marked as\
+    <span class="not-executed">Not Executed</span>. 
+
+    <div class="hmm">\
+      <div class="token label mb-1">Remember</div>\
+      You can hover the different sections of the instruction to learn more.
+    </div>\
+  `
+}
+
+const intermediate7: TTutorialPage = {
+  title: "Intermediate 7: Breaking the Loop",
+  content: // html
+  `\
+    Switch back to the editor where we left the loop earlier. 
+    
+    Remove your code from between the <span class="token label">main:</span> and\
+    <span class="token label">label:</span> labels and add a single instruction which sets the value of\
+    <span class="token register">r0</span> to <span class="token immediate">#0</span>.
+
+    Next, replace the code within your loop with:
+
+    <div class="ml-5">\
+      <ol>\
+        <li>\
+          an instruction which increments the value of <span class="token register">r0</span>
+        </li>\
+        <li>\
+          a comparison which compares the value of <span class="token register">r0</span> to\
+          <span class="token immediate">#6</span>
+        </li>\
+        <li>\
+          add a <span class="token operation">ne</span> (not equal) condition suffix to the\
+          <span class="token operation">b</span> <span class="token label">label</span> instruction
+        </li>\
+      </ol>\
+    </div>\
+
+    Run the program again. 
+    
+    <div class="hmm">\
+      <div class="token label mb-1">Hmm...</div>\
+      What happens now?
+    </div>\
+    
+  `
 }
 
 
+// Remove your code from before the <span class="token operation">b</span> <span class="token label">main</span>\
+// instruction and add an instruction to set <span class="token register">r0</span> equal to\
+// <span class="token immediate">0</span>.
+
+
 export default [
-  intermediate1, intermediate2, intermediate3, intermediate4, subroutine1, subroutine2, subroutine3, intermediate5
+  intermediate1, intermediate2, intermediate3, intermediate4, 
+  subroutine1, subroutine2, subroutine3, 
+  intermediate5, intermediate6, intermediate7
 ];

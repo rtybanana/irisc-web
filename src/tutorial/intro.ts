@@ -89,7 +89,7 @@ const intro4: TTutorialPage = {
     The registers can be found in the far left fenced section of the application. The current value is displayed as\
     an <span class="irisc">unsigned integer</span> in both hexadecimal and decimal representations. 
     
-    Beneath the registers are the CPSR flags - more on these later.
+    Beneath the registers are the cpsr flags - more on these later.
   `
 }
 
@@ -144,7 +144,7 @@ const intro7: TTutorialPage = {
     The most recently interpreted instruction is assembled into machine code and displayed in the upper fenced section\
     of the assembler component. Extra information about the instruction is displayed in the fenced section below it.
 
-    In a modern computer, code that you write is compiled into assembly language and then further assembled into machine\
+    In modern programming, code that you write is compiled into assembly language and then further assembled into machine\
     code. This machine code is then decoded and processed by the CPU where it is used to decide which action needs to be\
     taken. In the case of the ARMv7 family of processors, all assembled instructions fit into 32 bits of space.
     
@@ -166,12 +166,16 @@ const intro8: TTutorialPage = {
       <span class="token immediate">#1</span>
     </div>\
 
-    Press enter and you should see that the assembler section has been populated! Both the bitcode and text versions of the\
-    instruction are displayed, along with the execution status. 
+    Press enter and you should see that the <span class="irisc">assembler</span> section has been populated! Both the bitcode\
+    and text versions of the instruction are displayed, along with the execution status. 
     
     You will notice that the machine code for the instruction has been divided into many different sections. Each of these\
-    sections has a particular meaning which the the CPU uses to understand which action it needs to take. You can hover\
-    over any one of these areas to learn more about how the computer is able to decode your instruction.
+    sections has a particular meaning which the the CPU uses to understand which action it needs to take. 
+    
+    <div class="hmm">\
+      <div class="token label mb-1">Hint</div>\
+      You can hover over any one of these areas to learn more about how the computer is able to decode your instruction.
+    </div>
   `
 }
 
