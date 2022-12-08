@@ -59,7 +59,7 @@ languages.armv7 =  {
 	],
 	// 'number': /(?:\b|(?=\$))(?:0[hx](?:\.[\da-f]+|[\da-f]+(?:\.[\da-f]+)?)(?:p[+-]?\d+)?|\d[\da-f]+[hx]|\$\d[\da-f]*|0[oq][0-7]+|[0-7]+[oq]|0[by][01]+|[01]+[by]|0[dt]\d+|(?:\d+(?:\.\d+)?|\.\d+)(?:\.?e[+-]?\d+)?[dt]?)\b/i,
 	'comma': /,/,
-	'directive': /\.\b(text|data|byte|hword|word|asciz|skip)\b/m,
+	'directive': /\.\b(text|data|global|extern|byte|hword|word|asciz|skip)\b/m,
 	'data-label': /=\b[A-Za-z_][A-Za-z_\d]+\b/m,
 	'sign': [
 		{ pattern: /-/m, alias: "minus" },

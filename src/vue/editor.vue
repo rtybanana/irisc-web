@@ -69,8 +69,14 @@
       </div>
     </div>
 
-    <div class="errors">
+    <div class="output">
       <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
+        <div v-if="hasOutput">
+          <div v-for="(line, index) in output" :key="index">
+            {{ line }}
+          </div>
+        </div>
+
         <template v-if="computedTooltip.title !== ''">
           <div :style="`color: ${computedTooltip.color}`">{{ computedTooltip.title }}</div>
           <div>{{ computedTooltip.message }}</div>
@@ -122,11 +128,21 @@ export default Vue.extend({
   },
   computed: {
     memory: SimulatorState.memory,
-    errors: SimulatorState.errors,
     running: SimulatorState.running,
     paused: SimulatorState.paused,
     delay: SimulatorState.delay,
     currentInstruction: SimulatorState.currentInstruction,
+
+    output: SimulatorState.output,
+    hasOutput: function () : boolean {
+      if (this.output.length === 1 && !this.output[0]) {
+        return false;
+      }
+
+      return true;
+    },
+
+    errors: SimulatorState.errors,
     exitStatus: SimulatorState.exitStatus,
 
     computedTooltip: function () : TTooltip {
@@ -340,7 +356,9 @@ export default Vue.extend({
           let line = lines[error.lineNumber];
 
           if (line !== undefined) {
+            console.log(line);
             lines[error.lineNumber] = `<span class="line error" style="text-decoration-color: ${error.color}" data-error-idx="${index}">${line}</span>`;
+
           }
         });
 
@@ -514,8 +532,9 @@ export default Vue.extend({
   padding: 0.25rem 0.33rem 0.15rem 0.4rem;
 }
 
-.errors {
+.output {
   /* width: 100%; */
+  max-width: 600px;
   position: absolute;
   bottom: 0;
   padding: 0.25rem 0.5rem 0.5rem 0.25rem;

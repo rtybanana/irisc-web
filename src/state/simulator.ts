@@ -1,7 +1,7 @@
 import { bitset } from "@/assets/bitset";
 import { Condition, Flag, flagExplain, Register, TTransferSize } from "@/constants";
 import { IriscError, ReferenceError, RuntimeError } from "@/interpreter/error";
-import { LabelNode } from '@/syntax';
+import { BranchNode, DirectiveNode, LabelNode } from '@/syntax';
 import { SingleTransferNode } from '@/syntax/transfer/SingleTransferNode';
 import { TInstructionNode } from '@/syntax/types';
 import Vue from 'vue';
@@ -42,6 +42,7 @@ const data = Vue.observable<TSimulatorState>({
   currentInstruction: undefined,
   wasExecuted: false,
 
+  output: [""],
   errors: [],
   hoveredError: null,
   exitStatus: undefined,
@@ -64,6 +65,8 @@ const getters = {
   currentInstruction: () => data.currentInstruction,
   previousPC: () => data.previousPC,
   wasExecuted: () => data.wasExecuted,
+
+  output: () => data.output,
   errors: () => data.errors,
   hoveredError: () => data.hoveredError,
 
@@ -87,6 +90,7 @@ const actions = {
     this.observeRegisters();
 
     data.cpu.cpsr = Vue.observable([false, false, false, false]);
+    data.output = [""];
     data.exitStatus = undefined;
   },
 
@@ -128,6 +132,18 @@ const actions = {
 
   setEntryPoint: function () {
     if (this.hasLabel("main")) this.setRegister(Register.PC, this.label("main"));
+  },
+
+  addOutput(output: string) {
+    [...output].forEach(char => {
+      if (char === '\n') data.output.push("");
+      else {
+        let lastLine = data.output.length -1;
+        let existingLine = data.output[lastLine];
+        
+        Vue.set(data.output, lastLine, `${existingLine}${output}`);
+      }
+    })
   },
 
   addError(error: IriscError) {
@@ -291,12 +307,19 @@ const actions = {
     data.memory.text.forEach(ins => {
       if (ins instanceof LabelNode) {
         if (data.memory.textMap[ins.identifier] === undefined) {
-          this.addError(new ReferenceError(`Missing reference to '${ins.identifier}'`, ins.statement, ins.lineNumber, -1));
+          this.addError(new ReferenceError(`Missing reference to '${ins.identifier}'`, ins.statement, ins.lineNumber, 1));
+        }
+      }
+      else if (ins instanceof BranchNode) {
+        if (typeof ins.Rd === 'string') {
+          if (data.memory.textMap[ins.Rd] === undefined) {
+            this.addError(new ReferenceError(`Missing reference to '${ins.Rd}'`, ins.statement, ins.lineNumber, 1));
+          }
         }
       }
       else if (ins instanceof SingleTransferNode && ins.isLiteral) {
         if (data.memory.heapMap[ins.literal] === undefined) {
-          this.addError(new ReferenceError(`Missing reference to '${ins.literal}'`, ins.statement, ins.lineNumber, -1));
+          this.addError(new ReferenceError(`Missing reference to '${ins.literal}'`, ins.statement, ins.lineNumber, 3));
         }
       }
       // else if (instruction instanceof BlockTransferNode) {
@@ -313,7 +336,6 @@ const actions = {
 }
 
 actions.init();
-
 
 export default {
   ...actions,

@@ -39,6 +39,7 @@ export type TSimulatorState = {
   currentInstruction?: TInstructionNode;
   wasExecuted: boolean;
 
+  output: string[];
   errors: IriscError[];
   hoveredError: IriscError | null;
   exitStatus: TExitStatus | undefined;

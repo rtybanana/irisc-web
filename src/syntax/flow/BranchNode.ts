@@ -12,6 +12,8 @@ export class BranchNode extends InstructionNode {
   protected _Rd: TBranchAddress;
   // protected _offset: number;
 
+  get Rd() : TBranchAddress { return this._Rd; }
+
   constructor(statement: Token[], lineNumber: number, currentToken: number = 0) {
     super(statement, lineNumber, currentToken);
 

@@ -1,5 +1,5 @@
 import { rotr } from "@/assets/bitset";
-import { addressModeGroup, BlockTransfer, Flag, Operation, Register, Shift, SingleTransfer, TTransferSize } from "@/constants";
+import { addressModeGroup, BlockTransfer, callAddress, callMap, Flag, Operation, Register, Shift, SingleTransfer, TTransferSize } from "@/constants";
 import { SimulatorState } from "@/state";
 import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode } from "../syntax";
 import { BranchNode } from "../syntax/flow/BranchNode";
@@ -7,6 +7,7 @@ import { BlockTransferNode } from "../syntax/transfer/BlockTransferNode";
 import { SingleTransferNode } from "../syntax/transfer/SingleTransferNode";
 import { TInstructionNode } from "../syntax/types";
 import { ReferenceError, RuntimeError } from "./error";
+import { executeCall } from "./extern";
 
 /**
  * Local declaration of useful EmulatorState getters with the js object getter
@@ -245,9 +246,20 @@ function executeBranch(instruction: BranchNode) : boolean {
   if (!SimulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
   let address: number;
-  if (typeof addr === 'string') address = SimulatorState.label(addr as string);
+  if (typeof addr === 'string') {
+    address = SimulatorState.label(addr as string);
+    if (address === callAddress) {
+      let callExecuted = executeCall(instruction, callMap[addr as string]);
+      if (callExecuted) {
+        // move to next instruction
+        SimulatorState.setRegister(Register.PC, state.registers[Register.PC] + 4);
+      }
+
+      return callExecuted;
+    }
+  }
   else address = state.registers[addr as Register];
-  
+
   switch (op) {
     case Operation.B:
     case Operation.BX:
@@ -412,3 +424,5 @@ export function generateLabelOffset(label: string, instruction: TInstructionNode
 
   throw new ReferenceError(`Missing reference to '${label}'`, instruction.statement, instruction.lineNumber, -1)
 }
+
+export { state };

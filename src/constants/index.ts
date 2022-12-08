@@ -5,6 +5,7 @@ export * from "./shifts";
 export * from "./flags";
 export * from "./transfer";
 export * from "./allocation";
+export * from "./directives";
 // export { pages as tutorialPages, TTutorialPage } from "../tutorial/tutorial";
 
 

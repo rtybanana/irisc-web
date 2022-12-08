@@ -2,6 +2,7 @@ import { SimulatorState } from '@/state';
 import { AllocationNode, BiOperandNode, BlockTransferNode, BranchNode, DirectiveNode, InstructionNode, LabelNode, ShiftNode, SingleTransferNode, SyntaxNode, TriOperandNode } from '@/syntax';
 import { languages, Token, tokenize } from 'prismjs';
 import { AssemblyError, IriscError, SyntaxError } from './error';
+import { callAddress } from '@/constants';
 
 const state = {
   get memory() { return SimulatorState.memory(); }
@@ -118,6 +119,9 @@ function load(nodes: (SyntaxNode | null)[]) {
     if (node instanceof DirectiveNode) {
       if (node.isText) mode = Mode.Text;
       if (node.isData) mode = Mode.Data;
+      if (node.isExtern) {
+        SimulatorState.addLabel(node.identifier!, callAddress);
+      }
     }
 
     // TODO: memory allocation validation
@@ -133,7 +137,7 @@ function load(nodes: (SyntaxNode | null)[]) {
 
     else if (node instanceof LabelNode) {
       if (mode !== Mode.Text) {
-        SimulatorState.addError(new AssemblyError("Cannot declare branchable labels outside of the .text section.", node.statement, node.lineNumber, -1));
+        SimulatorState.addError(new AssemblyError("Cannot declare branchable labels outside of the .text section.", node.statement, node.lineNumber, 0));
       }
 
       if (SimulatorState.hasLabel(node.identifier)) {
@@ -144,7 +148,7 @@ function load(nodes: (SyntaxNode | null)[]) {
 
     else if (node instanceof InstructionNode) {
       if (mode !== Mode.Text) {
-        SimulatorState.addError(new AssemblyError("Cannot declare instructions outside of the .text section.", node.statement, node.lineNumber, -1));
+        SimulatorState.addError(new AssemblyError("Cannot declare instructions outside of the .text section.", node.statement, node.lineNumber, 0));
       }
 
       instructions.push(node);
