@@ -20,11 +20,40 @@
         ></i>
       </div>
     </div>
+
+    <div class="contents">
+      <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
+        <a v-if="!showContents" class="link clickable" style="color: #f9e1b3;" @click="showContents = true; contentsPage = 0;">contents</a>
+        <template v-else>
+          <div v-for="contentsLink in contentsSlice" :key="contentsLink.index">
+            <a class="link text-white clickable" @click="navigateTo(contentsLink)">{{ contentsLink.title }}</a>
+          </div>
+
+          <div class="mt-2">
+            <a class="link clickable" style="color: #f9e1b3;" @click="showContents = false">hide</a>
+
+            <span class="float-right">
+              <i 
+                class="fas fa-chevron-left fa-sm p-1 clickable hoverable rounded-sm"
+                @click="contentsPage > 0 && contentsPage--"
+              ></i>
+
+              <span class="mx-1 user-select-none">{{ contentsPage }}/{{ nContentsPages - 1 }}</span>
+
+              <i 
+                class="fas fa-chevron-right fa-sm p-1 clickable hoverable rounded-sm"
+                @click="contentsPage < (nContentsPages - 1) && contentsPage++"
+              ></i>
+            </span>
+          </div>
+        </template>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { TTutorialPage, tutorialPages } from "@/tutorial";
+import { TTutorialPage, tutorialPages, TContentsLink, contentsPage } from "@/tutorial";
 import Vue from 'vue';
 
 export default Vue.extend({
@@ -32,12 +61,28 @@ export default Vue.extend({
   data() {
     return {
       pages: tutorialPages as TTutorialPage[],
-      page: 0 as number
+      page: 0 as number,
+
+      contents: contentsPage as TContentsLink[],
+      contentsPerPage: 10,
+      contentsPage: 0,
+      showContents: false
     }
   },
   computed: {
     pageData: function () : TTutorialPage {
       return this.pages[this.page];
+    },
+
+    nContentsPages: function () : number {
+      return Math.ceil(this.contents.length / this.contentsPerPage);
+    },
+
+    contentsSlice: function () : TContentsLink[] {
+      return this.contents.slice(
+        this.contentsPage * this.contentsPerPage, 
+        (this.contentsPage + 1) * this.contentsPerPage
+      );
     }
   },
   methods: {
@@ -51,6 +96,11 @@ export default Vue.extend({
       if (this.page > 0) {
         this.page--;
       }
+    },
+
+    navigateTo: function (page: TContentsLink) {
+      this.page = page.index;
+      this.showContents = false;
     }
   },
 
@@ -137,5 +187,19 @@ export default Vue.extend({
   bottom: 0;
   padding: 0.25rem 0.5rem 0.6rem 0rem;
 }
+
+.contents {
+  position: absolute;
+  bottom: 0;
+  right: 18px;
+  padding: 0.25rem 0.5rem 0.6rem 0rem;
+
+}
+
+/* .contents .contents-list {
+  max-height: 350px;
+  overflow-x: hidden;
+  margin-bottom: 30px;
+} */
 
 </style>

@@ -42,8 +42,9 @@ export class AllocationNode extends SyntaxNode {
     // string length + 1 because null (0) terminated
     const data = new Uint8Array(new ArrayBuffer(token.length + 1));
     const string = (token.content as string).slice(1, -1);
+    const withEscapes = JSON.parse(`"${string}"`);
 
-    for (let i = 0; i < string.length; i++) data[i] = string.charCodeAt(i);
+    for (let i = 0; i < string.length; i++) data[i] = withEscapes.charCodeAt(i);
 
     return data;
   }

@@ -14,6 +14,7 @@ export function executeCall(instruction : TInstructionNode, call: Call) : boolea
 }
 
 function putchar() : boolean {
+  // add single char to output
   SimulatorState.addOutput(String.fromCharCode(state.registers[Register.R0]));
   return true;
 }
@@ -21,18 +22,18 @@ function putchar() : boolean {
 function puts() : boolean {
   let stringArr: string[] = [];
 
+  // fetch full string from simulator memory
   let index = state.registers[Register.R0];
   while (state.memory.byteView[index] !== 0) {
     stringArr.push(String.fromCharCode(state.memory.byteView[index]));
     index++;
   }
 
-  // convert pairs of escaped characters '\' + 'n' to single '\n' character
-  // using JSON.parse as a shortcut
+  // join char array
   let string = stringArr.join("");
-  let withEscapes = JSON.parse(`"${string}"`);
 
-  SimulatorState.addOutput(withEscapes);
+  // add to output and set return value
+  SimulatorState.addOutput(string);
   SimulatorState.setRegister(Register.R0, 1);
 
   return true;

@@ -1,8 +1,9 @@
-// helloworld1.s
+// typewriter.s
 // A simple helloworld implementation using a loop and a putchar() call.
+// It prints like a typewriter!
 
 .data
-greeting: .asciz "hello world!"
+greeting: .asciz "typewriter!\nclick, click, click, click, ding!"
 
 // include putchar()
 .extern putchar

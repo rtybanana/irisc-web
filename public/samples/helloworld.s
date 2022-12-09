@@ -1,4 +1,4 @@
-// helloworld2.s
+// helloworld.s
 // A better helloworld implementation using a single puts() call.
 
 .data

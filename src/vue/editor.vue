@@ -142,8 +142,8 @@ export default Vue.extend({
       
       showFiles: false,
       files: [
-        "helloworld1.s",
-        "helloworld2.s",
+        "helloworld.s",
+        "typewriter.s",
         "strlen.s",
         "recursion.s",
         "stackoverflow!.s"
