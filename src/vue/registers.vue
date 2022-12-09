@@ -13,9 +13,9 @@
     </div>
 
     <!-- cpsr -->
-    <div class="d-flex register cpsr my-3 pr-0">
+    <div class="d-flex my-3 pr-0">
       <div 
-        class="flex-grow-1"
+        class="flex-grow-1 cpsr"
         @mouseover="tip(cpsrTitle, cpsrExplain)"
         @mouseleave="untip"
       >
@@ -34,7 +34,7 @@
     </div>
     
     <!-- tooltip -->
-    <div class="register flex-grow-1">
+    <div class="dashed flex-grow-1">
       <div>
         {{ computedTitle }}
       </div>
@@ -156,10 +156,23 @@ export default Vue.extend({
   border: 2px dashed #8b0c3c;
 }
 
+.dashed {
+  border: 1px dashed #cccdcd;
+  padding: 0.1rem 0.6rem;
+}
+
 .register {
   border: 1px dashed #cccdcd;
   margin-bottom: -1px;
   padding: 0.1rem 0.6rem;
+}
+
+.register:hover {
+  border-color: #8b0c3c;
+  z-index: 10;
+  position: relative;
+  cursor: help;
+  color: #e02f72;
 }
 
 .register-name {
@@ -167,12 +180,28 @@ export default Vue.extend({
   width: 28px;
 }
 
+.cpsr {
+  border: 1px dashed #cccdcd;
+  margin-bottom: -1px;
+  padding: 0.1rem 0.6rem;
+}
+
 .flag {
   position: relative;
   width: 32px;
   text-align: center;
-  border-left: 1px dashed #cccdcd;
+  border: 1px dashed #cccdcd;
+  margin: 0 0 -1px -1px;
 }
+
+.flag:hover {
+  border-color: #8b0c3c;
+  z-index: 100;
+  position: relative;
+  cursor: help;
+  color: #e02f72;
+}
+
 
 .flag-name {
   position: absolute;
@@ -180,7 +209,7 @@ export default Vue.extend({
   width: 10px;
   font-size: 10px;
   line-height: 10px;
-  top: -2px;
+  top: -1px;
   left: 0px;
 }
 

@@ -1,7 +1,9 @@
 import { languages } from 'prismjs'
 
 languages.armv7 =  {
-	'string': /".+"/m,
+	'string': {
+		pattern: /".*"/m
+	},
 	'line-comment': {
 		pattern: /\/\/(?:[^\r\n\\]|\\(?:\r\n?|\n|(?![\r\n])))*|\/\*[\s\S]*?(?:\*\/|$)/,
 		greedy: true

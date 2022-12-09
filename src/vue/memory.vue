@@ -6,8 +6,19 @@
           class="d-flex flex-column sector text"
           :style="`width: ${textWidth}%;`"
         >
-          <div class="label">text</div>
-          <div class="region"></div>
+          <div class="label">
+            <span
+              @mouseenter="tip('text')"
+              @mouseleave="untip"
+            >
+              text
+            </span>
+          </div>
+          <div 
+            class="region"
+            @mouseenter="tip('text')"
+            @mouseleave="untip"
+          ></div>
           <div class="placeholder"></div>
         </div>
 
@@ -17,8 +28,19 @@
           :style="`width: ${dataWidth}%`"
         >
           <div class="placeholder"></div>
-          <div class="region"></div>
-          <div class="label">data</div>
+          <div 
+            class="region"
+            @mouseenter="tip('data')"
+            @mouseleave="untip"
+          ></div>
+          <div class="label">
+            <span
+              @mouseenter="tip('data')"
+              @mouseleave="untip"
+            >
+              data
+            </span>
+          </div>
         </div>
 
         <div class="flex-grow-1">
@@ -29,14 +51,26 @@
           class="d-flex flex-column sector stack"
           :style="`width: ${stackWidth}%`"
         >
-          <div class="label rtl">stack</div>
-          <div class="region"></div>
+          <div class="label rtl">
+            <span
+              @mouseenter="tip('stack')"
+              @mouseleave="untip"
+            >
+              stack
+            </span>
+          </div>
+          <div 
+            class="region"
+            @mouseenter="tip('stack')"
+            @mouseleave="untip"
+          ></div>
           <div class="placeholder"></div>
         </div>
 
         <div 
           v-if="stackPointer >= 0 && stackPointer <= 100"
           class="d-flex flex-column sector stack-pointer"
+          style="pointer-events: none"
           :style="`width: ${stackPointer}%`"
         >
           <div class="placeholder"></div>
@@ -51,21 +85,29 @@
     </div>
 
     <div class="flex-grow-1 dashed info px-2 py-1" style="overflow: auto;">
-      <div>
-        Total: {{ memory.size }} bytes
-      </div>
+      <template v-if="tooltip">
+        <div style="width: calc(100% - 40px);" :style="`color: ${tooltip.color};`">
+          {{ tooltip.tip }}
+        </div>
+      </template>
 
-      <div>
-        Used:  
-        <span
-          :class="{
-            'text-warning': used === memory.size,
-            'text-danger': used > memory.size
-          }"
-        >
-          {{ used }} bytes
-        </span>
-      </div>
+      <template v-else>
+        <div>
+          Total: {{ memory.size }} bytes
+        </div>
+
+        <div>
+          Used:  
+          <span
+            :class="{
+              'text-warning': used === memory.size,
+              'text-danger': used > memory.size
+            }"
+          >
+            {{ used }} bytes
+          </span>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -75,8 +117,19 @@ import { Register } from '@/constants';
 import { SimulatorState } from "@/state";
 import Vue from 'vue';
 
+type TTip = {
+  name: string;
+  tip: string;
+  color: string;
+}
+
 export default Vue.extend({
   name: 'memory',
+  data() {
+    return {
+      tooltip: undefined as TTip | undefined
+    }
+  },
   computed: {
     memory: SimulatorState.memory,
     registers: SimulatorState.registers,
@@ -85,12 +138,16 @@ export default Vue.extend({
       return this.memory.textHeight / this.memory.size * 100;
     },
 
-    dataWidth: function () {
+    dataWidth: function () : number {
       return this.memory.heapHeight / this.memory.size * 100;
     },
 
-    stackWidth: function () {
+    stackWidth: function () : number {
       return this.memory.stackHeight / this.memory.size * 100;
+    },
+
+    hoveredSection: function () : string | undefined {
+      return this.tooltip?.name;
     },
 
     stackPointer: function () : number {
@@ -100,6 +157,35 @@ export default Vue.extend({
 
     used: function () : number {
       return this.memory.textHeight + this.memory.heapHeight + this.memory.stackHeight;
+    }
+  },
+  methods: {
+    tip: function (section: string) : void {
+      if (section === "text") {
+        this.tooltip = {
+          name: "text",
+          tip: "The text section contains the instructions defined in the .text section of the program.",
+          color: "#0077aa"
+        }
+      }
+      else if (section === "data") {
+        this.tooltip = {
+          name: "data",
+          tip: "The data section contains all the static data defined in the .data section of the program.",
+          color: "#ff5555"
+        }
+      }
+      else if (section === "stack") {
+        this.tooltip = {
+          name: "stack",
+          tip: "The stack contains data temporarily saved from CPU registers to prevent overwriting.",
+          color: "#5d9455"
+        }
+      }
+    },
+
+    untip: function () : void {
+      this.tooltip = undefined;
     }
   }
 })
@@ -119,7 +205,13 @@ export default Vue.extend({
 
 .region {
   height: 38px;
+  cursor: help;
 }
+
+/* .region:hover {
+  border-style: solid !important;
+  background-color
+} */
 
 .placeholder {
   height: 24px;
@@ -127,6 +219,7 @@ export default Vue.extend({
 
 .label {
   text-align: left;
+  cursor: help;
 }
 
 .label.rtl {
@@ -140,12 +233,15 @@ export default Vue.extend({
 
 .sector.text .label { color: #0077aa; }
 .sector.text .region { border: 1px dashed #0077aa; }
+.sector.text .region:hover { background-color: rgba(0, 119, 170, 0.1); }
 
 .sector.data .label { color: #ff5555; }
 .sector.data .region { border: 1px dashed #ff5555; }
+.sector.data .region:hover { background-color: rgba(255, 85, 85, 0.1); }
 
 .sector.stack .label { color: #5d9455; }
 .sector.stack .region { border: 1px dashed #5d9455; }
+.sector.stack .region:hover { background-color: rgba(93, 148, 85, 0.1); }
 
 .sector.stack-pointer,
 .sector.stack {

@@ -56,7 +56,7 @@
             inline
             :value="1000 / delay"
             min="0.5"
-            max="50"
+            max="100"
             step="0.1"
             @input="setDelay"
           ></b-form-input>
@@ -72,21 +72,36 @@
     <div class="output">
       <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
         <div v-if="hasOutput">
-          <div v-for="(line, index) in output" :key="index">
+          <!-- <div style="color: #f9e1b3;">output</div> -->
+          <div v-for="(line, index) in output" :key="index" style="overflow-wrap: break-word;">
             {{ line }}
           </div>
         </div>
 
-        <template v-if="computedTooltip.title !== ''">
+        <div v-if="computedTooltip.title !== ''" :class="hasOutput ? 'mt-2' : ''">
           <div :style="`color: ${computedTooltip.color}`">{{ computedTooltip.title }}</div>
           <div>{{ computedTooltip.message }}</div>
-        </template>
+        </div>
 
         <div v-else-if="errors.length > 0">
           {{ errors.length }} errors
         </div>
       </div>
+    </div>
 
+    <div class="samples">
+      <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
+        <a v-if="!showFiles" class="link clickable" style="color: #f9e1b3;" @click="showFiles = true">files</a>
+        <div v-else>
+          <div v-for="file in files" :key="file">
+            <a class="link text-white clickable" @click="loadSampleProgram(file)">{{ file }}</a>
+          </div>
+
+          <div class="mt-2">
+            <a class="link clickable" style="color: #f9e1b3;" @click="showFiles = false">hide</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -124,6 +139,15 @@ export default Vue.extend({
     return {
       program: '' as string,
       tooltip: { title: '', color: '', message: '' } as TTooltip,
+      
+      showFiles: false,
+      files: [
+        "helloworld1.s",
+        "helloworld2.s",
+        "strlen.s",
+        "recursion.s",
+        "stackoverflow!.s"
+      ]
     }
   },
   computed: {
@@ -178,6 +202,10 @@ export default Vue.extend({
       SimulatorState.resume();
     },
 
+    reset: function () {
+      SimulatorState.reset();
+    },
+
     setDelay: function (delay: number) {
       SimulatorState.setDelay(1000 / delay)
     },
@@ -186,7 +214,7 @@ export default Vue.extend({
      * 
      */
     hover: function (e: any) {
-      if (e.target.parentNode.className.includes("error")) {
+      if (e.target.parentNode?.className.includes("error")) {
         if (!e.target.parentNode.dataset["errorIdx"]) return;
         
         let errorIndex = e.target.parentNode.dataset["errorIdx"] as number;
@@ -208,7 +236,7 @@ export default Vue.extend({
     },
 
     click: function (e: any) {
-      if (e.target.parentNode.className.includes("error")) {
+      if (e.target.parentNode?.className.includes("error")) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -229,7 +257,7 @@ export default Vue.extend({
      * 
      */
     dblclick: function (e: any) {
-      if (e.target.parentNode.className.includes("error")) {
+      if (e.target.parentNode?.className.includes("error")) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -443,6 +471,22 @@ export default Vue.extend({
       }
     },
 
+    loadSampleProgram: function (path: string) {
+      this.stop();
+
+      fetch(`/samples/${path}`)
+      .then(res => res.text())
+      .then(text => {
+        this.program = text;
+        this.showFiles = false;
+        this.reset();
+      });
+    },
+
+    readTextFile: function (file: string) {
+
+    },
+
     /**
      * Save editor content to local storage so that it persists on this device
      */
@@ -537,6 +581,13 @@ export default Vue.extend({
   max-width: 600px;
   position: absolute;
   bottom: 0;
+  padding: 0.25rem 0.5rem 0.5rem 0.25rem;
+}
+
+.samples {
+  position: absolute;
+  bottom: 0;
+  right: 0;
   padding: 0.25rem 0.5rem 0.5rem 0.25rem;
 }
 

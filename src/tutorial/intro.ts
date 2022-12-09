@@ -16,6 +16,14 @@ const intro1: TTutorialPage = {
     number representations, signed and unsigned integers, etc.
 
     Either way, I hope you find this to be a fun/useful tool!
+
+    <div class="hmm">\
+      <div class="token label mb-1">Note</div>\
+      If you already know your assembly pretty well and are just here for fun, use the <u>files</u>\
+      link in the bottom right of the editor screen to explore the demos.
+
+      You can switch to the editor screen using the <i class="fas fa-code fa-sm irisc"></i> button.
+    </div>    
   `
   // TODO: maybe add
   // Crucially, <span class="irisc">iRISC</span> is <u>not</u> a perfect simulator for an ARMv7 processor.\

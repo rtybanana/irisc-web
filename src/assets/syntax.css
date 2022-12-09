@@ -32,7 +32,8 @@
 }
 
 #app .token.op-label, 
-#app .token.label {
+#app .token.label,
+#app .token.escape {
   color: #f9e1b3;
 }
 
