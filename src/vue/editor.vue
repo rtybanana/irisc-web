@@ -474,17 +474,13 @@ export default Vue.extend({
     loadSampleProgram: function (path: string) {
       this.stop();
 
-      fetch(`/samples/${path}`)
+      fetch(`samples/${path}`)
       .then(res => res.text())
       .then(text => {
         this.program = text;
         this.showFiles = false;
         this.reset();
       });
-    },
-
-    readTextFile: function (file: string) {
-
     },
 
     /**
