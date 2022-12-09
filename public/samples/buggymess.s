@@ -11,6 +11,9 @@ fail: .asciz "still broken"
 
 .text
 strlen:
+  // push link register to stack
+  push {r12, lr}
+
 	// load first byte
 	ldrb r1, [r0]
 	
