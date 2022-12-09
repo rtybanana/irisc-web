@@ -19,8 +19,6 @@ export function ffs(n: number) : number {
  */
 export function fls(n: number) : number {
   n = (0xffffffff & n) >>> 0;
-  console.log(Math.log2(n), Math.floor(Math.log2(n)));
-
   return Math.floor(Math.log2(n));
 }
 

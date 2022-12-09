@@ -4,13 +4,14 @@ import { Interpreter, SyntaxError } from "@/interpreter";
 import { Token } from "prismjs";
 import { InstructionNode } from "../InstructionNode";
 import { IExplanation, TAssembled, TBranchAddress } from "../types";
+import { branchRegex } from "@/assets";
 
 export class BranchNode extends InstructionNode {
   protected _op: Operation;
   protected _cond: Condition;
   protected _setFlags: boolean;
   protected _Rd: TBranchAddress;
-  // protected _offset: number;
+  private readonly _regex: RegExp = branchRegex;
 
   get Rd() : TBranchAddress { return this._Rd; }
 
@@ -21,7 +22,7 @@ export class BranchNode extends InstructionNode {
     this._op = opMap[operation];
     this._setFlags = modifier.length === 0 ? false : true;
     this._cond = condMap[condition];
-
+    
     if (this.peekToken().type === "register") 
       this._Rd = this.parseReg(this.peekToken());
 
@@ -32,6 +33,18 @@ export class BranchNode extends InstructionNode {
 
     this.nextToken();
     if (this.hasToken()) throw new SyntaxError(`Unexpected token '${this.peekToken().content}' after valid instruction end.`, statement, lineNumber, currentToken + 1);
+  }
+
+  protected splitOpCode(token: Token): [string, string, string] {
+    let operation: string = "";
+    let modifier: string = "";
+    let condition: string = "";
+
+    const matches = this._regex.exec(token.content as string)!;
+    operation = matches[1];
+    condition = matches[2];
+
+    return [operation, modifier, condition];
   }
 
   unpack(): [Operation, Condition, TBranchAddress] {

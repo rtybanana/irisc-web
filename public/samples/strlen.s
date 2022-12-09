@@ -1,5 +1,6 @@
 // strlen.s
 // A strlen() implementation using a loop and ldrb.
+// Output stored in r0.
 
 .data
 greeting: .asciz "hello!"

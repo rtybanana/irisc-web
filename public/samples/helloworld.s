@@ -1,5 +1,5 @@
 // helloworld.s
-// A better helloworld implementation using a single puts() call.
+// A helloworld implementation using a single puts() call.
 
 .data
 greeting: .asciz "hello world!"

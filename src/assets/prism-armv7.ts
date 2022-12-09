@@ -1,5 +1,7 @@
 import { languages } from 'prismjs'
 
+export const branchRegex = /\b(b|bl|bx)(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)?\b/i
+
 languages.armv7 =  {
 	'string': {
 		pattern: /".*"/m
@@ -9,15 +11,15 @@ languages.armv7 =  {
 		greedy: true
 	},
 	'bi-operand': {
-		pattern: /\b(cmn|cmp|mov|mvn|teq|tst)s?(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)?\b/i,
+		pattern: /\b(cmn|cmp|mov|mvn|teq|tst)(s)?(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)?\b/i,
 		alias: 'operation'
 	},
 	'tri-operand': {
-		pattern: /\b(adc|add|and|bic|eor|orr|rsb|rsc|sbc|sub)s?(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)?\b/i,
+		pattern: /\b(adc|add|and|bic|eor|orr|rsb|rsc|sbc|sub)(s)?(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)?\b/i,
 		alias: 'operation'
 	},
 	'branch': {
-		pattern: /\b(b|bl|bx)(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)?\b/i,
+		pattern: branchRegex,
 		alias: 'operation'
 	},
 	'shift': {

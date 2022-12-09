@@ -136,7 +136,6 @@ const actions = {
 
   addOutput(output: string) {
     [...output].forEach(char => {
-      console.log(char, char === '\n');
       if (char === '\n') data.output.push("");
       else {
         let lastLine = data.output.length -1;

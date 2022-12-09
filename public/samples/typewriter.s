@@ -3,7 +3,7 @@
 // It prints like a typewriter!
 
 .data
-greeting: .asciz "typewriter!\nclick, click, click, click, ding!"
+greeting: .asciz "typewriter!\nclick, clack, ding!"
 
 // include putchar()
 .extern putchar
@@ -11,17 +11,17 @@ greeting: .asciz "typewriter!\nclick, click, click, click, ding!"
 .text
 print:
 	// push lr to stack
-	push {r12, lr}
+	push {r4, r5, r12, lr}
 	
-	// move address of print string to r1
-	mov r1, r0
+	// move address of print outside of scratch
+	mov r4, r0
 	
 	// set strlen counter to 0
-	mov r2, #0
+	mov r5, #0
 	
 	print_loop:
 		// load current byte and increment index
-		ldrb r0, [r1], #1
+		ldrb r0, [r4], #1
 		
 		// compare with null terminator
 		cmp r0, #0
@@ -41,14 +41,14 @@ print_loop_end:
 	mov r0, r2
 	
 	// pop lr from stack
-	pop {r12, lr}
+	pop {r4, r5, r12, lr}
 
 	// branch back to main
 	bx lr
 
 main:
 	// push lr to stack
-	push {r0, lr}
+	push {r12, lr}
 	
 	// load pointer to greeting string
 	ldr r0, =greeting
@@ -57,7 +57,7 @@ main:
 	bl print
 	
 	// pop lr from stack
-	pop {r0, lr}
+	pop {r12, lr}
 	
 	// program end
 	bx lr

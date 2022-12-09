@@ -23,10 +23,16 @@
 
     <div class="contents">
       <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
-        <a v-if="!showContents" class="link clickable" style="color: #f9e1b3;" @click="showContents = true; contentsPage = 0;">contents</a>
+        <a v-if="!showContents" class="link clickable" style="color: #f9e1b3;" @click="openContents">contents</a>
         <template v-else>
           <div v-for="contentsLink in contentsSlice" :key="contentsLink.index">
-            <a class="link text-white clickable" @click="navigateTo(contentsLink)">{{ contentsLink.title }}</a>
+            <a 
+              class="link text-white clickable"
+              :class="contentsLink.index === page ? 'current-page' : ''"
+              @click="navigateTo(contentsLink)"
+            >
+              {{ contentsLink.title }}
+            </a>
           </div>
 
           <div class="mt-2">
@@ -98,9 +104,13 @@ export default Vue.extend({
       }
     },
 
+    openContents: function () {
+      this.contentsPage = Math.floor(this.page / 10);
+      this.showContents = true;
+    },
+
     navigateTo: function (page: TContentsLink) {
       this.page = page.index;
-      this.showContents = false;
     }
   },
 
@@ -110,6 +120,7 @@ export default Vue.extend({
 
   watch: {
     page: function () {
+      this.showContents = false;
       localStorage.setItem('tutorial', JSON.stringify(this.page));
 
       this.$nextTick(() => {
@@ -162,7 +173,7 @@ export default Vue.extend({
 }
 
 .content >>> .hmm {
-  background-color: #191d21;
+  background-color: #1f2024;
   border-radius: 0.3rem;
   padding-left: 0.25rem;
   padding-right: 0.25rem;
@@ -193,7 +204,10 @@ export default Vue.extend({
   bottom: 0;
   right: 18px;
   padding: 0.25rem 0.5rem 0.6rem 0rem;
+}
 
+.contents .current-page {
+  color: #e02f72 !important;
 }
 
 /* .contents .contents-list {

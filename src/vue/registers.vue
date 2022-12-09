@@ -133,16 +133,12 @@ export default Vue.extend({
     },
 
     cpsr: function (newVal, oldVal) {
-      console.log(newVal, oldVal);
-
       let changeSet = new Set<number>();
       zip(newVal, oldVal).forEach(([newFlag, oldFlag], index) => {
         if (newFlag !== oldFlag) changeSet.add(index);
       });
 
       this.$set(this, 'flagChangeSet', changeSet);
-      // this.flagChangeSet = changeSet;
-      // console.log(this.flagChangeSet);
     }
   }
 })
