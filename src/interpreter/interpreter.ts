@@ -342,6 +342,8 @@ function executeBlockTransfer(instruction: BlockTransferNode) : boolean {
     case BlockTransfer.LDM:
       reglist.forEach(reg => {
         if (before) increment ? address += 4 : address -= 4;
+
+        checkStore(address, base, instruction);
         SimulatorState.setRegister(reg, state.memory.wordView[address / 4]);
 
         if (!before) increment ? address += 4 : address -= 4;
@@ -399,6 +401,9 @@ function checkAlignment(address: number, size: TTransferSize, instruction: TInst
 function checkStore(address: number, register: Register, instruction: TInstructionNode) : void {
   if (register === Register.SP) {
     if (address < state.memory.textHeight + state.memory.heapHeight) {
+      throw new RuntimeError("SIGSEG: Segmentation fault.", instruction.statement, instruction.lineNumber);
+    }
+    if (address > state.memory.size) {
       throw new RuntimeError("SIGSEG: Segmentation fault.", instruction.statement, instruction.lineNumber);
     }
   }

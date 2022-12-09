@@ -146,7 +146,8 @@ export default Vue.extend({
         "typewriter.s",
         "strlen.s",
         "recursion.s",
-        "stackoverflow!.s"
+        "stackoverflow!.s",
+        "buggymess.s"
       ]
     }
   },
