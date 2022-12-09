@@ -4,15 +4,14 @@
 
 .data
 string: .asciz "r0 == 8?"
-pass: .asciz "all fixed now!"			// you're looking for this output
-fail: .asciz "still broken"
 
-.extern puts
+////////////////////////////////////////////////////////////////
+// BROKEN
 
 .text
 strlen:
-  // push link register to stack
-  push {r12, lr}
+  	// push link register to stack
+  	push {r12, lr}
 
 	// load first byte
 	ldrb r1, [r0]
@@ -55,10 +54,23 @@ main:
 	// program end
 	bx lr
 
+// please fix
+////////////////////////////////////////////////////////////////
 
 
-// checker function
-// you can fix this if you like but it ain't broke 
+
+
+
+
+////////////////////////////////////////////////////////////////
+// CHECKER
+.data
+pass: .asciz "all fixed now!"		// you're looking for this output
+fail: .asciz "still broken"
+
+.extern puts
+
+.text
 check_func:
 	push {r12, lr}
 	
@@ -70,3 +82,6 @@ check_func:
 	
 	pop {r12, lr}
 	bx lr
+	
+// no need to fix
+////////////////////////////////////////////////////////////////
