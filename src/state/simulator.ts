@@ -44,6 +44,8 @@ const data = Vue.observable<TSimulatorState>({
 
   output: [""],
   errors: [],
+  breakpoints: [],
+
   hoveredError: null,
   exitStatus: undefined,
 });
@@ -68,8 +70,9 @@ const getters = {
 
   output: () => data.output,
   errors: () => data.errors,
-  hoveredError: () => data.hoveredError,
+  breakpoints: () => data.breakpoints,
 
+  hoveredError: () => data.hoveredError,
   exitStatus: () => data.exitStatus
 }
 
@@ -156,6 +159,28 @@ const actions = {
 
   unhoverError() {
     data.hoveredError = null;
+  },
+
+  toggleBreakpoint: function (lineNumber: number) {
+    console.log(lineNumber);
+    
+    console.log(data.memory.text);
+    let instruction = data.memory.text.find(e => e.lineNumber === lineNumber);
+    console.log(instruction);
+
+    if (instruction) {
+      let breakpoint = data.breakpoints.find(e => e.lineNumber === instruction?.lineNumber);
+      if (breakpoint) {
+        data.breakpoints = data.breakpoints.filter(e => e.lineNumber !== breakpoint?.lineNumber)
+      }
+      else {
+        data.breakpoints.push(instruction);
+      }
+    }
+  },
+
+  removeBreakpoints: function () {
+    data.breakpoints = [];
   },
 
   setRegister: function (register: Register, value: number) {

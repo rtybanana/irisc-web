@@ -69,6 +69,12 @@
 	padding-right: 0.25rem;
 }
 
+#app .line.breakpoint {
+	border-radius: 0.15rem;
+	background-color: rgba(181, 43, 43, 0.5);
+	padding-right: 0.25rem;
+}
+
 /* .prism-editor__line-number {
 	padding-left: 10px;
 	position: relative;

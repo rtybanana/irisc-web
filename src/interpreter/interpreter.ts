@@ -18,7 +18,8 @@ const state = {
   get registers() { return SimulatorState.registers(); },
   get cpsr() { return SimulatorState.cpsr(); },
   get memory() { return SimulatorState.memory(); },
-  get previousPC() { return SimulatorState.previousPC(); }
+  get previousPC() { return SimulatorState.previousPC(); },
+  get breakpoints() { return SimulatorState.breakpoints(); }
 }
 
 /**
@@ -30,6 +31,11 @@ const state = {
 export function execute(instruction: TInstructionNode, incPC: boolean = true) : boolean {
   let executed: boolean = false;
   SimulatorState.setCurrentInstruction(instruction);
+
+  // if (state.breakpoints.includes(instruction)) {
+  //   console.log("breaking on", instruction);
+  //   SimulatorState.pause()
+  // }
 
   if (instruction instanceof BranchNode) {
     executed = executeBranch(instruction);
@@ -408,7 +414,8 @@ function checkStore(address: number, register: Register, instruction: TInstructi
     }
   }
 
-  else if (address <= state.memory.textHeight || address >= state.memory.size) {
+  else if (address < state.memory.textHeight || address >= state.memory.size) {
+    console.log(address, state.memory.textHeight, state.memory.size);
     throw new RuntimeError("SIGSEG: Segmentation fault.", instruction.statement, instruction.lineNumber);
   }
 }

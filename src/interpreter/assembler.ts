@@ -23,7 +23,19 @@ function parse(program: string) : Token[][] {
 
       // push valid token into current line
       else if (!["whitespace", "line-comment"].includes(e.type)) {
-        a[a.length - 1].push(e); 
+        // do not convert to lower case if string
+        if (e.type === "string") {
+          a[a.length - 1].push(e); 
+        }
+
+        // convert all other tokens to lower case for compilation
+        else {
+          a[a.length - 1].push({
+            ...e,
+            content: (e.content as string).toLowerCase()
+          }); 
+        }
+        
       }
     }
 
@@ -167,6 +179,7 @@ function load(nodes: (SyntaxNode | null)[]) {
 function build(program: string) : void {
   SimulatorState.stop();
   SimulatorState.initMemory();
+  SimulatorState.removeBreakpoints();
 
   const lines = parse(program);
   const nodes = compile(lines);

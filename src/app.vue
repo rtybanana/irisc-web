@@ -181,6 +181,7 @@ export default Vue.extend({
   computed: {
     registers: SimulatorState.registers,
     memory: SimulatorState.memory,
+    breakpoints: SimulatorState.breakpoints,
     errors: SimulatorState.errors,
     
     running: SimulatorState.running,
@@ -251,6 +252,13 @@ export default Vue.extend({
           // check for bx lr to static exit point
           if (this.registers[Register.PC] === this.memory.exitPoint) {
             SimulatorState.setExitStatus(0);
+          }
+          else {
+            // check for breakpoint
+            const nextInstruction: TInstructionNode = SimulatorState.instruction(this.registers[Register.PC]);
+            if (this.breakpoints.find(e => e.lineNumber === nextInstruction.lineNumber)) {
+              SimulatorState.pause();
+            }
           }
         }
       }

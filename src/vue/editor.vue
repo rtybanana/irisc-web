@@ -147,6 +147,7 @@ export default Vue.extend({
         "strlen.s",
         "recursion.s",
         "stackoverflow!.s",
+        "bubblesort.s",
         "buggymess.s"
       ]
     }
@@ -168,6 +169,7 @@ export default Vue.extend({
     },
 
     errors: SimulatorState.errors,
+    breakpoints: SimulatorState.breakpoints,
     exitStatus: SimulatorState.exitStatus,
 
     computedTooltip: function () : TTooltip {
@@ -251,6 +253,11 @@ export default Vue.extend({
             }
           }
         ));
+      }
+      else if (e.target.className.includes("line-number")){
+        console.log(e.target.innerText);
+        console.log(e.layerX, e.layerY);
+        SimulatorState.toggleBreakpoint(e.target.innerText - 1);
       }
     },
 
@@ -344,6 +351,7 @@ export default Vue.extend({
       // reconstruct highlit tokens to lines
       lines = tokens.map(e => (e as string[]).join(""));
       this.highlightLineErrors(lines);
+      this.highlightBreakpoints(lines);
       this.highlightExecuting(lines);
       
       // reconstruct highlit lines to program
@@ -383,22 +391,32 @@ export default Vue.extend({
           if (error.tokenIndex !== -1) return;
 
           let line = lines[error.lineNumber];
-
           if (line !== undefined) {
-            console.log(line);
             lines[error.lineNumber] = `<span class="line error" style="text-decoration-color: ${error.color}" data-error-idx="${index}">${line}</span>`;
-
           }
         });
 
       // exit status runtime error
       if (this.exitStatus instanceof RuntimeError) {
         let line = lines[this.exitStatus.lineNumber];
-
         if (line !== undefined) {
           lines[this.exitStatus.lineNumber] = `<span class="line error" style="text-decoration-color: ${this.exitStatus.color}">${line}</span>`;
         }
       }
+    },
+
+    /**
+     * 
+     */
+    highlightBreakpoints: function (lines: string[]) {
+      // user breakpoints
+      this.breakpoints
+        .forEach((instruction) => {
+          let line = lines[instruction.lineNumber];
+          if (line !== undefined) {
+            lines[instruction.lineNumber] = `<span class="line breakpoint">${line}</span>`;
+          }
+        });
     },
 
     /**

@@ -67,6 +67,19 @@ export class SyntaxNode {
 
   /**
    * 
+   * @param index 
+   * @returns 
+   */
+  getToken(index: number) : Token {
+    if (index < this._statement.length) {
+      return this._statement[index];
+    }
+
+    throw new SyntaxError("Unexpected instruction end '" + this._statement[this._statement.length - 1].content + "'.", this._statement, this._lineNumber, this._statement.length - 1);
+  }
+
+  /**
+   * 
    * @param token 
    * @returns 
    */
