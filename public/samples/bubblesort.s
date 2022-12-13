@@ -58,8 +58,8 @@ bsort:
 	bsort_check:
 		add r7, r7, r6					// add total swaps
 		cmp r6, #0						// were there any swaps this loop?
-		subgt r1, r1, #1				// if there where the top element is sorted
-		bgt bsort_next					//	if there were go back and bubble again
+		subgt r1, r1, #1				// if there were, the bubbled element is sorted
+		bgt bsort_next					//	if there were, go back and bubble again
     
 bsort_done:
 	mov r0, r7							// set return to total swaps
