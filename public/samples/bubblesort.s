@@ -1,13 +1,15 @@
 // bubblesort.s
 // Sorts the string data into alphabetical order according to the ascii table.
-// What happens if you try to sort a mixed case string?
+// What happens if you try to sort a mixed case string? 
 
 .data
 string: 	.asciz 	"gdacbfe"    // try out other strings by changing the data
 worst: 	.asciz 	"gfedcba"
 best: 	.asciz 	"abcdefg"
 
-.extern puts
+format_str: .asciz "%s (%d swaps)"
+
+.extern printf
 
 .text
 // calculate string length to pass to bubble sort
@@ -31,6 +33,7 @@ strlen:
 //		r1 -> integer length of string
 bsort:
 	push {r4, r5, r6, r7, r12, lr}
+	mov r7, #0							// total swap counter
  	
 	bsort_next:
 		mov r2, #0						// current element index
@@ -53,12 +56,13 @@ bsort:
 			b bsort_loop				// loop!
 			
 	bsort_check:
-		add r7, r7, r6
+		add r7, r7, r6					// add total swaps
 		cmp r6, #0						// were there any swaps this loop?
 		subgt r1, r1, #1				// if there where the top element is sorted
 		bgt bsort_next					//	if there were go back and bubble again
     
 bsort_done:
+	mov r0, r7							// set return to total swaps
 	// pop link register directly into program counter
 	// avoids additional branch instruction
 	pop {r4, r5, r6, r7, r12, pc}
@@ -82,8 +86,10 @@ main:
 	bl bsort
 
 	// reset pointer to first character
-	mov r0, r4
-	bl puts
+	mov r2, r0
+	mov r1, r4
+	ldr r0, =format_str
+	bl printf
 
 	// pop and end
 	pop {r12, lr}

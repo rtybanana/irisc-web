@@ -3,7 +3,11 @@
 // Output stored in r0.
 
 .data
-greeting: .asciz "hello!"
+greeting: 	.asciz "hello!"
+strlen_str: .asciz "\"%s\" has %d characters"
+
+.extern puts
+.extern printf
 
 .text
 strlen:
@@ -36,11 +40,15 @@ main:
 	// push lr to stack
 	push {r12, lr}
 	
-	// load pointer to greeting string
-	ldr r0, =greeting
-	
 	// calculate string length
+	ldr r0, =greeting
 	bl strlen
+	
+	// print strlen details
+	mov r2, r0
+	ldr r1, =greeting
+	ldr r0, =strlen_str
+	bl printf
 	
 	// pop lr from stack
 	pop {r12, lr}

@@ -36,7 +36,8 @@
     "src/**/*.vue",
     "tests/**/*.ts",
     "tests/**/*.tsx",
-    "decs.d.ts"
+    "decs.d.ts", 
+    "src/assets/printf.js"  
   ],
   "exclude": [
     "node_modules"

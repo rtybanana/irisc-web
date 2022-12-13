@@ -4,7 +4,7 @@ export const branchRegex = /\b(b|bl|bx)(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|l
 
 languages.armv7 =  {
 	'string': {
-		pattern: /".*"/m
+		pattern: /"(?:\\(?:\r\n|[\s\S])|[^"\\\r\n])*"/
 	},
 	'line-comment': {
 		pattern: /\/\/(?:[^\r\n\\]|\\(?:\r\n?|\n|(?![\r\n])))*|\/\*[\s\S]*?(?:\*\/|$)/,
