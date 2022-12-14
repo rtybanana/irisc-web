@@ -20,4 +20,4 @@ export const callMap: Record<string, Call> = {
   "printf": Call.PRINTF
 }
 
-export const callAddress = -1;
+export const callAddress = -4;

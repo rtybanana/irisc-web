@@ -3,7 +3,7 @@
 // Output stored in r0.
 
 .data
-greeting: 	.asciz "hello!"
+greeting: 	.asciz "hello world!"
 strlen_str: .asciz "\"%s\" has %d characters"
 
 .extern puts
