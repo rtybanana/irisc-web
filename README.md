@@ -126,9 +126,28 @@ This is an example of how to list things you need to use the software and how to
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Memory visualiser
-- [ ] Complete assembly visualiser
+- [ ] Memory visualiser
+  - [ ] Usage overview
+    - [x] Text
+    - [x] Data
+    - [ ] Heap
+    - [x] Stack
+  - [ ] Data explorer (byte view)
+- [ ] Assembly visualiser
     - [ ] Add assembly of shift instructions
+- [ ] Support for external C stdlib and stdio calls
+  - [x] putchar()
+  - [x] puts()
+  - [ ] printf() 
+    - [x] Support for %c, %d and %c
+    - [ ] Support for other specifiers
+  - [ ] scanf()
+  - [ ] malloc() and free()
+- [ ] Tutorial
+  - [x] Introduction
+  - [x] Basics (instructions, immediate representation)
+  - [ ] Intermediate (loops, conditionals, static allocation)
+  - [ ] Advanced (AAPCS, dynamic allocation)
 
 See the [open issues](https://github.com/rtybanana/irisc-web/issues) for a full list of proposed features (and known issues).
 

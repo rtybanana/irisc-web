@@ -101,14 +101,14 @@ function printf() : boolean {
     else if (token.specifier === 's') {
       [data, register, offset] = getString(useStack, currentRegister, currentOffset);
     }
-    else if (token.specifier === 'd') {
+    else if (['i', 'd'].includes(token.specifier)) {
       [data, register, offset] = getDecimal(useStack, currentRegister, currentOffset);
     }
 
     // TODO: implement other format specifiers
     else {
       const instruction = SimulatorState.currentInstruction()!;
-      throw new RuntimeError("printf format strings with specifiers other than %c, %s and %d are not yet supported.", instruction.statement, instruction.lineNumber);
+      throw new RuntimeError("printf format strings with specifiers other than %c, %s, %d and %i are not yet supported.", instruction.statement, instruction.lineNumber);
     }
 
     currentRegister = register;

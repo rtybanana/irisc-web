@@ -203,7 +203,7 @@ export class BlockTransferNode extends TransferNode {
     explanation.push({
       title: "Write-back Bit", 
       subtitle: writeBackBit ? "Updating" : "Not updating", 
-      detail: "Tells the processor whether (1) or not (0) to update the base register after transfering the data.", 
+      detail: "Tells the processor whether (1) or not (0) to update the base register after transferring the data.", 
       range: 1
     });
 
