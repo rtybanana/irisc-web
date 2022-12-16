@@ -42,7 +42,7 @@ export class BranchNode extends InstructionNode {
 
     const matches = this._regex.exec(token.content as string)!;
     operation = matches[1];
-    condition = matches[2];
+    condition = matches[2] ?? "";
 
     return [operation, modifier, condition];
   }
