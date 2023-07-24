@@ -343,7 +343,7 @@ export default Vue.extend({
       let lines = highlit.split(`<span class="token end">\n</span>`);
 
       // deconstruct lines to tokens
-      let tokens = lines.map(e => e.match(/<span.*?<\/span>\s*/gim) ?? []);
+      let tokens = lines.map(e => e.match(/<span.*?<\/span>\s*/gim) ?? []) as RegExpMatchArray[];
 
       // squiggly underline token errors
       this.highlightTokenErrors(tokens);
@@ -579,7 +579,6 @@ export default Vue.extend({
   left: 0;
   right: 0;
   overflow-x: hidden;
-  padding-bottom: 30%;
 }
 
 .controls {

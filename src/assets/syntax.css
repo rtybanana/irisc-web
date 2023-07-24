@@ -7,6 +7,11 @@
   min-height: 100%;
   color: white;
   line-height: 1.2em;
+  padding-bottom: 30%;
+}
+
+.prism-editor-wrapper .prism-editor__line-numbers {
+	padding-bottom: 30%;
 }
 
 .prism-editor-wrapper .prism-editor__textarea:focus-visible {
