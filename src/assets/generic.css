@@ -10,3 +10,40 @@ body {
 .hoverable:hover {
   background-color: rgba(255, 255, 255, 0.15);
 }
+
+body .btn,
+body .btn-group-toggle .btn {
+  background-color: transparent;
+  border: 1px dashed #cccdcd;
+  border-radius: unset;
+  padding: 0 10px;
+}
+
+body .btn-secondary:not(:disabled):not(.disabled):active,
+body .btn-secondary:not(:disabled):not(.disabled).active {
+  background-color: transparent;
+  border: 1px dashed #8b0c3c;
+  border-radius: unset;
+  color: #8b0c3c;
+}
+
+
+body .btn:active .btn.active {
+  background-color: transparent;
+}
+
+body .btn:focus, body .btn.focus {
+  outline: 0;
+  box-shadow: none;
+}
+
+body .form-group .col-form-label {
+  padding-bottom: 0;
+}
+
+body .btn:hover {
+  background-color: transparent;
+  border: 1px dashed #8b0c3c;
+  border-radius: unset;
+  color: #8b0c3c;
+}

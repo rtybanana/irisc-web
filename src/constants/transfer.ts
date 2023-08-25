@@ -52,6 +52,11 @@ export const addressModeGroup = {
   "after": [BlockAddressMode.IA, BlockAddressMode.DA]
 }
 
+export const readWriteGroup = {
+  "read": [SingleTransfer.LDR, BlockTransfer.LDM, StackTransfer.POP],
+  "write": [SingleTransfer.STR, BlockTransfer.STM, StackTransfer.PUSH]
+}
+
 const plus = "+";
 const minus = "-";
 export type TSign = typeof plus | typeof minus;

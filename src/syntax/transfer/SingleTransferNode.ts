@@ -67,27 +67,21 @@ export class SingleTransferNode extends TransferNode {
     this._Rn = this.parseReg(this.nextToken());
     
     try { 
-      console.log("attempting to parse post-indexed updating");
       this.parseIndexer(this.peekToken(), "end");
 
       this._addressMode = "post"; 
       this._updating = true;
-      console.log("transfer is post-indexed (updating)");
 
       this.nextToken();
     }
     catch (e) { 
       if (!(e instanceof SyntaxError)) throw e;   // rethrow if not syntax error
-      console.log("transfer is pre-indexed");
     }  
 
     let comma = false;
     try {
-      console.log("parsing offset");
       this.parseComma(this.nextToken());
       comma = true;
-
-      console.log("parsing sign");
 
       this.peekToken();
       if (this.peekToken().type === "sign") {
@@ -96,14 +90,10 @@ export class SingleTransferNode extends TransferNode {
       }
 
       if (this._addressMode === "pre") {
-        console.log("finding end indexer location if pre-indexed");
         const endIndexerIndex = this.findEndIndexer();
-
-        console.log("delegating parsing to flex-operand constructor", this.statement.slice(0, endIndexerIndex));
         this._flex = new FlexOperand(this.statement.slice(0, endIndexerIndex), this.lineNumber, this._currentToken);      // parsing delegated to FlexOperand constructor
       }
       else {
-        console.log("delegating parsing to flex-operand constructor");
         this._flex = new FlexOperand(this.statement, this.lineNumber, this._currentToken);      // parsing delegated to FlexOperand constructor
       }
       this._currentToken = this._flex.currentToken;

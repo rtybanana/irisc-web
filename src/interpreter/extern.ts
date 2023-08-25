@@ -6,7 +6,6 @@ import { state } from "./interpreter";
 import { printf as cprintf, getTokens} from "@/assets/printf";
 
 export function executeCall(instruction : TInstructionNode, call: Call) : boolean {
-
   if (call === Call.PUTCHAR) return putchar();
   if (call === Call.PUTS) return puts();
   if (call === Call.PRINTF) return printf();
@@ -76,7 +75,6 @@ function printf() : boolean {
   
   // get replaceable identifiers
   const tokens = getTokens(formatStr);
-  console.log(tokens);
 
   let useStack = false;
   let currentRegister = Register.R1;
@@ -94,7 +92,6 @@ function printf() : boolean {
       throw new RuntimeError("Passing arguments to printf via the stack is not yet supported. Coming soon!", instruction.statement, instruction.lineNumber);
     }
 
-    console.log(useStack, currentRegister, currentOffset);
     if (token.specifier === 'c') {
       [data, register, offset] = getChar(useStack, currentRegister, currentOffset);
     }

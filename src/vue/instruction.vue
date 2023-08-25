@@ -16,6 +16,10 @@
           {{ bit }}
         </span>
       </span>
+
+      <div class="history clickable" @click="$refs.history.show()">
+        <i class="button fas fa-history"></i>
+      </div>
     </div>
 
     <div class="fenced flex-grow-1" style="overflow: auto;">
@@ -41,12 +45,69 @@
       </template>
      
     </div>
+
+    <b-modal
+      ref="history"
+      centered hide-header 
+      hide-footer
+      body-class="irisc-modal history-modal p-1"
+    >
+      <div class="px-4 py-1">
+        <h4>state history</h4>
+        
+        <div class="mt-3">
+          <div 
+            v-for="snapshot in snapshots" 
+            class="snapshot fenced clickable mb-4" 
+            :class="currentTick === snapshot.tick ? 'current' : 'not-current'"
+            @click="reinstate(snapshot.tick)"
+            :key="snapshot.tick"
+          >
+            <!-- tick number -->
+            <span class="d-inline-block tick rounded py-1">{{ snapshot.tick }}</span>
+
+            <!-- instruction text -->
+            <div>
+              <span 
+                v-html="snapshot.instruction"
+                class="p-1"
+                style="color: #DCDCDC;"
+            ></span>
+              <span class="reinstate px-1 float-right">
+                <i class="fas fa-share fa-rotate-180 fa-xs" style="color: #1f2024;"></i>
+              </span>
+            </div>
+
+            <!-- register change summary -->
+            <div class="ml-3">
+              <div v-for="[register, oldValue] in snapshot.registersHit" :key="register">
+                {{ regName[register] }}: {{ oldValue }} >> {{ snapshot.registers[register] }}
+              </div>
+            </div>
+            
+            <!-- memory write summary -->
+            <div v-if="snapshot.memWrite" class="ml-3">
+              bytes written in range: {{ snapshot.memWrite.base }} - {{ snapshot.memWrite.limit }}
+            </div>
+
+            <!-- memory read summary -->
+            <div v-if="snapshot.memRead" class="ml-3">
+              bytes read in range: {{ snapshot.memRead.base }} - {{ snapshot.memRead.limit }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </b-modal>
   </div>
 </template>
 
 <script lang="ts">
-import { SimulatorState } from '@/state';
+import { SimulatorState, TSimulatorSnapshot } from '@/state';
+import { zip } from '@/assets/functions';
+import { TransferNode } from '@/syntax';
 import { IExplanation, TAssembled } from '@/syntax/types';
+import { flagExplain, flagName, flagTitle, regExplain, Register, regName, regTitle, Flag } from "@/constants";
+import { explain, TSnapshotExplanation } from "@/explainer";
 import { highlight, languages } from 'prismjs';
 import Vue from 'vue';
 
@@ -75,6 +136,14 @@ export default Vue.extend({
   name: 'instruction',
   data() {
     return {
+      regName,
+      regTitle,
+      regExplain,
+
+      flagName, 
+      flagTitle,
+      flagExplain,
+
       default: {
         bitcode: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         explanation: [{
@@ -91,6 +160,10 @@ export default Vue.extend({
   computed: {
     currentInstruction: SimulatorState.currentInstruction,
     wasExecuted: SimulatorState.wasExecuted,
+    currentTick: SimulatorState.currentTick,
+    memSize: () => SimulatorState.memory().size,
+
+    // hack so we can access the enum in dom
     TipType: () => TipType,
 
     sections: function (): ISection[] {
@@ -121,7 +194,19 @@ export default Vue.extend({
         detail: "This is the assembled machine code for the last instruction. Hover over the different sections to see what they mean.",
         type: TipType.INSTRUCTION
       }
-      
+    },
+
+    snapshots: function (): TSnapshotExplanation[] {
+      return SimulatorState.snapshots()
+        .data()
+        .slice()
+        .reduce((a, snapshot, index, snapshots) => {
+          const prevSnapshot: TSimulatorSnapshot | undefined = snapshots[index - 1];
+
+          a.push(explain(snapshot, prevSnapshot));
+          return a;
+        }, [] as TSnapshotExplanation[])
+        .reverse()
     }
   },
   methods: {
@@ -134,6 +219,10 @@ export default Vue.extend({
 
     untip: function () {
       this.tooltip = undefined;
+    },
+
+    reinstate: function (tick: number) {
+      SimulatorState.reinstateSnapshot(tick);
     }
   }
 })
@@ -187,4 +276,62 @@ export default Vue.extend({
   border-radius: 0.15rem;
 }
 
+.history {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  border-radius: 0.3rem;
+  background-color: #191d21;
+  padding: 0.20rem 0.35rem 0.08rem 0.35rem;
+}
+
+.reinstate {
+  display: none;
+}
+
+.snapshot {
+  position: relative;
+}
+
+.snapshot:hover .reinstate {
+  display: inline;
+}
+
+.snapshot.fenced {
+  padding: 0.35rem 0.35rem;
+  border-color: #cccdcd;
+}
+
+.snapshot.current {
+  border-color: #8b0c3c;
+}
+
+.snapshot.not-current {
+  background-color: #1f2024;
+}
+
+.tick {
+  position: absolute;
+  top: 0;
+  left: -23px;
+  text-align: right;
+  direction: rtl;
+  font-size: 13px;
+  writing-mode: sideways-lr;
+  text-orientation: mixed;
+  padding: 0.15rem 0;
+}
+
+.snapshot.current .tick {
+  background-color: #8b0c3c;
+  color: white;
+}
+</style>
+
+<style>
+.history-modal {
+  border-color: #cccdcd;
+  background-color: #0d1117;
+  color: #DCDCDC;
+}
 </style>

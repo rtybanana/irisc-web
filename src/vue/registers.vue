@@ -22,7 +22,7 @@
         cpsr
       </div>
       <div
-        v-for="(flag, index) in cpsr"
+        v-for="(_, index) in cpsr"
         class="flag"
         @mouseover="tip(flagTitle[index], flagExplain[index])"
         @mouseleave="untip"

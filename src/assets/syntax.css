@@ -19,43 +19,43 @@
 }
 
 
-#app .token.register {
+body .token.register {
   color: #07a;
 }
 
-#app .token.operation {
+body .token.operation {
   color: #ff5555;
 }
 
-#app .token.immediate,
-#app .token.number {
+body .token.immediate,
+body .token.number {
   color: #a6a6a6;
 }
 
-#app .token.line-comment {
+body .token.line-comment {
   color: #5d9455;
 }
 
-#app .token.op-label, 
-#app .token.label,
-#app .token.escape {
+body .token.op-label, 
+body .token.label,
+body .token.escape {
   color: #f9e1b3;
 }
 
-#app .token.data-label {
+body .token.data-label {
 	color: #85fbff;
 }
 
-#app .token.directive {
+body .token.directive {
 	color: #e02f72;
 }
 
-#app .token.string {
+body .token.string {
 	color: #ce9178;
 }
 
-#app .token.error,
-#app .line.error {
+body .token.error,
+body .line.error {
 	text-decoration: underline wavy 1px;
 	border-radius: 0.15rem;
 	pointer-events: auto;
@@ -63,18 +63,18 @@
 	user-select: none;
 }
 
-#app .token.error:hover,
-#app .line.error:hover {
+body .token.error:hover,
+body .line.error:hover {
 	background-color: rgba(240, 128, 128, 0.5);
 }
 
-#app .line.executing {
+body .line.executing {
 	border-radius: 0.15rem;
 	background-color: rgba(255, 255, 255, 0.2);
 	padding-right: 0.25rem;
 }
 
-#app .line.breakpoint {
+body .line.breakpoint {
 	border-radius: 0.15rem;
 	background-color: rgba(181, 43, 43, 0.5);
 	padding-right: 0.25rem;
@@ -109,4 +109,10 @@
 	min-width: 42px;
 	background: transparent !important;
 	overflow: visible;
+}
+
+.prism-editor-wrapper .prism-editor__editor,
+.prism-editor-wrapper .prism-editor__textarea {
+	overflow: hidden;
+	white-space: pre;
 }

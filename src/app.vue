@@ -1,6 +1,5 @@
 <template>
   <div id="app">
-    
     <div class="container-fluid h-100">
       <div class="row h-100">
         <!-- <div class="col-12 mt-3 mb-0">
@@ -54,9 +53,9 @@
                 <div class="col-6 pl-1" style="max-height: 100%;">
                   <memory></memory>
 
-                  <div class="settings">
+                  <div class="settings clickable" @click="$refs.settings.show()">
                     <!-- <i class="button fas fa-info clickable" @click="$refs.settings.show()"></i> -->
-                    <i class="button fas fa-sliders-h clickable" @click="$refs.settings.show()"></i>
+                    <i class="button fas fa-sliders-h"></i>
                   </div>
                 </div>
               </div>
@@ -81,9 +80,10 @@
     <!-- size="lg" -->
     <b-modal 
       ref="settings" 
-      centered hide-header 
-      hide-footer hide-backdrop
-      body-class="settings-modal p-1"
+      centered 
+      hide-header 
+      hide-footer
+      body-class="irisc-modal p-1"
     >
 
       <div class="px-5 py-1">
@@ -123,7 +123,7 @@
       ref="about" 
       centered hide-header 
       hide-footer hide-backdrop
-      body-class="settings-modal p-1"
+      body-class="irisc-modal p-1"
     >
 
       <div class="px-5 py-1">
@@ -137,12 +137,19 @@
       centered hide-header 
       hide-footer
       :visible="isTooSmall"
-      body-class="settings-modal p-1"
+      body-class="irisc-modal p-1"
+
     >
       <h4>oh no!</h4>
       <div class="mt-3">
         It looks like the device you're using is too small to properly interact with iRISC. <br><br>
-        I recommend retrying on a larger, desktop or laptop device for the best experience.
+        I recommend retrying on a larger, desktop or laptop device for the best experience (at least 1280x720).
+      </div>
+
+      <div class="text-center mt-3 mb-2">
+        <b-button @click="dismissTooSmall = true;">
+          try anyway
+        </b-button>
       </div>
     </b-modal>
     
@@ -175,10 +182,14 @@ export default Vue.extend({
       env: EnvironmentType.TERMINAL,
       emulator: SimulatorState,
 
+      dismissTooSmall: false,
+
       windowSize: 0
     }
   },
   computed: {
+    currentTick: SimulatorState.currentTick,
+
     registers: SimulatorState.registers,
     memory: SimulatorState.memory,
     breakpoints: SimulatorState.breakpoints,
@@ -190,7 +201,7 @@ export default Vue.extend({
     step: SimulatorState.step,
 
     isTooSmall: function (): boolean {
-      return this.windowSize < 1000;
+      return !this.dismissTooSmall && this.windowSize < 1250;
     }
   },
   methods: {
@@ -234,7 +245,6 @@ export default Vue.extend({
       SimulatorState.setStackHeight(0);
       SimulatorState.start();
 
-      // await this.sleep();
       try {
         while(this.running) {
           SimulatorState.setStep(false);
@@ -287,6 +297,8 @@ export default Vue.extend({
      * 
      */
     doStep: function () {
+      console.log("do step");
+
       if (this.running && this.paused) {
         SimulatorState.setStep(true);
         return
@@ -301,18 +313,38 @@ export default Vue.extend({
 
     windowSizeListener: function () {
       this.windowSize = window.innerWidth;
+    },
+
+    keyListener: function (e: KeyboardEvent) {
+      if (e.code === "Period" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        
+        console.log("keyboard step");
+        this.doStep();
+      }
+
+      else if (e.code === "Comma" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        
+        SimulatorState.reinstateSnapshot(this.currentTick - 1);
+      }
     }
   },
 
   created: function () {
     this.env = (localStorage.getItem('environment') as EnvironmentType) ?? EnvironmentType.TERMINAL;
-
+    
     window.addEventListener("resize", this.windowSizeListener);
     this.windowSizeListener();
   },
 
-  destroyed: function () {
+  mounted: function () {
+    document.addEventListener('keydown', this.keyListener.bind(this));
+  },
+
+  beforeDestroy: function () {
     window.removeEventListener("resize", this.windowSizeListener);
+    document.removeEventListener('keydown', this.keyListener);
   }
 })
 </script>
@@ -350,12 +382,12 @@ html, body {
   padding: 0.25rem 0.33rem 0.15rem 0.4rem;
 }
 
-.settings-modal {
+.irisc-modal {
   font-family: 'Ubuntu Mono', monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f7f7f7;
-  border: 1px dashed #0d1117;
-  color: #171c24;
+  background-color: #0d1117;
+  border: 1px dashed #DCDCDC;
+  color: #DCDCDC;
 }
 </style>

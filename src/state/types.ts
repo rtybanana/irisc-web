@@ -1,5 +1,6 @@
 import { IriscError, RuntimeError } from "@/interpreter/error";
 import { TInstructionNode } from '@/syntax/types';
+import { Queue } from '@/utilities';
 
 type TMemory = {
   size: number;
@@ -9,8 +10,8 @@ type TMemory = {
   wordView: Uint32Array;
   byteView: Uint8Array;
 
-  heapHeight: number;
-  heapMap: Record<string, number>;
+  dataHeight: number;
+  dataMap: Record<string, number>;
   
   text: TInstructionNode[];
   textHeight: number;
@@ -23,25 +24,34 @@ type TCPU = {
   registers: Uint32Array;
   observableRegisters: number[];
   cpsr: boolean[];
+  tick: number;
 }
 
 export type TExitStatus = RuntimeError | number;
-export type TSimulatorState = {
-  running: boolean;
-  paused: boolean;
-  step: boolean;
-  delay: number;
 
+type TSimulatorStateBase = {
   cpu: TCPU;
   memory: TMemory;
 
+  running: boolean;
   previousPC: number;
   currentInstruction?: TInstructionNode;
   wasExecuted: boolean;
 
   output: string[];
+  exitStatus: TExitStatus | undefined;
+}
+
+export type TSimulatorSnapshot = TSimulatorStateBase;
+
+export type TSimulatorState = TSimulatorStateBase & {
+  paused: boolean;
+  step: boolean;
+  delay: number;
+
   errors: IriscError[];
   breakpoints: TInstructionNode[];
   hoveredError: IriscError | null;
-  exitStatus: TExitStatus | undefined;
+
+  snapshots: Queue<TSimulatorSnapshot>
 }

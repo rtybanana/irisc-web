@@ -6,4 +6,4 @@ export type TTutorialPage = {
 export type TContentsLink = {
   title: string;
   index: number;
-}
+};

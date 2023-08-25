@@ -4,6 +4,7 @@ import { SyntaxError } from '@/interpreter/error';
 import { Token } from 'prismjs';
 import { IExplanation, TAssembled } from '../types';
 import { TransferNode } from './TransferNode';
+import { TByteRange } from './types';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */

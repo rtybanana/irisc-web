@@ -10,6 +10,7 @@
             <span
               @mouseenter="tip('text')"
               @mouseleave="untip"
+              @click="explore('text')"
             >
               text
             </span>
@@ -18,6 +19,7 @@
             class="region"
             @mouseenter="tip('text')"
             @mouseleave="untip"
+            @click="explore('text')"
           ></div>
           <div class="placeholder"></div>
         </div>
@@ -32,19 +34,27 @@
             class="region"
             @mouseenter="tip('data')"
             @mouseleave="untip"
+            @click="explore('data')"
           ></div>
           <div class="label">
             <span
               @mouseenter="tip('data')"
               @mouseleave="untip"
+              @click="explore('data')"
             >
               data
             </span>
           </div>
         </div>
 
-        <div class="flex-grow-1">
-          
+        <div class="flex-grow-1 sector uninitialised">
+          <div 
+            class="region"
+            @mouseenter="tip('uninitialised')"
+            @mouseleave="untip"
+            @click="explore('uninitialised')"
+          ></div>
+          <div class="placeholder"></div>
         </div>
 
         <div 
@@ -55,6 +65,7 @@
             <span
               @mouseenter="tip('stack')"
               @mouseleave="untip"
+              @click="explore('stack')"
             >
               stack
             </span>
@@ -63,6 +74,7 @@
             class="region"
             @mouseenter="tip('stack')"
             @mouseleave="untip"
+            @click="explore('stack')"
           ></div>
           <div class="placeholder"></div>
         </div>
@@ -74,10 +86,18 @@
           :style="`width: ${stackPointer}%`"
         >
           <div class="placeholder"></div>
-          <div class="region"></div>
+          <div 
+            class="region"
+            style="pointer-events: none;"
+          ></div>
           <div 
             class="label rtl text-white text-left">
-            <span>sp</span> 
+            <span
+              @mouseenter="tip('stackPointer')"
+              @mouseleave="untip"
+            >
+              sp
+            </span> 
           </div>
         </div>
 
@@ -109,12 +129,17 @@
         </div>
       </template>
     </div>
+
+    <explorer ref="explorer"></explorer>
   </div>
 </template>
 
 <script lang="ts">
-import { Register } from '@/constants';
+import { TDictionary } from "@/assets";
+import { Register, StackTransfer } from '@/constants';
 import { SimulatorState } from "@/state";
+import { default as explorer } from "./explorer.vue";
+import { BModal } from "bootstrap-vue";
 import Vue from 'vue';
 
 type TTip = {
@@ -125,9 +150,40 @@ type TTip = {
 
 export default Vue.extend({
   name: 'memory',
+  components: {
+    explorer
+  },
   data() {
     return {
-      tooltip: undefined as TTip | undefined
+      tooltip: undefined as TTip | undefined,
+
+      tips: {
+        text: {
+          name: "text",
+          tip: "The text section contains the instructions defined in the .text section of the program.",
+          color: "#0077aa"
+        },
+        data: {
+          name: "data",
+          tip: "The data section contains all the static data defined in the .data section of the program.",
+          color: "#ff5555"
+        },
+        uninitialised: {
+          name: "uninitialised memory",
+          tip: "This section contains uninitialised memory waiting to be used by your program.",
+          color: "#dcdcdc"
+        },
+        stack: {
+          name: "stack",
+          tip: "The stack contains data temporarily saved from CPU registers to prevent overwriting.",
+          color: "#5d9455"
+        },
+        stackPointer: {
+          name: "stack pointer",
+          tip: "The stack pointer is a reference to the memory location which represents the current top of the stack.",
+          color: "white"
+        } 
+      } as TDictionary<TTip>
     }
   },
   computed: {
@@ -139,7 +195,7 @@ export default Vue.extend({
     },
 
     dataWidth: function () : number {
-      return this.memory.heapHeight / this.memory.size * 100;
+      return this.memory.dataHeight / this.memory.size * 100;
     },
 
     stackWidth: function () : number {
@@ -151,41 +207,25 @@ export default Vue.extend({
     },
 
     stackPointer: function () : number {
-      let reversePtr = this.memory.size - this.registers[Register.SP];
+      const reversePtr = this.memory.size - this.registers[Register.SP];
       return (reversePtr / this.memory.size) * 100;
     },
 
     used: function () : number {
-      return this.memory.textHeight + this.memory.heapHeight + this.memory.stackHeight;
+      return this.memory.textHeight + this.memory.dataHeight + this.memory.stackHeight;
     }
   },
   methods: {
     tip: function (section: string) : void {
-      if (section === "text") {
-        this.tooltip = {
-          name: "text",
-          tip: "The text section contains the instructions defined in the .text section of the program.",
-          color: "#0077aa"
-        }
-      }
-      else if (section === "data") {
-        this.tooltip = {
-          name: "data",
-          tip: "The data section contains all the static data defined in the .data section of the program.",
-          color: "#ff5555"
-        }
-      }
-      else if (section === "stack") {
-        this.tooltip = {
-          name: "stack",
-          tip: "The stack contains data temporarily saved from CPU registers to prevent overwriting.",
-          color: "#5d9455"
-        }
-      }
+      this.tooltip = this.tips[section];
     },
 
     untip: function () : void {
       this.tooltip = undefined;
+    },
+
+    explore: function (section: string) {
+      (this.$refs.explorer as any).show(section);
     }
   }
 })
@@ -206,6 +246,7 @@ export default Vue.extend({
 .region {
   height: 38px;
   cursor: help;
+  pointer-events: all;
 }
 
 /* .region:hover {
@@ -215,11 +256,13 @@ export default Vue.extend({
 
 .placeholder {
   height: 24px;
+  pointer-events: none;
 }
 
 .label {
   text-align: left;
   cursor: help;
+  pointer-events: all;
 }
 
 .label.rtl {
@@ -229,6 +272,7 @@ export default Vue.extend({
 
 .sector {
   min-width: 1px;
+  pointer-events: none;
 }
 
 .sector.text .label { color: #0077aa; }
@@ -238,6 +282,8 @@ export default Vue.extend({
 .sector.data .label { color: #ff5555; }
 .sector.data .region { border: 1px dashed #ff5555; }
 .sector.data .region:hover { background-color: rgba(255, 85, 85, 0.1); }
+
+.sector.uninitialised .region:hover { background-color: rgba(100, 100, 100, 0.1);}
 
 .sector.stack .label { color: #5d9455; }
 .sector.stack .region { border: 1px dashed #5d9455; }

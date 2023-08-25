@@ -85,6 +85,7 @@ export default Vue.extend({
     enter: function (e: any) {
       let input = this.input
         .substring(this.prompt.length)
+        .trim()
         .replace(/(\r\n|\n|\r)/gm, "");
 
       this.addHistory(input)
@@ -96,7 +97,8 @@ export default Vue.extend({
         this.input = this.prompt;
         e.target.innerText = "";
 
-        this.execute(input);
+        // only bother executing if there is any text
+        if (input.length > 0) this.execute(input);
 
         this.$nextTick(() => {
           let element = this.$refs.container as HTMLElement;
@@ -236,6 +238,7 @@ export default Vue.extend({
 
 .repl.output {
   white-space: pre-line;
+  overflow: hidden;
 }
 
 .repl.input {

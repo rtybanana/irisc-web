@@ -1,6 +1,7 @@
-import { Condition, TTransfer } from '@/constants';
+import { Condition, TTransfer, readWriteGroup } from '@/constants';
 import { InstructionNode } from '../InstructionNode';
 import { TBranchAddress } from '../types';
+import { TByteRange } from './types';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */
@@ -15,4 +16,5 @@ export abstract class TransferNode extends InstructionNode {
 
   // get transferSize() : TTransferSize { return this._transferSize; }
   get isUpdating() : boolean { return this._updating; }
+  get isRead() : boolean { return readWriteGroup.read.includes(this._op); }
 }

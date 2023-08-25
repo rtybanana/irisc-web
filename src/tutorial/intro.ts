@@ -183,7 +183,21 @@ const intro8: TTutorialPage = {
     <div class="hmm">\
       <div class="token label mb-1">Hint</div>\
       You can hover over any one of these areas to learn more about how the computer is able to decode your instruction.
+    </div>\
+
+    <div class="hmm">\
+      <div class="token label mb-1">New!</div>\
+      You can use the <i class="fas fa-history fa-sm text-white"></i> button to view the history of executed instructions\
+      and summaries of how they affected the state of the simulated CPU and memory.
     </div>
+  `
+}
+
+const intro9: TTutorialPage = {
+  title: "Introduction 7: The Assembler 2",
+  content: // html
+  `\
+    
   `
 }
 
@@ -199,5 +213,5 @@ const intro99: TTutorialPage = {
 }
 
 export default [
-  intro1, intro2, intro3, intro4, intro5, intro6, intro7, intro8, intro99
+  intro1, intro2, intro3, intro4, intro5, intro6, intro7, intro8, intro9, intro99
 ]

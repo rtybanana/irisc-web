@@ -32,7 +32,7 @@ export class IriscError extends Error {
 /**
  * General parser error - unparseable tokens
  */
- export class ParserError extends IriscError {
+export class ParserError extends IriscError {
   get type() : string { return 'ParserError'; }
 
   constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {

@@ -167,8 +167,10 @@ function load(nodes: (SyntaxNode | null)[]) {
     }
   });
 
-  SimulatorState.setInstructions(instructions);
+  SimulatorState.setTextHeight(instructions.length * 4);
   SimulatorState.allocateHeap(heap, heapHeight, heapMap);
+  SimulatorState.setInstructions(instructions);
+  
   SimulatorState.validate();
 }
 

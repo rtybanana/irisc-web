@@ -1,11 +1,8 @@
 import { rotr } from "@/assets/bitset";
 import { addressModeGroup, BlockTransfer, callAddress, callMap, Flag, Operation, Register, Shift, SingleTransfer, TTransferSize } from "@/constants";
 import { SimulatorState } from "@/state";
-import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode } from "../syntax";
-import { BranchNode } from "../syntax/flow/BranchNode";
-import { BlockTransferNode } from "../syntax/transfer/BlockTransferNode";
-import { SingleTransferNode } from "../syntax/transfer/SingleTransferNode";
-import { TInstructionNode } from "../syntax/types";
+import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode, BranchNode, BlockTransferNode, SingleTransferNode } from "@/syntax";
+import { TInstructionNode } from "@/syntax/types";
 import { ReferenceError, RuntimeError } from "./error";
 import { executeCall } from "./extern";
 
@@ -32,11 +29,6 @@ export function execute(instruction: TInstructionNode, incPC: boolean = true) : 
   let executed: boolean = false;
   SimulatorState.setCurrentInstruction(instruction);
 
-  // if (state.breakpoints.includes(instruction)) {
-  //   console.log("breaking on", instruction);
-  //   SimulatorState.pause()
-  // }
-
   if (instruction instanceof BranchNode) {
     executed = executeBranch(instruction);
 
@@ -54,7 +46,10 @@ export function execute(instruction: TInstructionNode, incPC: boolean = true) : 
     if (instruction instanceof BlockTransferNode) executed = executeBlockTransfer(instruction);
   }
 
+  SimulatorState.tick();
   SimulatorState.setExecuted(executed);
+  SimulatorState.takeSnapshot();
+
   return executed;
 }
 
@@ -255,10 +250,16 @@ function executeBranch(instruction: BranchNode) : boolean {
   if (typeof addr === 'string') {
     address = SimulatorState.label(addr as string);
     if (address === callAddress) {
+
       let callExecuted = executeCall(instruction, callMap[addr as string]);
       if (callExecuted) {
-        // move to next instruction
-        SimulatorState.setRegister(Register.PC, state.registers[Register.PC] + 4);
+        // if branch with link, set the link register
+        if (op === Operation.BL) {
+          SimulatorState.setRegister(Register.LR, state.registers[Register.PC] + 4);
+        }
+
+        // move to link register
+        SimulatorState.setRegister(Register.PC, state.registers[Register.LR]);
       }
 
       return callExecuted;
@@ -398,7 +399,7 @@ function checkAlignment(address: number, size: TTransferSize, instruction: TInst
 /**
  * Checks that the requested load/store address is read/writeable in the current context. Checks the 
  * stack pointer post-decrement to ensure that stack is not overflowing. Ensures that data is not 
- * written to the text section.
+ * written to the text section. Throws segmentation faults for all errors.
  * 
  * @param address 
  * @param register 
@@ -406,7 +407,7 @@ function checkAlignment(address: number, size: TTransferSize, instruction: TInst
  */
 function checkStore(address: number, register: Register, instruction: TInstructionNode) : void {
   if (register === Register.SP) {
-    if (address < state.memory.textHeight + state.memory.heapHeight) {
+    if (address < state.memory.textHeight + state.memory.dataHeight) {
       throw new RuntimeError("SIGSEG: Segmentation fault.", instruction.statement, instruction.lineNumber);
     }
     if (address > state.memory.size) {
@@ -426,8 +427,8 @@ function checkStore(address: number, register: Register, instruction: TInstructi
  * @returns 
  */
 export function generateLabelOffset(label: string, instruction: TInstructionNode): number {
-  if (label in state.memory.heapMap) {
-    return (state.memory.heapMap[label] - state.previousPC) / 4;
+  if (label in state.memory.dataMap) {
+    return (state.memory.dataMap[label] - state.previousPC) / 4;
   }
 
   if (label in state.memory.textMap) {
