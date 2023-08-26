@@ -502,7 +502,7 @@ export default Vue.extend({
         let y = p2.x - p1.x;
         let x = p2.y - p1.y;
         
-        return Math.sqrt(x * x + y * y);
+        return x * x + y * y;
       }
     },
 
