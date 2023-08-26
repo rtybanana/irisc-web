@@ -1,4 +1,4 @@
-import { SimulatorState } from '@/state';
+import { SimulatorState } from '@/simulator';
 import { AllocationNode, BiOperandNode, BlockTransferNode, BranchNode, DirectiveNode, InstructionNode, LabelNode, ShiftNode, SingleTransferNode, SyntaxNode, TriOperandNode } from '@/syntax';
 import { languages, Token, tokenize } from 'prismjs';
 import { AssemblyError, IriscError, SyntaxError } from './error';
@@ -168,10 +168,11 @@ function load(nodes: (SyntaxNode | null)[]) {
   });
 
   SimulatorState.setTextHeight(instructions.length * 4);
-  SimulatorState.allocateHeap(heap, heapHeight, heapMap);
+  SimulatorState.allocateData(heap, heapHeight, heapMap);
   SimulatorState.setInstructions(instructions);
   
-  SimulatorState.validate();
+  // SimulatorState.validate();
+  // SimulatorState.setTextSection(instructions);
 }
 
 /**

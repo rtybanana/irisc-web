@@ -49,7 +49,7 @@
 <script lang="ts">
 import { zip } from '@/assets/functions';
 import { flagExplain, flagName, flagTitle, regExplain, Register, regName, regTitle } from "@/constants";
-import { SimulatorState } from "@/state";
+import { SimulatorState } from "@/simulator";
 import Vue from 'vue';
 
 export default Vue.extend({

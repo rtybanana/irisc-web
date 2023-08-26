@@ -159,7 +159,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { editor, terminal, registers, memory, instruction, tutorial } from "@/vue";
-import { SimulatorState } from "@/state";
+import { SimulatorState } from "@/simulator";
 import { Interpreter, RuntimeError } from '@/interpreter';
 import { Register, EnvironmentType } from "@/constants"
 
@@ -334,6 +334,7 @@ export default Vue.extend({
   },
 
   created: function () {
+    SimulatorState.init();
     this.env = (localStorage.getItem('environment') as EnvironmentType) ?? EnvironmentType.TERMINAL;
     
     window.addEventListener("resize", this.windowSizeListener);

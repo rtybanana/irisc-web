@@ -1,9 +1,9 @@
-import { TSimulatorSnapshot } from "@/state/types";
+import { TSimulatorSnapshot } from "@/simulator/types";
 import { TSnapshotExplanation } from "./types";
 import { Flag, Register } from "@/constants";
 import { highlight, languages } from "prismjs";
 import { zip } from "@/assets/functions";
-import { SimulatorState } from "@/state";
+import { SimulatorState } from "@/simulator";
 import { TransferNode } from "@/syntax";
 
 export function explain(snapshot: TSimulatorSnapshot, prevSnapshot: TSimulatorSnapshot | undefined): TSnapshotExplanation {

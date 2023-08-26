@@ -137,7 +137,7 @@
 <script lang="ts">
 import { TDictionary } from "@/assets";
 import { Register, StackTransfer } from '@/constants';
-import { SimulatorState } from "@/state";
+import { SimulatorState } from "@/simulator";
 import { default as explorer } from "./explorer.vue";
 import { BModal } from "bootstrap-vue";
 import Vue from 'vue';

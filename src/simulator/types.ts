@@ -9,6 +9,8 @@ type TMemory = {
   buffer: ArrayBuffer | undefined;
   wordView: Uint32Array;
   byteView: Uint8Array;
+  observableWordView: number[];
+  observableByteView: number[];
 
   dataHeight: number;
   dataMap: Record<string, number>;
