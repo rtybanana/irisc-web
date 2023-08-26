@@ -248,11 +248,11 @@ export default Vue.extend({
       try {
         while(this.running) {
           SimulatorState.setStep(false);
-          let node: TInstructionNode = SimulatorState.instruction(this.registers[Register.PC]);
+          const node: TInstructionNode = SimulatorState.instruction(this.registers[Register.PC]);
 
           // if runtime instruction runoff
           if (node === undefined) {
-            let last: TInstructionNode = SimulatorState.currentInstruction()!;
+            const last: TInstructionNode = SimulatorState.currentInstruction()!;
             throw new RuntimeError("SIGSEG: Segmentation fault.", last.statement, last.lineNumber);
           }
 

@@ -18,7 +18,7 @@ export function executeCall(instruction : TInstructionNode, call: Call) : boolea
  * registers should not be assumed to stay the same after a function call.
  */
 function randomiseScratch() {
-  let randomRange = 256
+  const randomRange = 256
   SimulatorState.setRegister(Register.R0, Math.floor(Math.random() * randomRange));
   SimulatorState.setRegister(Register.R1, Math.floor(Math.random() * randomRange));
   SimulatorState.setRegister(Register.R2, Math.floor(Math.random() * randomRange));
@@ -38,7 +38,7 @@ function putchar() : boolean {
 }
 
 function puts() : boolean {
-  let stringArr: string[] = [];
+  const stringArr: string[] = [];
 
   // fetch full string from simulator memory
   let index = state.registers[Register.R0];
@@ -48,7 +48,7 @@ function puts() : boolean {
   }
 
   // join char array
-  let string = stringArr.join("");
+  const string = stringArr.join("");
 
   // append newline character and add to output
   SimulatorState.addOutput(`${string}\n`);
@@ -61,7 +61,7 @@ function puts() : boolean {
 }
 
 function printf() : boolean {
-  let stringArr: string[] = [];
+  const stringArr: string[] = [];
 
   // fetch full string from simulator memory
   let index = state.registers[Register.R0];
@@ -71,7 +71,7 @@ function printf() : boolean {
   }
 
   // join char array
-  let formatStr = stringArr.join("");
+  const formatStr = stringArr.join("");
   
   // get replaceable identifiers
   const tokens = getTokens(formatStr);
@@ -130,7 +130,7 @@ function getChar(useStack: boolean, register: Register, offset: number): [string
     register = (register + 1) as Register;
   }
   else {
-    let framePointer = state.registers[Register.R11];
+    const framePointer = state.registers[Register.R11];
     data = String.fromCharCode(state.memory.byteView[framePointer + offset]);
     offset += 4;
   }
@@ -146,12 +146,12 @@ function getString(useStack: boolean, register: Register, offset: number): [stri
     register = (register + 1) as Register;
   }
   else {
-    let framePointer = state.registers[Register.R11];
+    const framePointer = state.registers[Register.R11];
     address = state.memory.byteView[framePointer + offset]
     offset += 4;
   }
 
-  let stringArr: string[] = [];
+  const stringArr: string[] = [];
   while (state.memory.byteView[address] !== 0) {
     stringArr.push(String.fromCharCode(state.memory.byteView[address]));
     address++;
@@ -170,7 +170,7 @@ function getDecimal(useStack: boolean, register: Register, offset: number): [num
     register = (register + 1) as Register;
   }
   else {
-    let framePointer = state.registers[Register.R11];
+    const framePointer = state.registers[Register.R11];
     data = state.memory.wordView[(framePointer + offset) / 4];
     offset += 4;
   }

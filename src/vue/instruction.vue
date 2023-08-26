@@ -170,7 +170,7 @@ export default Vue.extend({
 
       let startIdx = 0;
       return assembled.explanation.map(explanation => {
-        let section = {
+        const section = {
           ...explanation,
           bits: assembled.bitcode.slice(startIdx, startIdx + explanation.range)
         };

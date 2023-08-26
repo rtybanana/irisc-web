@@ -103,8 +103,8 @@ export default Vue.extend({
     },
 
     registerTip(reg: Register) {
-      let value = this.registers[reg];
-      let hexValue = this.hexstr(value);
+      const value = this.registers[reg];
+      const hexValue = this.hexstr(value);
 
       this.tip(
         this.regTitle[reg],
@@ -124,7 +124,7 @@ export default Vue.extend({
   },
   watch: {
     registers: function (newVal, oldVal) {
-      let changeSet = new Set<Register>();
+      const changeSet = new Set<Register>();
       zip(newVal, oldVal).forEach(([newReg, oldReg], index) => {
         if (newReg !== oldReg) changeSet.add(index);
       });
@@ -133,7 +133,7 @@ export default Vue.extend({
     },
 
     cpsr: function (newVal, oldVal) {
-      let changeSet = new Set<number>();
+      const changeSet = new Set<number>();
       zip(newVal, oldVal).forEach(([newFlag, oldFlag], index) => {
         if (newFlag !== oldFlag) changeSet.add(index);
       });

@@ -159,8 +159,8 @@ const actions = {
     [...output].forEach(char => {
       if (char === '\n') data.output.push("");
       else {
-        let lastLine = data.output.length -1;
-        let existingLine = data.output[lastLine];
+        const lastLine = data.output.length -1;
+        const existingLine = data.output[lastLine];
         
         Vue.set(data.output, lastLine, `${existingLine}${char}`);
       }
@@ -183,11 +183,11 @@ const actions = {
     console.log(lineNumber);
     
     console.log(data.memory.text);
-    let instruction = data.memory.text.find(e => e.lineNumber === lineNumber);
+    const instruction = data.memory.text.find(e => e.lineNumber === lineNumber);
     console.log(instruction);
 
     if (instruction) {
-      let breakpoint = data.breakpoints.find(e => e.lineNumber === instruction?.lineNumber);
+      const breakpoint = data.breakpoints.find(e => e.lineNumber === instruction?.lineNumber);
       if (breakpoint) {
         data.breakpoints = data.breakpoints.filter(e => e.lineNumber !== breakpoint?.lineNumber)
       }
@@ -250,7 +250,7 @@ const actions = {
     const signr: number = bitset(32, result)[31];          // sign of result
     const result_ext: number[] = bitset(33, result);       // msb = carry bit
     
-    let cpsr = [false, false, false, false];
+    const cpsr = [false, false, false, false];
     
     cpsr[Flag.N] = result_ext[31] === 1;                    // msb = 1
     cpsr[Flag.Z] = (result & 0xffffffff) === 0              // first 32 bits are 0 
@@ -408,7 +408,7 @@ const actions = {
     }
 
     if (transfer instanceof BlockTransferNode) {
-      let [op, cond, base, reglist, mode, wb] = transfer.unpack();
+      const [op, cond, base, reglist, mode, wb] = transfer.unpack();
 
       const address = snapshot.cpu.registers[base as Register];
       const isIncrement = addressModeGroup.increment.includes(mode);

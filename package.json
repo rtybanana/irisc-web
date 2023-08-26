@@ -1,17 +1,19 @@
 {
   "name": "irisc-web",
   "version": "1.0.1",
-  "engines": {
-    "node": "14.x"
-  },
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "deploy": "npm run build && push-dir --dir=dist --branch=deploy",
+    "electron:build": "vue-cli-service electron:build",
+    "electron:serve": "vue-cli-service electron:serve",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps",
     "test": "jest"
   },
+  "main": "background.js",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.2",
     "@types/lodash.clonedeep": "^4.5.7",
@@ -29,6 +31,7 @@
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.17.12",
+    "@types/electron-devtools-installer": "^2.2.0",
     "@types/jest": "^28.1.2",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
@@ -39,14 +42,17 @@
     "@vue/eslint-config-typescript": "^5.0.2",
     "@vue/runtime-dom": "^3.3.4",
     "babel-eslint": "^10.1.0",
+    "electron": "^13.0.0",
+    "electron-devtools-installer": "^3.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
     "jest": "^28.1.1",
     "jest-environment-jsdom": "^28.1.1",
     "push-dir": "^0.4.1",
     "ts-jest": "^28.0.5",
-    "ts-loader": "^9.4.2",
+    "ts-loader": "^8.2.0",
     "typescript": "^4.6.4",
+    "vue-cli-plugin-electron-builder": "~2.1.1",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {
@@ -72,5 +78,8 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "engines": {
+    "node": "14.x"
+  }
 }

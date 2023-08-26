@@ -251,7 +251,7 @@ function executeBranch(instruction: BranchNode) : boolean {
     address = SimulatorState.label(addr as string);
     if (address === callAddress) {
 
-      let callExecuted = executeCall(instruction, callMap[addr as string]);
+      const callExecuted = executeCall(instruction, callMap[addr as string]);
       if (callExecuted) {
         // if branch with link, set the link register
         if (op === Operation.BL) {

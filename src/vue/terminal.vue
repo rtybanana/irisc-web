@@ -65,7 +65,7 @@ export default Vue.extend({
     errors: SimulatorState.errors,
 
     highlitInput: function () : string {
-      let line = this.input.replace(/(\r\n|\n|\r)/gm, "");
+      const line = this.input.replace(/(\r\n|\n|\r)/gm, "");
       return highlight(line, languages.armv7, 'ARMv7');
     }
   },
@@ -83,7 +83,7 @@ export default Vue.extend({
     },
     
     enter: function (e: any) {
-      let input = this.input
+      const input = this.input
         .substring(this.prompt.length)
         .trim()
         .replace(/(\r\n|\n|\r)/gm, "");
@@ -101,7 +101,7 @@ export default Vue.extend({
         if (input.length > 0) this.execute(input);
 
         this.$nextTick(() => {
-          let element = this.$refs.container as HTMLElement;
+          const element = this.$refs.container as HTMLElement;
           element.scrollTop = element.scrollHeight;
         });
       });
@@ -120,7 +120,7 @@ export default Vue.extend({
       this.historyIndex = Math.min(this.historyIndex + 1, this.history.length - 1);
       if (this.historyIndex < 0) return;
 
-      let input = this.history[this.historyIndex];
+      const input = this.history[this.historyIndex];
       this.insertInput(e.target, input);
     },
 
@@ -143,11 +143,11 @@ export default Vue.extend({
 
         // set caret position to end - if there is any text in this history item
         if (target.firstChild) {
-          let range = document.createRange();
+          const range = document.createRange();
           range.setStart(target.firstChild, input.length);
           range.collapse(true);
 
-          let sel = window.getSelection() as Selection;
+          const sel = window.getSelection() as Selection;
           sel.removeAllRanges();
           sel.addRange(range);
         }
@@ -166,8 +166,8 @@ export default Vue.extend({
           return;
         }
 
-        let line = Assembler.parse(input)[0];
-        let node = Assembler.compileOne(line, 0);
+        const line = Assembler.parse(input)[0];
+        const node = Assembler.compileOne(line, 0);
 
         if (node instanceof InstructionNode) {
           if (node instanceof BranchNode) {
