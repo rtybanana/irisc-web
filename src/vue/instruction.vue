@@ -101,7 +101,7 @@
 </template>
 
 <script lang="ts">
-import { SimulatorState, TSimulatorSnapshot } from '@/state';
+import { SimulatorState, TSimulatorSnapshot } from '@/simulator';
 import { zip } from '@/assets/functions';
 import { TransferNode } from '@/syntax';
 import { IExplanation, TAssembled } from '@/syntax/types';

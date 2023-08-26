@@ -109,7 +109,7 @@
 <script lang="ts">
 import { debounce } from "@/assets/functions";
 import { Assembler, RuntimeError } from "@/interpreter";
-import { SimulatorState } from "@/state";
+import { SimulatorState } from "@/simulator";
 import { highlight, languages } from 'prismjs';
 import 'prismjs/themes/prism.css'; // import syntax highlighting styles
 import getCaretCoordinates from "textarea-caret";
@@ -246,10 +246,14 @@ export default Vue.extend({
         const prismEditor = this.$refs.prism as any;    // casting to any :(
         const newTarget = prismEditor.$refs.textarea as HTMLInputElement;
 
+        let errorIndex = e.target.parentNode.dataset["errorIdx"] as number;
+        let error = this.errors[errorIndex];
+
         newTarget.dispatchEvent(
           new CustomEvent('errorClick', {
             detail: {
-              coords: { x: e.layerX, y: e.layerY } as TPoint
+              coords: { x: e.layerX, y: e.layerY } as TPoint,
+              lineNumber: error.lineNumber
             }
           }
         ));
@@ -272,10 +276,14 @@ export default Vue.extend({
         const prismEditor = this.$refs.prism as any;    // casting to any :(
         const newTarget = prismEditor.$refs.textarea as HTMLInputElement;
 
+        let errorIndex = e.target.parentNode.dataset["errorIdx"] as number;
+        let error = this.errors[errorIndex];
+
         newTarget.dispatchEvent(
           new CustomEvent('errorDblClick', {
             detail: {
-              coords: { x: e.layerX, y: e.layerY } as TPoint
+              coords: { x: e.layerX, y: e.layerY } as TPoint,
+              lineNumber: error.lineNumber
             }
           }
         ));
@@ -436,9 +444,9 @@ export default Vue.extend({
      * 
      */
     moveCaretToCursor: function (e: any) {
-      const mouseCoords: TPoint = e.detail.coords;
-      const textarea = e.target as HTMLTextAreaElement;
-      const caretPosition = this.getCaretPositionAtCursor(textarea, mouseCoords);
+      let mouseCoords: TPoint = e.detail.coords;
+      let textarea = e.target as HTMLTextAreaElement;
+      let caretPosition = this.getCaretPositionAtCursor(textarea, mouseCoords, e.detail.lineNumber);
 
       textarea.setSelectionRange(caretPosition, caretPosition);
       textarea.focus();
@@ -448,9 +456,9 @@ export default Vue.extend({
      * 
      */
     highlightWordAtCursor: function (e: any) {
-      const mouseCoords: TPoint = e.detail.coords;
-      const textarea = e.target as HTMLTextAreaElement;
-      const caretPosition = this.getCaretPositionAtCursor(textarea, mouseCoords);
+      let mouseCoords: TPoint = e.detail.coords;
+      let textarea = e.target as HTMLTextAreaElement;
+      let caretPosition = this.getCaretPositionAtCursor(textarea, mouseCoords, e.detail.lineNumber);
       let [wordStart, wordEnd] = [caretPosition, caretPosition];
 
       while (/\w/.test(textarea.value[wordStart - 1]) && wordStart > 0) wordStart--;
@@ -463,17 +471,25 @@ export default Vue.extend({
     /**
      * 
      */
-    getCaretPositionAtCursor: function (element: HTMLTextAreaElement, mouseCoords: TPoint) : number {
+    getCaretPositionAtCursor: function (element: HTMLTextAreaElement, mouseCoords: TPoint, lineNumber: number) : number {
+      // skip to start of offending line
+      const lines = element.value.split("\n");
+      let startIndex = 0;
+      for (let i = 0; i < lineNumber; i++) {
+        startIndex += lines[i].length + 1   // +1 here because of newline character which was removed during the split
+      }
+
+      let endIndex = startIndex + lines[lineNumber].length;
       let smallestDistance = Number.MAX_VALUE;
       let caretPosition = 0;
-      for (let i = 0; i < element.value.length + 1; i++) {
-        const textPos = getCaretCoordinates(element, i);
-        const charCoords: TPoint = { 
+      for (let i = startIndex; i < endIndex; i++) {
+        let textPos = getCaretCoordinates(element, i);
+        let charCoords: TPoint = { 
           x: textPos.left, 
           y: textPos.top + (textPos.height / 2)
         };
 
-        const distance = getDistance(mouseCoords, charCoords);
+        let distance = getRoughDistance(mouseCoords, charCoords);
         if (distance < smallestDistance) {
           smallestDistance = distance;
           caretPosition = i;
@@ -482,11 +498,11 @@ export default Vue.extend({
 
       return caretPosition;
 
-      function getDistance(p1: TPoint, p2: TPoint) : number {
-        const y = p2.x - p1.x;
-        const x = p2.y - p1.y;
+      function getRoughDistance(p1: TPoint, p2: TPoint) : number {
+        let y = p2.x - p1.x;
+        let x = p2.y - p1.y;
         
-        return Math.sqrt(x * x + y * y);
+        return x * x + y * y;
       }
     },
 

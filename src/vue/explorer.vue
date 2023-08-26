@@ -202,7 +202,7 @@
   
 <script lang="ts">
 import { BModal } from 'bootstrap-vue';
-import { SimulatorState } from '@/state';
+import { SimulatorState } from '@/simulator';
 import { TDictionary, asciiTable } from "@/assets";
 import Vue from 'vue';
 import { highlight, languages } from 'prismjs';
@@ -346,11 +346,11 @@ export default Vue.extend({
 	},
 
 	computed: {
-		memIsInitialised: () => SimulatorState.memory().buffer !== undefined,
-
+		byteView: SimulatorState.byteView,
+		wordView: SimulatorState.wordView,
 		memSize: () => SimulatorState.memory().size,
-		byteView: () => Array.from(SimulatorState.memory().byteView),
-		wordView: () => Array.from(SimulatorState.memory().wordView),
+
+		memIsInitialised: () => SimulatorState.memory().buffer !== undefined,
 
 		textHeight: () => SimulatorState.memory().textHeight,
 		dataHeight: () => SimulatorState.memory().dataHeight,

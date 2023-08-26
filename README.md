@@ -132,9 +132,12 @@ This is an example of how to list things you need to use the software and how to
     - [x] Data
     - [ ] Heap
     - [x] Stack
-  - [ ] Data explorer (byte view)
+  - [x] Data explorer (byte view)
 - [ ] Assembly visualiser
     - [ ] Add assembly of shift instructions
+- [x] Simulation state history
+  - [x] Snapshot history modal
+  - [x] Ability to reinstate old simulator states (go backwards)
 - [ ] Support for external C stdlib and stdio calls
   - [x] putchar()
   - [x] puts()

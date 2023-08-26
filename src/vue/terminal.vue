@@ -38,7 +38,7 @@
 <script lang="ts">
 import { replWelcome } from "@/constants";
 import { Assembler, InteractiveError, Interpreter, IriscError } from '@/interpreter';
-import { SimulatorState } from "@/state";
+import { SimulatorState } from "@/simulator";
 import { InstructionNode } from '@/syntax';
 import { BranchNode } from '@/syntax/flow/BranchNode';
 import { highlight, languages } from 'prismjs';
