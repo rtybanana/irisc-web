@@ -193,14 +193,6 @@ const intro8: TTutorialPage = {
   `
 }
 
-const intro9: TTutorialPage = {
-  title: "Introduction 7: The Assembler 2",
-  content: // html
-  `\
-    
-  `
-}
-
 const intro99: TTutorialPage = {
   title: "Introduction 8: Outro",
   content: // html
@@ -213,5 +205,5 @@ const intro99: TTutorialPage = {
 }
 
 export default [
-  intro1, intro2, intro3, intro4, intro5, intro6, intro7, intro8, intro9, intro99
+  intro1, intro2, intro3, intro4, intro5, intro6, intro7, intro8, intro99
 ]
