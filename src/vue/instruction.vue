@@ -17,7 +17,7 @@
         </span>
       </span>
 
-      <div class="history clickable" @click="$refs.history.show()">
+      <div class="history clickable" @click="showHistory">
         <i class="button fas fa-history"></i>
       </div>
     </div>
@@ -48,14 +48,14 @@
 
     <b-modal
       ref="history"
-      centered hide-header 
+      hide-header 
       hide-footer
       body-class="irisc-modal history-modal p-1"
     >
       <div class="px-4 py-1">
         <h4>state history</h4>
         
-        <div class="mt-3">
+        <div class="mt-3 position-relative">
           <div 
             v-for="snapshot in snapshots" 
             class="snapshot fenced clickable mb-4" 
@@ -94,6 +94,19 @@
               bytes read in range: {{ snapshot.memRead.base }} - {{ snapshot.memRead.limit }}
             </div>
           </div>
+
+          <div class="position-absolute" style="top: 0;">
+            <transition name="slide-fade-right">
+              <div v-if="historyShown" class="position-fixed fenced control-box px-1 pb-1">
+                <div class="pb-1">debugger</div>
+                <debug class="debugger" :tooltip.sync="debuggerTooltip"></debug>
+
+                <div v-show="debuggerTooltip" class="control-tooltip fenced px-1">
+                  {{ debuggerTooltip }}
+                </div>
+              </div>
+            </transition>
+          </div>
         </div>
       </div>
     </b-modal>
@@ -109,6 +122,8 @@ import { flagExplain, flagName, flagTitle, regExplain, Register, regName, regTit
 import { explain, TSnapshotExplanation } from "@/explainer";
 import { highlight, languages } from 'prismjs';
 import Vue from 'vue';
+import { BModal } from 'bootstrap-vue';
+import debug from "./debug.vue";
 
 /**
  * Extends IExplanation interface to include a portion of the instruction bitcode,
@@ -133,6 +148,9 @@ type TTip = {
 
 export default Vue.extend({
   name: 'instruction',
+  components: {
+    debug
+  },
   data() {
     return {
       regName,
@@ -153,7 +171,10 @@ export default Vue.extend({
         }]
       } as TAssembled,
 
-      tooltip: undefined as TTip | undefined
+      tooltip: undefined as TTip | undefined,
+
+      historyShown: false,
+      debuggerTooltip: undefined as string | undefined
     }
   },
   computed: {
@@ -220,6 +241,16 @@ export default Vue.extend({
       this.tooltip = undefined;
     },
 
+    showHistory: function () {
+      this.historyShown = false;
+			(this.$refs.history as BModal).show();
+
+			const v = this;
+			setTimeout(() => {
+				v.historyShown = true;
+			}, 350);
+    },
+
     reinstate: function (tick: number) {
       SimulatorState.reinstateSnapshot(tick);
     }
@@ -236,7 +267,6 @@ export default Vue.extend({
 }
 
 .fenced {
-  padding: 0.25rem 0.5rem;
   border: 1px dashed #cccdcd;
 }
 
@@ -289,6 +319,7 @@ export default Vue.extend({
 }
 
 .snapshot {
+  padding: 0.25rem 0.5rem;
   position: relative;
 }
 
@@ -324,6 +355,24 @@ export default Vue.extend({
 .snapshot.current .tick {
   background-color: #8b0c3c;
   color: white;
+}
+
+.control-box {
+	background-color: #0d1117;
+	left: calc(50vw + (498px / 2) + 15px);
+}
+
+.control-tooltip {
+	position: absolute;
+	left: -1px;
+	bottom: -27px;
+	background-color: #0d1117;
+  /* padding: 0 0.25rem 0.05rem 0.25rem; */
+  font-size: 14px;
+}
+
+.debugger {
+	padding: 0 0.25rem;
 }
 </style>
 

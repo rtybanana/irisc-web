@@ -1,104 +1,76 @@
 <template>
-	<b-modal 
-		ref="modal"
-		centered 
-		hide-header 
-		hide-footer
-		body-class="irisc-modal p-1"
-	>
+	<b-modal ref="modal" centered hide-header hide-footer body-class="irisc-modal p-1">
 		<div class="px-4 py-1">
 			<h4>memory explorer</h4>
 
 			<div v-if="memIsInitialised" class="my-3">
 				<div class="row">
-					<div class="col-1 pl-0 pr-3" style="margin-top: 1px;">
+					<div class="col-1 pl-0 pr-3">
 						<div v-for="(_, index) in memSize / 4" class="word-index" :key="index">{{ index * 4 }}</div>
 					</div>
 
 					<div class="col pl-0">
-						<div 
-							class="fenced region-text tippable"
-							@mouseenter="tip('text')" 
-							@mouseleave="untip"
-						>
-							<div 
-								v-for="(_, wordIndex) in textWordHeight" 
-								class="row word no-gutters" 
-								@mouseenter="instructionIndex = wordIndex;"
-								@mouseleave="instructionIndex = undefined;"
-								:key="`text_${wordIndex}`"
-							>
-								<template v-if="size === 'byte'">
-									<div v-for="(_, byteIndex) in 4" class="col text-center" :key="`text_${wordIndex}_${byteIndex}`">
-										{{ printByte(byteValue(textOffset + wordIndex, byteIndex)) }}
-									</div>
-								</template>
+						<div class="position-relative ">
+							<!-- actual data printout -->
+							<div>
+								<div v-for="(word, wordIndex) in wordView" class="row word no-gutters" :key="wordIndex">
+									<template v-if="size === 'byte'">
+										<div v-for="(_, byteIndex) in 4" class="col text-center" :key="`${wordIndex}_${byteIndex}`">
+											{{ printByte(byteValue(wordIndex, byteIndex)) }}
+										</div>
+									</template>
 
-								<template v-else>
-									<div class="col text-center">
-										{{ printWord(wordValue(textOffset + wordIndex)) }}
-									</div>
-								</template>
+									<template v-else>
+										<div class="col text-center">
+											{{ printWord(word) }}
+										</div>
+									</template>
+								</div>
 							</div>
-						</div>
 
-						<div 
-							class="fenced region-data tippable"
-							@mouseenter="tip('data')" 
-							@mouseleave="untip"
-						>
-							<div v-for="(_, wordIndex) in dataWordHeight" class="row word no-gutters" :key="`data_${wordIndex}`">
-								<template v-if="size === 'byte'">
-									<div v-for="(_, byteIndex) in 4" class="col text-center" :key="`data_${wordIndex}_${byteIndex}`">
-										{{ printByte(byteValue(dataOffset + wordIndex, byteIndex)) }}
-									</div>
-								</template>
+							<!-- fenced regions and colouring -->
+							<div class="regions">
+								<div 
+									class="region text fenced tippable" 
+									@mouseenter="tip('text')" 
+									@mouseleave="untip"
+								>
+									<div 
+										v-for="(n, index) in textWordHeight" 
+										class="word" 
+										@mouseenter="instructionIndex = index;" 
+										@mouseleave="instructionIndex = undefined;"
+										:key="n"
+									></div>
+								</div>
 
-								<template v-else>
-									<div class="col text-center">
-										{{ printWord(wordValue(dataOffset + wordIndex)) }}
-									</div>
-								</template>
-							</div>
-						</div>
+								<div
+									v-if="dataWordHeight > 0" 
+									class="region data fenced tippable" 
+									:style="`top: ${textWordHeight * 22}px`"
+									@mouseenter="tip('data')" 
+									@mouseleave="untip"
+								>
+									<div v-for="n in dataWordHeight" class="word" :key="n"></div>
+								</div>
 
-						<div
-							class="tippable"
-							@mouseenter="tip('uninitialised')" 
-							@mouseleave="untip"
-						>
-							<div v-for="(_, wordIndex) in uninitWordHeight" class="row word no-gutters" :key="`uninit_${wordIndex}`">
-								<template v-if="size === 'byte'">
-									<div v-for="(_, byteIndex) in 4" class="col text-center" :key="`uninit_${wordIndex}_${byteIndex}`">
-										{{ printByte(byteValue(uninitOffset + wordIndex, byteIndex)) }}
-									</div>
-								</template>
+								<div
+									class="region tippable" 
+									:style="`top: ${(textWordHeight + dataWordHeight) * 22}px`"
+									@mouseenter="tip('uninitialised')" 
+									@mouseleave="untip"
+								>
+									<div v-for="n in uninitWordHeight" class="word" :key="n"></div>
+								</div>
 
-								<template v-else>
-									<div class="col text-center">
-										{{ printWord(wordValue(uninitOffset + wordIndex)) }}
-									</div>
-								</template>
-							</div>
-						</div>
 
-						<div 
-							class="fenced region-stack tippable"
-							@mouseenter="tip('stack')" 
-							@mouseleave="untip"
-						>
-							<div v-for="(_, wordIndex) in stackWordHeight" class="row word no-gutters" :key="`stack_${wordIndex}`">
-								<template v-if="size === 'byte'">
-									<div v-for="(_, byteIndex) in 4" class="col text-center" :key="`stack_${wordIndex}_${byteIndex}`">
-										{{ printByte(byteValue(stackOffset + wordIndex, byteIndex)) }}
-									</div>
-								</template>
-
-								<template v-else>
-									<div class="col text-center">
-										{{ printWord(wordValue(stackOffset + wordIndex)) }}
-									</div>
-								</template>
+								<div 
+									class="region stack fenced tippable" 
+									@mouseenter="tip('stack')" 
+									@mouseleave="untip"
+								>
+									<div v-for="n in stackWordHeight" class="word" :key="n"></div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -106,83 +78,46 @@
 					<div class="col-3 px-0">
 						<div class="position-fixed fenced px-2" style="width: 117px;">
 							<h5 class="mb-2">options</h5>
-							
+
 							<b-form-group label="chunk size" v-slot="{ ariaDescribedby }">
-								<b-form-radio-group
-									v-model="size"
-									:aria-describedby="ariaDescribedby"
-									class="radio"
-									buttons
-									stacked
-								>
-									<b-form-radio 
-										v-for="dsize in sizes" 
-										:value="dsize.value"
-										:key="dsize.value"
-									>
+								<b-form-radio-group v-model="size" :aria-describedby="ariaDescribedby" class="radio" buttons stacked>
+									<b-form-radio v-for="dsize in sizes" :value="dsize.value" :key="dsize.value">
 										{{ dsize.text }}
 									</b-form-radio>
 								</b-form-radio-group>
 							</b-form-group>
 
 							<b-form-group label="datatype" v-slot="{ ariaDescribedby }">
-								<b-form-radio-group
-									v-model="datatype"
-									:aria-describedby="ariaDescribedby"
-									class="radio"
-									buttons
-									stacked
-								>
-									<b-form-radio 
-										v-for="dtype in datatypes" 
-										:value="dtype.value"
-										:key="dtype.value"
-									>
+								<b-form-radio-group v-model="datatype" :aria-describedby="ariaDescribedby" class="radio" buttons stacked>
+									<b-form-radio v-for="dtype in datatypes" :value="dtype.value" :key="dtype.value">
 										{{ dtype.text }}
 									</b-form-radio>
 
-									<b-form-radio
-										v-if="size !== 'word'"
-										value="ascii"
-									>
+									<b-form-radio v-if="size !== 'word'" value="ascii">
 										ascii
 									</b-form-radio>
 								</b-form-radio-group>
 							</b-form-group>
-							
-							<div 
-								v-if="size === 'byte'"
-								class="tippable"
-								@mouseenter="tip('endianness')" 
-								@mouseleave="untip"
-							>
+
+							<div v-if="size === 'byte'" class="tippable" @mouseenter="tip('endianness')" @mouseleave="untip">
 								<b-form-group label="endianness" v-slot="{ ariaDescribedby }">
-									<b-form-radio-group
-										v-model="endianness"
-										:aria-describedby="ariaDescribedby"
-										class="radio"
-										buttons
-										stacked
-									>
-										<b-form-radio 
-											v-for="endian in endiannesses" 
-											:value="endian.value"
-											:key="endian.value"
-										>
+									<b-form-radio-group v-model="endianness" :aria-describedby="ariaDescribedby" class="radio" buttons
+										stacked>
+										<b-form-radio v-for="endian in endiannesses" :value="endian.value" :key="endian.value">
 											{{ endian.text }}
 										</b-form-radio>
 									</b-form-radio-group>
 								</b-form-group>
 							</div>
 						</div>
-						
-						<transition name="slide-fade">
+
+						<transition name="slide-fade-left">
 							<div v-if="shown" class="position-fixed fenced tooltip-box px-1 pb-1">
 								<template>
-									<div class="pb-1">{{ tooltip.title }}</div>
+									<div v-html="tooltip.title" class="pb-1"></div>
 									<div style="font-size: 14px;">
 										<div v-html="tooltip.detail"></div>
-										
+
 										<div v-if="instructionIndex !== undefined && instruction" class="ml-3 mt-3 mb-3">
 											<div>address: {{ instructionIndex * 4 }}</div>
 											<div v-html="highlight(instruction)"></div>
@@ -191,6 +126,17 @@
 										</div>
 									</div>
 								</template>
+							</div>
+						</transition>
+
+						<transition name="slide-fade-right">
+							<div v-if="shown" class="position-fixed fenced control-box px-1 pb-1">
+								<div class="pb-1">debugger</div>
+								<debug class="debugger" :tooltip.sync="controlTooltip"></debug>
+
+								<div v-show="controlTooltip" class="control-tooltip fenced px-1">
+									{{ controlTooltip }}
+								</div>
 							</div>
 						</transition>
 					</div>
@@ -207,6 +153,7 @@ import { TDictionary, asciiTable } from "@/assets";
 import Vue from 'vue';
 import { highlight, languages } from 'prismjs';
 import { TInstructionNode } from '@/syntax/types';
+import debug from './debug.vue';
 
 type TTip = {
 	title: string;
@@ -215,6 +162,9 @@ type TTip = {
 
 export default Vue.extend({
 	name: 'explorer',
+	components: {
+		debug
+	},
 	data() {
 		return {
 			section: undefined as string | undefined,
@@ -229,23 +179,23 @@ export default Vue.extend({
 			datatypes: [
 				{ text: 'hex', value: 'hex' },
 				{ text: 'dec', value: 'dec' },
-				{ text: 'bin', value: 'bin'}
+				{ text: 'bin', value: 'bin' }
 			],
 
 			endianness: 'little',
 			endiannesses: [
-				{ text: 'little', value: 'little'},
-				{ text: 'big', value: 'big'}
+				{ text: 'little', value: 'little' },
+				{ text: 'big', value: 'big' }
 			],
 
 			instructionIndex: undefined as number | undefined,
 
 			tooltip: {} as TTip,
 			tips: {
-        default: {
-          title: "memory explorer",
-          detail: // html
-					`\
+				default: {
+					title: "memory explorer",
+					detail: // html
+						`\
 						This explorer displays the current contents of the simulated memory arranged vertically into words and horizontally\
 						into the 4 bytes which make up each word.
 
@@ -253,11 +203,11 @@ export default Vue.extend({
 						<span class="label-stack">stack</span>. The unfenced region between the <span class="label-data">data</span> and\
 						<span class="label-stack">stack</span> is unintialised memory.
 					`
-        },
+				},
 				text: {
-					title: "text",
+					title: `<span class="label-text">text</span>`,
 					detail: // html
-					`\
+						`\
 						This region, situated in the lowest addresses of the program's virtual address space, contains the machine code\
 						for each instruction in the program.
 						
@@ -266,9 +216,9 @@ export default Vue.extend({
 					`
 				},
 				data: {
-					title: "data",
+					title: `<span class="label-data">data</span>`,
 					detail: // html
-					`\
+						`\
 						This region, which immediately follows the <span class="label-text">text</span> region, contains all static data\
 						defined in the .data region of the loaded program. It is used for storing information which cannot be represented\
 						in assembly language immediate values - such as strings and arrays. 
@@ -283,7 +233,7 @@ export default Vue.extend({
 				uninitialised: {
 					title: "uninitialised memory",
 					detail: // html
-					`\
+						`\
 						This region contains uninitialised memory, separating the heap (an area of dynamic memory allocation which immediately\
 						follows the data section) from the stack in the virtual address space allocated to the loaded program.
 
@@ -293,9 +243,9 @@ export default Vue.extend({
 					`
 				},
 				stack: {
-					title: "stack",
+					title: `<span class="label-stack">stack</span>`,
 					detail: // html
-					`\
+						`\
 						The stack is located in the highest addressess of the owning program's virtual address space. As items are pushed onto\
 						the stack, it grows downwards through the addresses until it meets the top of the heap, at which point a segmentation fault\
 						is thrown.
@@ -306,9 +256,9 @@ export default Vue.extend({
 					`
 				},
 				endianness: {
-          title: "endianness",
-          detail: // html
-					`\
+					title: "endianness",
+					detail: // html
+						`\
 						'Endianness' describes the byte order within collections of bytes in memory. Since ARMv7 is a 32 bit processor,\
 						the most common 'collection' of bytes are 32-bit (4-byte) integers. In almost all modern computers, numbers are\
 						stored '<span class="irisc">little-endian</span>', meaning that the 'logical' byte order as a human might expect\
@@ -337,8 +287,10 @@ export default Vue.extend({
 						This reversed order is what is actually contained within the memory. I have provided a way to switch the endianness\
 						of each word so that they make a bit more sense when read as a whole.
 					`
-        },
-      } as TDictionary<TTip>,
+				},
+			} as TDictionary<TTip>,
+
+			controlTooltip: undefined as string | undefined,
 
 			ascii: asciiTable.ascii,
 			shown: false
@@ -359,7 +311,7 @@ export default Vue.extend({
 		textWordHeight: function (): number { return this.textHeight / 4 },
 		dataWordHeight: function (): number { return this.dataHeight / 4 },
 		stackWordHeight: function (): number { return this.stackHeight / 4 },
-		uninitWordHeight: function (): number { return (this.memSize / 4) - this.textWordHeight - this.dataWordHeight - this.stackWordHeight },
+		uninitWordHeight: function (): number { return Math.max((this.memSize / 4) - this.textWordHeight - this.dataWordHeight - this.stackWordHeight, 0) },
 
 		textOffset: function (): number { return 0; },
 		dataOffset: function (): number { return this.textOffset + this.textWordHeight; },
@@ -412,10 +364,10 @@ export default Vue.extend({
 		},
 
 		hexstr: function (value: number, pad: number = 2): string {
-      return `${value?.toString(16).padStart(pad, '0')}`
-    },
+			return `${value?.toString(16).padStart(pad, '0')}`
+		},
 
-		binstr: function(value: number, pad: number = 8): string {
+		binstr: function (value: number, pad: number = 8): string {
 			return `${value?.toString(2).padStart(pad, '0')}`
 		},
 
@@ -455,19 +407,34 @@ export default Vue.extend({
 	margin-bottom: -2px;
 }
 
-.region-text {
-	background-color: rgba(0, 119, 170, 0.1);
-	border-color: #0077aa;
+.regions {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
 }
 
-.region-data {
+.region {
+	position: absolute;
+	width: 100%;
+}
+
+.region.text {
+	background-color: rgba(0, 119, 170, 0.1);
+	border-color: #0077aa;
+	top: 0;
+}
+
+.region.data {
 	background-color: rgba(255, 85, 85, 0.1);
 	border-color: #ff5555;
 }
 
-.region-stack {
+.region.stack {
 	background-color: rgba(93, 148, 85, 0.1);
 	border-color: #5d9455;
+	bottom: 0;
 }
 
 .word {
@@ -488,25 +455,42 @@ export default Vue.extend({
 
 .tooltip-box {
 	background-color: #0d1117;
-	left: calc(50vw - (498px / 2) - 280px - 15px); 
+	right: calc(50vw + (498px / 2) + 15px);
 	width: 280px;
 	white-space: pre-line;
 }
 
-.tooltip-box >>> .label-text { color: #0077aa; }
-.tooltip-box >>> .label-data { color: #ff5555; }
-.tooltip-box >>> .label-stack { color: #5d9455; }
-
-.tooltip-box >>> .irisc { color: #e02f72; }
-
-.slide-fade-enter-active {
-  transition: all .3s ease;
+.control-box {
+	background-color: #0d1117;
+	left: calc(50vw + (498px / 2) + 15px);
 }
 
-.slide-fade-enter
-/* .slide-fade-leave-active below version 2.1.8 */ {
-  transform: translateX(10px);
-  opacity: 0;
+.debugger {
+	padding: 0 0.25rem;
 }
 
+.control-tooltip {
+	position: absolute;
+	left: -1px;
+	bottom: -27px;
+	background-color: #0d1117;
+  /* padding: 0 0.25rem 0.05rem 0.25rem; */
+  font-size: 14px;
+}
+
+.tooltip-box>>>.label-text {
+	color: #0077aa;
+}
+
+.tooltip-box>>>.label-data {
+	color: #ff5555;
+}
+
+.tooltip-box>>>.label-stack {
+	color: #5d9455;
+}
+
+.tooltip-box>>>.irisc {
+	color: #e02f72;
+}
 </style>

@@ -1,31 +1,32 @@
 import { bitset } from "@/assets/bitset";
 import { Register, Condition, Flag } from "@/constants";
 import Vue from 'vue';
-import { data } from "../data";
-import { runtime } from "./runtime";
+import { state } from "../state";
+import { memory } from "./memory";
 
 export const cpu = {
 	tick: function () {
-    data.cpu.tick++;
+    state.cpu.tick++;
   },
 	
   setRegister: function (register: Register, value: number) {
+    console.log("setting register", register, value);
     if (register === Register.PC) {
-      data.previousPC = data.cpu.registers[Register.PC];
-      data.currentInstruction = runtime.instruction(data.cpu.registers[Register.PC]);
+      state.previousPC = state.cpu.registers[Register.PC];
+      state.currentInstruction = memory.instruction(state.cpu.registers[Register.PC]);
     }
-    Vue.set(data.cpu.registers, register, value);
+    Vue.set(state.cpu.registers, register, value);
 
     this.observeRegisters();
   },
 
   observeRegisters: function () {
-    data.cpu.observableRegisters = [...data.cpu.registers];
+    state.cpu.observableRegisters = [...state.cpu.registers];
   },
 
   checkFlags: function (cond: Condition) : boolean {
     const bits = bitset(4, cond);
-    const cpsr = data.cpu.cpsr;
+    const cpsr = state.cpu.cpsr;
 
     let result: boolean = false;
     switch(cond) {
@@ -72,6 +73,6 @@ export const cpu = {
       cpsr[Flag.V] = sign1 !== sign2 && sign2 === signr     // signs different and result sign same as subtrahend 
     }
 
-    Vue.set(data.cpu, 'cpsr', cpsr);
+    Vue.set(state.cpu, 'cpsr', cpsr);
   },
 }

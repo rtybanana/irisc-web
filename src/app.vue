@@ -34,10 +34,12 @@
                     <component 
                       :is="env" 
                       @switch="switchEnvironment"
-                      @run="start"
-                      @step="doStep"
                     ></component>
                   </keep-alive>
+
+                  <!-- @run="start"
+                      @forward="stepForward"
+                      @back="stepBack" -->
                 </div>
                 <div class="col-4 pl-1 h-100">
                   <!-- <h5 class="mb-0">memory</h5> -->
@@ -215,101 +217,103 @@ export default Vue.extend({
       localStorage.setItem('environment', this.env);
     },
 
-    /**
-     * 
-     */
-    start: function () {
-      if (this.running) {
-        if (!this.step) SimulatorState.resume();
-        return;
-      }
+    // /**
+    //  * 
+    //  */
+    // start: function () {
+    //   if (this.running) {
+    //     if (!this.step) SimulatorState.resume();
+    //     return;
+    //   }
       
-      // reset emulator state
-      SimulatorState.reset();
+    //   // reset emulator state
+    //   SimulatorState.reset();
 
-      // report errors (alert is temporary)
-      if (this.errors.length > 0) {
-        alert(`This code has errors!\n\n\t${this.errors.map(e => `${e.constructHelper()}`).join("\n\t")}`);
-        return;
-      } 
+    //   // report errors (alert is temporary)
+    //   if (this.errors.length > 0) {
+    //     alert(`This code has errors!\n\n\t${this.errors.map(e => `${e.constructHelper()}`).join("\n\t")}`);
+    //     return;
+    //   } 
       
-      // run the program
-      this.run();
-    },
+    //   // run the program
+    //   this.run();
+    // },
 
-    /**
-     * 
-     */
-    run: async function () {
-      SimulatorState.setEntryPoint();
-      SimulatorState.setStackHeight(0);
-      SimulatorState.start();
+    // /**
+    //  * 
+    //  */
+    // run: async function () {
+    //   SimulatorState.setEntryPoint();
+    //   SimulatorState.setStackHeight(0);
+    //   SimulatorState.start();
 
-      try {
-        while(this.running) {
-          SimulatorState.setStep(false);
-          let node: TInstructionNode = SimulatorState.instruction(this.registers[Register.PC]);
+    //   try {
+    //     while(this.running) {
+    //       SimulatorState.setStep(false);
+    //       let node: TInstructionNode = SimulatorState.instruction(this.registers[Register.PC]);
 
-          // if runtime instruction runoff
-          if (node === undefined) {
-            let last: TInstructionNode = SimulatorState.currentInstruction()!;
-            throw new RuntimeError("SIGSEG: Segmentation fault.", last.statement, last.lineNumber);
-          }
+    //       // if runtime instruction runoff
+    //       if (node === undefined) {
+    //         let last: TInstructionNode = SimulatorState.currentInstruction()!;
+    //         throw new RuntimeError("SIGSEG: Segmentation fault.", last.statement, last.lineNumber);
+    //       }
 
-          Interpreter.execute(node);
-          await this.sleep();
+    //       Interpreter.execute(node);
+    //       await this.sleep();
 
-          // check for bx lr to static exit point
-          if (this.registers[Register.PC] === this.memory.exitPoint) {
-            SimulatorState.setExitStatus(0);
-          }
-          else {
-            // check for breakpoint
-            const nextInstruction: TInstructionNode = SimulatorState.instruction(this.registers[Register.PC]);
-            if (this.breakpoints.find(e => e.lineNumber === nextInstruction.lineNumber)) {
-              SimulatorState.pause();
-            }
-          }
-        }
-      }
-      catch (e) {
-        if (e instanceof RuntimeError) {
-          SimulatorState.setExitStatus(e);
-        }
-      }
-    },
+    //       // check for bx lr to static exit point
+    //       if (this.registers[Register.PC] === this.memory.exitPoint) {
+    //         SimulatorState.setExitStatus(0);
+    //       }
+    //       else {
+    //         // check for breakpoint
+    //         const nextInstruction: TInstructionNode = SimulatorState.instruction(this.registers[Register.PC]);
+    //         if (this.breakpoints.find(e => e.lineNumber === nextInstruction.lineNumber)) {
+    //           SimulatorState.pause();
+    //         }
+    //       }
+    //     }
+    //   }
+    //   catch (e) {
+    //     if (e instanceof RuntimeError) {
+    //       SimulatorState.setExitStatus(e);
+    //     }
+    //   }
+    // },
 
-    /**
-     * Checks every 50ms to see if tick speed (delay) value has changed. If the delay has elapsed
-     * then move return so that the simulator may continue to the next instruction.
-     */
-    sleep: async function () {
-      let sleptfor: number = 0;
-      while ((sleptfor < this.delay || this.paused) && this.running && !this.step) {
-        await new Promise(r => setTimeout(r, 10));
-        sleptfor += 10;
-      }
+    // /**
+    //  * Checks every 50ms to see if tick speed (delay) value has changed. If the delay has elapsed
+    //  * then move return so that the simulator may continue to the next instruction.
+    //  */
+    // sleep: async function () {
+    //   let sleptfor: number = 0;
+    //   while ((sleptfor < this.delay || this.paused) && this.running && !this.step) {
+    //     await new Promise(r => setTimeout(r, 10));
+    //     sleptfor += 10;
+    //   }
 
-      return;
-    },
+    //   return;
+    // },
 
-    /**
-     * 
-     */
-    doStep: function () {
-      console.log("do step");
-
-      if (this.running && this.paused) {
-        SimulatorState.setStep(true);
-        return
-      }
+    // /**
+    //  * 
+    //  */
+    // stepForward: function () {
+    //   if (this.running && this.paused) {
+    //     SimulatorState.setStep(true);
+    //     return
+    //   }
       
-      SimulatorState.pause();
-      if (!this.running) {
-        SimulatorState.reset();
-        this.run();
-      }
-    },
+    //   SimulatorState.pause();
+    //   if (!this.running) {
+    //     SimulatorState.reset();
+    //     this.run();
+    //   }
+    // },
+
+    // stepBack: function () {
+    //   SimulatorState.reinstateSnapshot(this.currentTick - 1);
+    // },
 
     windowSizeListener: function () {
       this.windowSize = window.innerWidth;
@@ -322,7 +326,7 @@ export default Vue.extend({
         e.preventDefault();
         
         console.log("keyboard step");
-        this.doStep();
+        SimulatorState.stepForward();
       }
 
       else if (e.code === "Comma" && (e.ctrlKey || e.metaKey)) {

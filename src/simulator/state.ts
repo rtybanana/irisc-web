@@ -2,7 +2,7 @@ import { Queue } from '@/utilities';
 import { TSimulatorSnapshot, TSimulatorState } from './types';
 import Vue from 'vue';
 
-export const data = Vue.observable<TSimulatorState>({
+export const state = Vue.observable<TSimulatorState>({
   running: false,
   paused: false,
   step: false,
@@ -27,12 +27,15 @@ export const data = Vue.observable<TSimulatorState>({
     observableWordView: [],
     observableByteView: [],
 
-    dataHeight: 0,
-    dataMap: {},
-    
     text: [],
     textHeight: 0,
     textMap: {},
+
+    dataHeight: 0,
+    dataMap: {},
+    
+    heapHeight: 0,
+    heapMap: {},
 
     stackHeight: 0,
   },

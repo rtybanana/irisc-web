@@ -29,8 +29,12 @@
         <i 
           class="button code fas fa-code clickable" 
           @click="$emit('switch')"
+          @mouseenter="controlTooltip = 'editor'"
+          @mouseleave="controlTooltip = undefined"
         ></i>
       </div>
+
+      <div v-show="controlTooltip" class="control-tooltip">{{ controlTooltip }}</div>
     </div>
   </div>
 </template>
@@ -59,6 +63,8 @@ export default Vue.extend({
         title: '' as string,
         message: '' as string
       },
+
+      controlTooltip: undefined as string | undefined
     }
   },
   computed: {
@@ -262,6 +268,16 @@ export default Vue.extend({
   border-radius: 0.3rem; 
   background-color: #191d21;
   padding: 0.25rem 0.33rem 0.15rem 0.4rem;
+}
+
+.controls .control-tooltip {
+  position: absolute;
+  right: 0;
+  bottom: -25px;
+  border-radius: 0.3rem; 
+  background-color: #191d21;
+  padding: 0 0.25rem 0.05rem 0.25rem;
+  font-size: 14px;
 }
 
 .button.code {

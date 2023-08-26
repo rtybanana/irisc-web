@@ -2,6 +2,11 @@ import { IriscError, RuntimeError } from "@/interpreter/error";
 import { TInstructionNode } from '@/syntax/types';
 import { Queue } from '@/utilities';
 
+type TAllocation = {
+	size: number;
+	allocated: boolean;
+}
+
 type TMemory = {
   size: number;
   sizes: number[];
@@ -12,12 +17,15 @@ type TMemory = {
   observableWordView: number[];
   observableByteView: number[];
 
-  dataHeight: number;
-  dataMap: Record<string, number>;
-  
   text: TInstructionNode[];
   textHeight: number;
   textMap: Record<string, number>;
+
+  dataHeight: number;
+  dataMap: Record<string, number>;
+  
+  heapMap: Record<number, TAllocation>;
+  heapHeight: number;
 
   stackHeight: number;
 }

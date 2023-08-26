@@ -1,33 +1,33 @@
-import { data } from './data';
+import { state } from './state';
 
 export const getters = {
-  running: () => data.running,
-  paused: () => data.paused,
-  step: () => data.step,
-  delay: () => data.delay,
+  running: () => state.running,
+  paused: () => state.paused,
+  step: () => state.step,
+  delay: () => state.delay,
 
-  currentTick: () => data.cpu.tick,
-  registers: () => data.cpu.observableRegisters,
-  cpsr: () => data.cpu.cpsr,
+  currentTick: () => state.cpu.tick,
+  registers: () => state.cpu.observableRegisters,
+  cpsr: () => state.cpu.cpsr,
   memory: () => ({
-    ...data.memory,
-    exitPoint: data.memory.size + 4
+    ...state.memory,
+    exitPoint: state.memory.size + 4
   }),
 
-  byteView: () => data.memory.observableByteView,
-  wordView: () => data.memory.observableWordView,
+  byteView: () => state.memory.observableByteView,
+  wordView: () => state.memory.observableWordView,
 
   // currentInstruction: () => actions.instruction(data.previousPC),
-  currentInstruction: () => data.currentInstruction,
-  previousPC: () => data.previousPC,
-  wasExecuted: () => data.wasExecuted,
+  currentInstruction: () => state.currentInstruction,
+  previousPC: () => state.previousPC,
+  wasExecuted: () => state.wasExecuted,
 
-  output: () => data.output,
-  errors: () => data.errors,
-  breakpoints: () => data.breakpoints,
+  output: () => state.output,
+  errors: () => state.errors,
+  breakpoints: () => state.breakpoints,
 
-  hoveredError: () => data.hoveredError,
-  exitStatus: () => data.exitStatus,
+  hoveredError: () => state.hoveredError,
+  exitStatus: () => state.exitStatus,
 
-  snapshots: () => data.snapshots
+  snapshots: () => state.snapshots
 }

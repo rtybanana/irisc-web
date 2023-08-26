@@ -19,54 +19,16 @@
     ></prism-editor>
 
     <div class="controls">
-      <div class="d-inline-block">
-        <i 
-          class="button red fas fa-stop mr-1 clickable" 
-          @click="stop"
-        ></i>
+      <debug :tooltip.sync="controlTooltip"></debug>
 
-        <!-- run / pause / resume -->
-        <template>
-          <i 
-            v-show="!running"
-            class="button green fas fa-play mx-1 clickable" 
-            @click="$emit('run')"
-          ></i>
-          <i 
-            v-show="running && !paused"
-            class="button fas fa-pause mx-1 clickable" 
-            @click="pause"
-          ></i>
-          <i 
-            v-show="running && paused"
-            class="button green fas fa-play mx-1 clickable" 
-            @click="resume"
-          ></i>
-        </template>
+      <i 
+        class="button terminal fas fa-terminal ml-1 clickable" 
+        @click="$emit('switch')"
+        @mouseenter="controlTooltip = 'terminal'"
+        @mouseleave="controlTooltip = undefined"
+      ></i>
 
-        <i 
-          class="button amber step fas fa-step-forward mx-1 clickable"
-          @click="$emit('step')"
-        ></i>
-
-        <div class="d-inline-block mx-1" style="width: 60px;">
-          <b-form-input 
-            style="margin-bottom: -5px;" 
-            type="range" 
-            inline
-            :value="1000 / delay"
-            min="0.5"
-            max="100"
-            step="0.1"
-            @input="setDelay"
-          ></b-form-input>
-        </div>
-
-        <i 
-          class="button terminal fas fa-terminal ml-1 clickable" 
-          @click="$emit('switch')"
-        ></i>
-      </div>
+      <div v-show="controlTooltip" class="control-tooltip">{{ controlTooltip }}</div>
     </div>
 
     <div class="output">
@@ -108,7 +70,7 @@
 
 <script lang="ts">
 import { debounce } from "@/assets/functions";
-import { Assembler, RuntimeError } from "@/interpreter";
+import { Assembler, IriscError, RuntimeError } from "@/interpreter";
 import { SimulatorState } from "@/simulator";
 import { highlight, languages } from 'prismjs';
 import 'prismjs/themes/prism.css'; // import syntax highlighting styles
@@ -116,8 +78,7 @@ import getCaretCoordinates from "textarea-caret";
 import Vue from 'vue';
 import { PrismEditor } from 'vue-prism-editor';
 import 'vue-prism-editor/dist/prismeditor.min.css';
-
-
+import debug from './debug.vue';
 
 type TPoint = {
   x: number;
@@ -133,7 +94,8 @@ type TTooltip = {
 export default Vue.extend({
   name: 'editor',
   components: {
-    PrismEditor
+    PrismEditor,
+    debug
   },
   data() {
     return {
@@ -149,7 +111,9 @@ export default Vue.extend({
         "stackoverflow!.s",
         "bubblesort.s",
         "buggymess.s"
-      ]
+      ],
+
+      controlTooltip: undefined as string | undefined
     }
   },
   computed: {
@@ -193,21 +157,13 @@ export default Vue.extend({
     }
   },
   methods: {
-    stop: function () {
-      SimulatorState.stop();
-    },
-
-    pause: function () {
-      SimulatorState.pause();
-    },
-
-    resume: function () {
-      SimulatorState.resume();
-    },
-
-    reset: function () {
-      SimulatorState.reset();
-    },
+    run: SimulatorState.start,
+    stop: SimulatorState.stop,
+    pause: SimulatorState.pause,
+    resume: SimulatorState.resume,
+    stepBack: SimulatorState.stepBack,
+    stepForward: SimulatorState.stepForward,
+    reset: SimulatorState.reset,
 
     setDelay: function (delay: number) {
       SimulatorState.setDelay(1000 / delay)
@@ -220,7 +176,9 @@ export default Vue.extend({
       if (e.target.parentNode?.className.includes("error")) {
         if (!e.target.parentNode.dataset["errorIdx"]) return;
         
-        let errorIndex = e.target.parentNode.dataset["errorIdx"] as number;
+        let errorIndex = parseInt(e.target.parentNode.dataset["errorIdx"]) as number;
+        if (errorIndex === -1) return;
+
         let error = this.errors[errorIndex];
 
         this.tooltip = {
@@ -246,8 +204,11 @@ export default Vue.extend({
         let prismEditor = this.$refs.prism as any;    // casting to any :(
         let newTarget = prismEditor.$refs.textarea as HTMLInputElement;
 
-        let errorIndex = e.target.parentNode.dataset["errorIdx"] as number;
-        let error = this.errors[errorIndex];
+        let errorIndex = parseInt(e.target.parentNode.dataset["errorIdx"]) as number;
+        
+        let error: IriscError;
+        if (errorIndex === -1) error = this.exitStatus as RuntimeError;
+        else error = this.errors[errorIndex];
 
         newTarget.dispatchEvent(
           new CustomEvent('errorClick', {
@@ -259,8 +220,6 @@ export default Vue.extend({
         ));
       }
       else if (e.target.className.includes("line-number")){
-        console.log(e.target.innerText);
-        console.log(e.layerX, e.layerY);
         SimulatorState.toggleBreakpoint(e.target.innerText - 1);
       }
     },
@@ -276,8 +235,11 @@ export default Vue.extend({
         let prismEditor = this.$refs.prism as any;    // casting to any :(
         let newTarget = prismEditor.$refs.textarea as HTMLInputElement;
 
-        let errorIndex = e.target.parentNode.dataset["errorIdx"] as number;
-        let error = this.errors[errorIndex];
+        let errorIndex = parseInt(e.target.parentNode.dataset["errorIdx"]) as number;
+        
+        let error: IriscError;
+        if (errorIndex === -1) error = this.exitStatus as RuntimeError;
+        else error = this.errors[errorIndex];
 
         newTarget.dispatchEvent(
           new CustomEvent('errorDblClick', {
@@ -408,7 +370,7 @@ export default Vue.extend({
       if (this.exitStatus instanceof RuntimeError) {
         let line = lines[this.exitStatus.lineNumber];
         if (line !== undefined) {
-          lines[this.exitStatus.lineNumber] = `<span class="line error" style="text-decoration-color: ${this.exitStatus.color}">${line}</span>`;
+          lines[this.exitStatus.lineNumber] = `<span class="line error" style="text-decoration-color: ${this.exitStatus.color}" data-error-idx="${-1}">${line}</span>`;
         }
       }
     },
@@ -597,6 +559,8 @@ export default Vue.extend({
   overflow-x: hidden;
 }
 
+
+
 .controls {
   position: absolute;
   top: 8px;
@@ -604,6 +568,21 @@ export default Vue.extend({
   border-radius: 0.3rem; 
   background-color: #191d21;
   padding: 0.25rem 0.33rem 0.15rem 0.4rem;
+  opacity: 0.2;
+}
+
+.controls .control-tooltip {
+  position: absolute;
+  right: 0;
+  bottom: -25px;
+  border-radius: 0.3rem; 
+  background-color: #191d21;
+  padding: 0 0.25rem 0.05rem 0.25rem;
+  font-size: 14px;
+}
+
+.prism-container:hover .controls {
+  opacity: 1;
 }
 
 .output {
@@ -635,5 +614,11 @@ export default Vue.extend({
 
 .button.terminal {
   color: #8b0c3c;
+}
+
+.controls >>> .custom-range {
+  height: auto;
+  padding-bottom: 1px;
+  -webkit-padding-after: 2px;
 }
 </style>

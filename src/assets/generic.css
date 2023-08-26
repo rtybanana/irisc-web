@@ -47,3 +47,27 @@ body .btn:hover {
   border-radius: unset;
   color: #8b0c3c;
 }
+
+
+
+/* transitions */
+.slide-fade-left-enter-active,
+.slide-fade-right-enter-active {
+	transition: all .3s ease;
+}
+
+.slide-fade-left-enter
+
+/* .slide-fade-leave-active below version 2.1.8 */
+	{
+	transform: translateX(10px);
+	opacity: 0;
+}
+
+.slide-fade-right-enter
+
+/* .slide-fade-leave-active below version 2.1.8 */
+	{
+	transform: translateX(-10px);
+	opacity: 0;
+}

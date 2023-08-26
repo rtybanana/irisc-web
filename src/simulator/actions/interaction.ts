@@ -1,70 +1,110 @@
 import { IriscError } from "@/interpreter";
-import { data } from "../data";
+import { state } from "../state";
 import { TExitStatus } from "../types";
+import Vue from 'vue';
+import { snapshots } from "./snapshots";
+import { init } from "./init";
+import { runner } from "./runner";
 
 export const interaction = {
   start: function () {
-    data.running = true;
+    if (state.running) {
+      if (!state.step) this.resume();
+      return;
+    }
+    
+    // reset emulator state and run simulation
+    init.reset();
+    runner.run();
+  },
+
+  stepForward: function () {
+    if (state.running && state.paused) {
+      this.setStep(true);
+      return
+    }
+    
+    this.pause();
+    if (!state.running) {
+      init.reset();
+      runner.run();
+    }
+  },
+
+  stepBack: function () {
+    snapshots.reinstateSnapshot(state.cpu.tick - 1);
   },
 
   pause: function () {
-    data.paused = true;
+    state.paused = true;
   },
 
   resume: function () {
-    data.paused = false;
+    state.paused = false;
   },
 
   setStep: function (value: boolean) {
-    data.step = value;
+    state.step = value;
   },
 
   stop: function () {
-    data.running = false;
-    data.paused = false;
+    state.running = false;
+    state.paused = false;
   },
 
   setDelay(delay: number) : void {
-    data.delay = delay;
+    state.delay = delay;
   },
 
 	addError(error: IriscError) {
-    data.errors.push(error);
+    state.errors.push(error);
   },
 
   hoverError(error: IriscError) {
-    data.hoveredError = error;
+    state.hoveredError = error;
   },
 
   unhoverError() {
-    data.hoveredError = null;
+    state.hoveredError = null;
   },
 
 	toggleBreakpoint: function (lineNumber: number) {
     console.log(lineNumber);
     
-    console.log(data.memory.text);
-    let instruction = data.memory.text.find(e => e.lineNumber === lineNumber);
+    console.log(state.memory.text);
+    let instruction = state.memory.text.find(e => e.lineNumber === lineNumber);
     console.log(instruction);
 
     if (instruction) {
-      let breakpoint = data.breakpoints.find(e => e.lineNumber === instruction?.lineNumber);
+      let breakpoint = state.breakpoints.find(e => e.lineNumber === instruction?.lineNumber);
       if (breakpoint) {
-        data.breakpoints = data.breakpoints.filter(e => e.lineNumber !== breakpoint?.lineNumber)
+        state.breakpoints = state.breakpoints.filter(e => e.lineNumber !== breakpoint?.lineNumber)
       }
       else {
-        data.breakpoints.push(instruction);
+        state.breakpoints.push(instruction);
       }
     }
   },
 
   removeBreakpoints: function () {
-    data.breakpoints = [];
+    state.breakpoints = [];
+  },
+
+  addOutput(output: string) {
+    [...output].forEach(char => {
+      if (char === '\n') state.output.push("");
+      else {
+        let lastLine = state.output.length -1;
+        let existingLine = state.output[lastLine];
+        
+        Vue.set(state.output, lastLine, `${existingLine}${char}`);
+      }
+    })
   },
 
 	// on simulation finish
   setExitStatus: function (status: TExitStatus) {
-    data.exitStatus = status;
+    state.exitStatus = status;
     this.stop();
   }
 }
