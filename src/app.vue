@@ -316,6 +316,8 @@ export default Vue.extend({
     },
 
     keyListener: function (e: KeyboardEvent) {
+      if (this.env !== EnvironmentType.EDITOR) return;
+
       if (e.code === "Period" && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         

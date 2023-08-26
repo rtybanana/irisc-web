@@ -67,14 +67,13 @@
             <span class="d-inline-block tick rounded py-1">{{ snapshot.tick }}</span>
 
             <!-- instruction text -->
-            <div>
+            <div style="color: #DCDCDC;">
               <span 
                 v-html="snapshot.instruction"
                 class="p-1"
-                style="color: #DCDCDC;"
-            ></span>
+              ></span>
               <span class="reinstate px-1 float-right">
-                <i class="fas fa-share fa-rotate-180 fa-xs" style="color: #1f2024;"></i>
+                <i class="fas fa-share fa-rotate-180 fa-xs"></i>
               </span>
             </div>
 
