@@ -7,6 +7,10 @@ import { TransferNode, BlockTransferNode, SingleTransferNode } from "@/syntax";
 import { TSimulatorSnapshot } from "../../types";
 
 export const common = {
+  align(size: number): number {
+    return Math.ceil(size / 8) * 8;
+  },
+
 	store: function (toStore: number, address: number, size: TTransferSize) {
     if (size === "word") {
       state.memory.wordView[address / 4] = toStore;

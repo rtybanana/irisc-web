@@ -1,5 +1,5 @@
 import { Queue } from '@/utilities';
-import { TSimulatorSnapshot, TSimulatorState } from './types';
+import { TAllocation, TSimulatorSnapshot, TSimulatorState } from './types';
 import Vue from 'vue';
 
 export const state = Vue.observable<TSimulatorState>({
@@ -35,7 +35,7 @@ export const state = Vue.observable<TSimulatorState>({
     dataMap: {},
     
     heapHeight: 0,
-    heapMap: {},
+    heapMap: new Map<number, TAllocation>(),
 
     stackHeight: 0,
   },
@@ -51,5 +51,6 @@ export const state = Vue.observable<TSimulatorState>({
   hoveredError: null,
   exitStatus: undefined,
 
-  snapshots: new Queue<TSimulatorSnapshot>(500, true)
+  snapshots: new Queue<TSimulatorSnapshot>(500, true),
+  vue: undefined
 });

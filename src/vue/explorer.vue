@@ -32,6 +32,7 @@
 							<div class="regions">
 								<div 
 									class="region text fenced tippable" 
+									:style="`top: ${textOffset * 22}px`"
 									@mouseenter="tip('text')" 
 									@mouseleave="untip"
 								>
@@ -47,7 +48,7 @@
 								<div
 									v-if="dataWordHeight > 0" 
 									class="region data fenced tippable" 
-									:style="`top: ${textWordHeight * 22}px`"
+									:style="`top: ${dataOffset * 22}px`"
 									@mouseenter="tip('data')" 
 									@mouseleave="untip"
 								>
@@ -55,8 +56,34 @@
 								</div>
 
 								<div
+									v-if="heapWordHeight > 0" 
+									class="region heap fenced tippable" 
+									:style="`top: ${heapOffset * 22}px`"
+									@mouseenter="tip('heap')" 
+									@mouseleave="untip"
+								>
+									<div 
+										v-for="(block, index) in heapBlocks" 
+										class="block"
+										:style="`height: ${(block.size / 4) * 22}px`"
+										:key="index"
+									></div>
+
+									<div class="region" style="top: 0">
+										<div 
+											v-for="(block, index) in heapContiguousBlocks"
+											:class="block.allocated ? 'allocated' : ''"
+											:style="`height: ${(block.size / 4) * 22}px`"
+											@mouseenter="tip('heap')" 
+											@mouseleave="untip"
+											:key="index"
+										></div>
+									</div>
+								</div>
+
+								<div
 									class="region tippable" 
-									:style="`top: ${(textWordHeight + dataWordHeight) * 22}px`"
+									:style="`top: ${uninitOffset * 22}px`"
 									@mouseenter="tip('uninitialised')" 
 									@mouseleave="untip"
 								>
@@ -154,6 +181,8 @@ import Vue from 'vue';
 import { highlight, languages } from 'prismjs';
 import { TInstructionNode } from '@/syntax/types';
 import debug from './debug.vue';
+import { TAllocation } from '@/simulator/types';
+import clone from "lodash.clonedeep";
 
 type TTip = {
 	title: string;
@@ -195,7 +224,7 @@ export default Vue.extend({
 				default: {
 					title: "memory explorer",
 					detail: // html
-						`\
+					`\
 						This explorer displays the current contents of the simulated memory arranged vertically into words and horizontally\
 						into the 4 bytes which make up each word.
 
@@ -205,9 +234,9 @@ export default Vue.extend({
 					`
 				},
 				text: {
-					title: `<span class="label-text">text</span>`,
+					title: `the <span class="label-text">text</span> section`,
 					detail: // html
-						`\
+					`\
 						This region, situated in the lowest addresses of the program's virtual address space, contains the machine code\
 						for each instruction in the program.
 						
@@ -216,9 +245,9 @@ export default Vue.extend({
 					`
 				},
 				data: {
-					title: `<span class="label-data">data</span>`,
+					title: `the <span class="label-data">data</span> section`,
 					detail: // html
-						`\
+					`\
 						This region, which immediately follows the <span class="label-text">text</span> region, contains all static data\
 						defined in the .data region of the loaded program. It is used for storing information which cannot be represented\
 						in assembly language immediate values - such as strings and arrays. 
@@ -230,10 +259,17 @@ export default Vue.extend({
 						i.e. the data can be changed, but not added to.
 					`
 				},
+				heap: {
+					title: `the <span class="label-heap">heap</span>`,
+					detail: // html
+					`\
+						This region is the <span class="label-heap">heap</span> and contains data which has been dynamically allocated during the execution of your program.
+					`
+				},
 				uninitialised: {
 					title: "uninitialised memory",
 					detail: // html
-						`\
+					`\
 						This region contains uninitialised memory, separating the heap (an area of dynamic memory allocation which immediately\
 						follows the data section) from the stack in the virtual address space allocated to the loaded program.
 
@@ -243,9 +279,9 @@ export default Vue.extend({
 					`
 				},
 				stack: {
-					title: `<span class="label-stack">stack</span>`,
+					title: `the <span class="label-stack">stack</span>`,
 					detail: // html
-						`\
+					`\
 						The stack is located in the highest addressess of the owning program's virtual address space. As items are pushed onto\
 						the stack, it grows downwards through the addresses until it meets the top of the heap, at which point a segmentation fault\
 						is thrown.
@@ -258,7 +294,7 @@ export default Vue.extend({
 				endianness: {
 					title: "endianness",
 					detail: // html
-						`\
+					`\
 						'Endianness' describes the byte order within collections of bytes in memory. Since ARMv7 is a 32 bit processor,\
 						the most common 'collection' of bytes are 32-bit (4-byte) integers. In almost all modern computers, numbers are\
 						stored '<span class="irisc">little-endian</span>', meaning that the 'logical' byte order as a human might expect\
@@ -306,17 +342,43 @@ export default Vue.extend({
 
 		textHeight: () => SimulatorState.memory().textHeight,
 		dataHeight: () => SimulatorState.memory().dataHeight,
+		heapHeight: () => SimulatorState.memory().heapHeight,
 		stackHeight: () => SimulatorState.memory().stackHeight,
 
 		textWordHeight: function (): number { return this.textHeight / 4 },
 		dataWordHeight: function (): number { return this.dataHeight / 4 },
+		heapWordHeight: function (): number { return this.heapHeight / 4 },
 		stackWordHeight: function (): number { return this.stackHeight / 4 },
-		uninitWordHeight: function (): number { return Math.max((this.memSize / 4) - this.textWordHeight - this.dataWordHeight - this.stackWordHeight, 0) },
+		uninitWordHeight: function (): number { return Math.max((this.memSize / 4) - this.textWordHeight - this.dataWordHeight  - this.heapWordHeight - this.stackWordHeight, 0) },
 
 		textOffset: function (): number { return 0; },
 		dataOffset: function (): number { return this.textOffset + this.textWordHeight; },
-		uninitOffset: function (): number { return this.dataOffset + this.dataWordHeight; },
+		heapOffset: function (): number { return this.dataOffset + this.dataWordHeight; },
+		uninitOffset: function (): number { return this.heapOffset + this.heapWordHeight; },
 		stackOffset: function (): number { return this.uninitOffset + this.uninitWordHeight; },
+
+		heapMap: () => SimulatorState.memory().heapMap,
+		heapBlocks: function (): TAllocation[] {
+			return Array.from(this.heapMap)
+				.sort(([aPtr, _a], [bPtr, _b]) => {
+					return aPtr - bPtr;
+				})
+				.map(e => e[1]);
+		},
+
+		heapContiguousBlocks: function (): TAllocation[] {
+			return this.heapBlocks
+				.reduce((contig, block, index, allocations) => {
+					const lastAllocation = allocations[index - 1];
+
+					if (lastAllocation?.allocated !== block.allocated) {
+						contig.push(clone(block));
+					}
+					else contig[contig.length - 1].size += block.size;
+
+					return contig;
+				}, [] as TAllocation[])
+		},
 
 		instructions: () => SimulatorState.memory().text,
 		instruction: function (): TInstructionNode | undefined {
@@ -431,6 +493,11 @@ export default Vue.extend({
 	border-color: #ff5555;
 }
 
+.region.heap {
+	background-color: rgba(249, 225, 179, 0.1);
+	border-color: #f9e1b3;
+}
+
 .region.stack {
 	background-color: rgba(93, 148, 85, 0.1);
 	border-color: #5d9455;
@@ -439,6 +506,21 @@ export default Vue.extend({
 
 .word {
 	height: 22px;
+}
+
+.region.heap .block:not(:first-child) {
+	border-top: 1px dashed #f9e1b3;
+	/* border-bottom: 1px dotted #cccdcd; */
+}
+
+.region.heap .allocated {
+	background: repeating-linear-gradient(
+		135deg,
+		transparent,
+		transparent 10px,
+		rgba(249, 225, 179, 0.05) 10px,
+		rgba(249, 225, 179, 0.05) 20px
+	);
 }
 
 .word-index {
@@ -484,6 +566,10 @@ export default Vue.extend({
 
 .tooltip-box>>>.label-data {
 	color: #ff5555;
+}
+
+.tooltip-box>>>.label-heap {
+	color: #f9e1b3;
 }
 
 .tooltip-box>>>.label-stack {

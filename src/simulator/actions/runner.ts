@@ -7,15 +7,28 @@ import { memory } from "./memory";
 import { interaction } from "./interaction";
 import { cpu } from "./cpu";
 import { snapshots } from "./snapshots";
+import { TAllocation } from "../types";
 
 export const runner = {
   /**
    * 
    */
   run: async function (skipToSleep?: boolean) {
+    if (state.errors.length > 0) {
+      console.log("attempting to show modal");
+      state.vue!.$root.$emit('bv::show::modal', 'errors-modal');
+      return;
+    }
+
     if (!skipToSleep) {
       init.setEntryPoint();
+
+      // reset stack
       memory.setStackHeight(0);
+
+      // reset heap
+      state.memory.heapMap = new Map<number, TAllocation>();
+      memory.setHeapHeight();
     }
 
     state.running = true;

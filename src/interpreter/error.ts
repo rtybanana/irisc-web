@@ -25,7 +25,7 @@ export class IriscError extends Error {
   }
 
   constructHelper() : string {
-    return `${this.lineNumber} : ${this.tokenIndex} ${this.message}`;
+    return `${this.lineNumber + 1} : ${this.message}`;
   }
 }
 

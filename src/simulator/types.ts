@@ -2,7 +2,7 @@ import { IriscError, RuntimeError } from "@/interpreter/error";
 import { TInstructionNode } from '@/syntax/types';
 import { Queue } from '@/utilities';
 
-type TAllocation = {
+export type TAllocation = {
 	size: number;
 	allocated: boolean;
 }
@@ -24,7 +24,7 @@ type TMemory = {
   dataHeight: number;
   dataMap: Record<string, number>;
   
-  heapMap: Record<number, TAllocation>;
+  heapMap: Map<number, TAllocation>;
   heapHeight: number;
 
   stackHeight: number;
@@ -63,5 +63,6 @@ export type TSimulatorState = TSimulatorStateBase & {
   breakpoints: TInstructionNode[];
   hoveredError: IriscError | null;
 
-  snapshots: Queue<TSimulatorSnapshot>
+  snapshots: Queue<TSimulatorSnapshot>;
+  vue: Vue | undefined;
 }

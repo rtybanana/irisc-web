@@ -155,6 +155,30 @@
       </div>
     </b-modal>
     
+    <b-modal
+			ref="errors"
+      id="errors-modal"
+      hide-header 
+      hide-footer
+      centered
+      body-class="irisc-modal p-1"
+		>
+      <template #default="{ hide }">
+        This code has errors!
+
+        <div class="mt-3 ml-5">
+          <div v-for="(summary, index) in errorSummary" :key="index">
+            {{ summary }}
+          </div>
+        </div>
+
+        <div class="text-center mt-4 mb-2">
+          <b-button @click="hide">
+            fix
+          </b-button>
+        </div>
+      </template>
+    </b-modal>
   </div>
 </template>
 
@@ -196,6 +220,9 @@ export default Vue.extend({
     memory: SimulatorState.memory,
     breakpoints: SimulatorState.breakpoints,
     errors: SimulatorState.errors,
+    errorSummary: function (): string[] {
+      return this.errors.map(e => `${e.constructHelper()}`)
+    },
     
     running: SimulatorState.running,
     paused: SimulatorState.paused,
@@ -338,6 +365,8 @@ export default Vue.extend({
 
   created: function () {
     SimulatorState.init();
+    SimulatorState.setVueInstance(this)
+
     this.env = (localStorage.getItem('environment') as EnvironmentType) ?? EnvironmentType.TERMINAL;
     
     window.addEventListener("resize", this.windowSizeListener);

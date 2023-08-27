@@ -16,6 +16,7 @@ export const getters = {
 
   byteView: () => state.memory.observableByteView,
   wordView: () => state.memory.observableWordView,
+  heapBase: () => state.memory.textHeight + state.memory.dataHeight,
 
   // currentInstruction: () => actions.instruction(data.previousPC),
   currentInstruction: () => state.currentInstruction,

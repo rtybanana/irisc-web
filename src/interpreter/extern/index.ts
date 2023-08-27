@@ -5,7 +5,7 @@ import { TInstructionNode } from "@/syntax/types";
 import { printf } from './printf';
 import { putchar } from "./putchar";
 import { puts } from './puts';
-// import { malloc } from './malloc';
+import { malloc, free } from './allocation';
 
 /**
  * Randomises the scratch registers to demonstrate that the contents of these
@@ -20,10 +20,15 @@ export function randomiseScratch() {
 }
 
 export function executeCall(instruction: TInstructionNode, call: Call) : boolean {
+
+  // output
   if (call === Call.PUTCHAR) return putchar();
   if (call === Call.PUTS) return puts();
   if (call === Call.PRINTF) return printf();
-  // if (call === Call.MALLOC) return malloc();
+
+  // allocation
+  if (call === Call.MALLOC) return malloc();
+  if (call === Call.FREE) return free();
 
   throw new RuntimeError("Attempted to branch to unrecognised function call. This is likely an error with iRISC. Please inform the developers.", instruction.statement, instruction.lineNumber)
 }

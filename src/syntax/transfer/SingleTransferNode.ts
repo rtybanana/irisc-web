@@ -25,7 +25,7 @@ export class SingleTransferNode extends TransferNode {
   get isReg() : boolean { return typeof this._Rn === 'number'; }
   get isLiteral() : boolean { return typeof this._Rn === 'string'; }
   get literal() : string { 
-    if (!this.isLiteral) throw new ReferenceError("Tried to access reference where there was none. Contact the developer.", this.statement, this.lineNumber, -1);
+    if (!this.isLiteral) throw new ReferenceError("Tried to access reference where there was none. Contact the developer at contact@polysoftit.co.uk.", this.statement, this.lineNumber, -1);
     return this._Rn as string;
   }
 

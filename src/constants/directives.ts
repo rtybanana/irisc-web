@@ -11,14 +11,19 @@ export const directiveMap: Record<string, Directive> = {
 }
 
 export enum Call {
-  PUTCHAR, PUTS, PRINTF, MALLOC
+  // stdout
+  PUTCHAR, PUTS, PRINTF, 
+  
+  // allocation
+  MALLOC, FREE
 }
 
 export const callMap: Record<string, Call> = {
   "putchar": Call.PUTCHAR,
   "puts": Call.PUTS,
   "printf": Call.PRINTF,
-  "malloc": Call.MALLOC
+  "malloc": Call.MALLOC,
+  "free": Call.FREE
 }
 
 export const callAddress = -4;

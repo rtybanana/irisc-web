@@ -122,9 +122,9 @@ function load(nodes: (SyntaxNode | null)[]) {
   enum Mode { Text, Data }
 
   const instructions: InstructionNode[] = [];
-  const heap = new Uint8Array(new ArrayBuffer(state.memory.size)); 
+  const data = new Uint8Array(new ArrayBuffer(state.memory.size)); 
   let heapHeight: number = 0;
-  const heapMap: Record<string, number> = {};
+  const dataMap: Record<string, number> = {};
 
   let mode: Mode = Mode.Text;
   nodes.forEach((node, index) => {
@@ -142,8 +142,8 @@ function load(nodes: (SyntaxNode | null)[]) {
         SimulatorState.addError(new AssemblyError("Cannot declare data allocations outside of the .data section.", node.statement, node.lineNumber, -1));
       }
 
-      heap.set(node.data, heapHeight);
-      heapMap[node.identifier] = heapHeight; 
+      data.set(node.data, heapHeight);
+      dataMap[node.identifier] = heapHeight; 
       heapHeight = Math.ceil((heapHeight + node.data.length) / 4) * 4;    // new heap height with word alignment 
     }
 
@@ -167,8 +167,20 @@ function load(nodes: (SyntaxNode | null)[]) {
     }
   });
 
+  // pad end with nop
+  if (instructions.length % 2 !== 0) {
+    const nop = "andeq r0, r0, r0";
+    const tokens = parse(nop) as Token[][];
+    console.log(tokens);
+
+    const nopnode = compileOne(tokens[0], -1) as InstructionNode;
+    console.log(nopnode);
+
+    instructions.push(nopnode);
+  }
+
   SimulatorState.setTextHeight(instructions.length * 4);
-  SimulatorState.allocateData(heap, heapHeight, heapMap);
+  SimulatorState.allocateData(data, heapHeight, dataMap);
   SimulatorState.setInstructions(instructions);
   
   // SimulatorState.validate();

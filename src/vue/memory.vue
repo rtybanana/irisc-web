@@ -47,6 +47,29 @@
           </div>
         </div>
 
+        <div 
+          v-if="heapWidth > 0"
+          class="d-flex flex-column sector heap"
+          :style="`width: ${heapWidth}%`"
+        >
+          <div class="label">
+            <span
+              @mouseenter="tip('heap')"
+              @mouseleave="untip"
+              @click="explore('heap')"
+            >
+              heap
+            </span>
+          </div>
+          <div 
+            class="region"
+            @mouseenter="tip('heap')"
+            @mouseleave="untip"
+            @click="explore('heap')"
+          ></div>
+          <div class="placeholder"></div>
+        </div>
+
         <div class="flex-grow-1 sector uninitialised">
           <div 
             class="region"
@@ -190,29 +213,33 @@ export default Vue.extend({
     memory: SimulatorState.memory,
     registers: SimulatorState.registers,
 
-    textWidth: function () : number {
+    textWidth: function (): number {
       return this.memory.textHeight / this.memory.size * 100;
     },
 
-    dataWidth: function () : number {
+    dataWidth: function (): number {
       return this.memory.dataHeight / this.memory.size * 100;
     },
 
-    stackWidth: function () : number {
+    heapWidth: function (): number {
+      return this.memory.heapHeight / this.memory.size * 100;
+    },
+
+    stackWidth: function (): number {
       return this.memory.stackHeight / this.memory.size * 100;
     },
 
-    hoveredSection: function () : string | undefined {
+    hoveredSection: function (): string | undefined {
       return this.tooltip?.name;
     },
 
-    stackPointer: function () : number {
+    stackPointer: function (): number {
       const reversePtr = this.memory.size - this.registers[Register.SP];
       return (reversePtr / this.memory.size) * 100;
     },
 
-    used: function () : number {
-      return this.memory.textHeight + this.memory.dataHeight + this.memory.stackHeight;
+    used: function (): number {
+      return this.memory.textHeight + this.memory.dataHeight + this.memory.heapHeight + this.memory.stackHeight;
     }
   },
   methods: {
@@ -282,6 +309,10 @@ export default Vue.extend({
 .sector.data .label { color: #ff5555; }
 .sector.data .region { border: 1px dashed #ff5555; }
 .sector.data .region:hover { background-color: rgba(255, 85, 85, 0.1); }
+
+.sector.heap .label { color: #f9e1b3; }
+.sector.heap .region { border: 1px dashed #f9e1b3; }
+.sector.heap .region:hover { background-color: rgba(249, 225, 179, 0.1); }
 
 .sector.uninitialised .region:hover { background-color: rgba(100, 100, 100, 0.1);}
 

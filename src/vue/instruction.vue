@@ -50,7 +50,7 @@
       ref="history"
       hide-header 
       hide-footer
-      body-class="irisc-modal history-modal p-1"
+      body-class="irisc-modal p-1"
     >
       <div class="px-4 py-1">
         <h4>state history</h4>

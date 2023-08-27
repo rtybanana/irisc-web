@@ -34,16 +34,12 @@ export default Vue.extend({
 	props: {
 		tooltip: String
 	},
-	data() {
-		return {
-
-		};
-	},
 	computed: {
 		currentTick: SimulatorState.currentTick,
 		running: SimulatorState.running,
 		paused: SimulatorState.paused,
 		delay: SimulatorState.delay,
+		errors: SimulatorState.errors
 	},
 	methods: {
 		run: () => SimulatorState.start(),
