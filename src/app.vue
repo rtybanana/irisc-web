@@ -325,7 +325,6 @@ export default Vue.extend({
       if (e.code === "Period" && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         
-        console.log("keyboard step");
         SimulatorState.stepForward();
       }
 

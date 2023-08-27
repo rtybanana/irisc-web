@@ -416,7 +416,6 @@ function checkStore(address: number, register: Register, instruction: TInstructi
   }
 
   else if (address < state.memory.textHeight || address >= state.memory.size) {
-    console.log(address, state.memory.textHeight, state.memory.size);
     throw new RuntimeError("SIGSEG: Segmentation fault.", instruction.statement, instruction.lineNumber);
   }
 }

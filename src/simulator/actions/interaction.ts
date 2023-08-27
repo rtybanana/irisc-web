@@ -1,10 +1,12 @@
 import { IriscError } from "@/interpreter";
 import { state } from "../state";
-import { TExitStatus } from "../types";
+import { TExitStatus, TSimulatorSnapshot } from "../types";
 import Vue from 'vue';
 import { snapshots } from "./snapshots";
 import { init } from "./init";
 import { runner } from "./runner";
+import { memory } from "./memory";
+import { Queue } from "@/utilities";
 
 export const interaction = {
   start: function () {
@@ -69,11 +71,7 @@ export const interaction = {
   },
 
 	toggleBreakpoint: function (lineNumber: number) {
-    console.log(lineNumber);
-    
-    console.log(state.memory.text);
     let instruction = state.memory.text.find(e => e.lineNumber === lineNumber);
-    console.log(instruction);
 
     if (instruction) {
       let breakpoint = state.breakpoints.find(e => e.lineNumber === instruction?.lineNumber);

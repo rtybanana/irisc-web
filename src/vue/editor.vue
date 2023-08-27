@@ -122,6 +122,7 @@ export default Vue.extend({
     paused: SimulatorState.paused,
     delay: SimulatorState.delay,
     currentInstruction: SimulatorState.currentInstruction,
+    currentTick: SimulatorState.currentTick,
 
     output: SimulatorState.output,
     hasOutput: function () : boolean {
@@ -393,7 +394,7 @@ export default Vue.extend({
      * 
      */
     highlightExecuting: function (lines: string[]) {
-      if (this.running) {
+      if (this.currentInstruction) {
         let executing = lines[this.currentInstruction!.lineNumber];
 
         if (executing !== undefined) {
@@ -559,8 +560,6 @@ export default Vue.extend({
   overflow-x: hidden;
 }
 
-
-
 .controls {
   position: absolute;
   top: 8px;
@@ -614,11 +613,5 @@ export default Vue.extend({
 
 .button.terminal {
   color: #8b0c3c;
-}
-
-.controls >>> .custom-range {
-  height: auto;
-  padding-bottom: 1px;
-  -webkit-padding-after: 2px;
 }
 </style>

@@ -9,8 +9,6 @@ import { TSimulatorSnapshot } from "../../types";
 export const text = {
 	
 	instruction: function (offset: number) : TInstructionNode {
-		console.log("getting instruction at", offset);
-
     if (offset > state.memory.textHeight) {
       throw new RuntimeError(`SIGSEG: Segmentation fault.`, [], -1);
     }

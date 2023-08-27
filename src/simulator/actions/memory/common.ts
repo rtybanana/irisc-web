@@ -8,7 +8,6 @@ import { TSimulatorSnapshot } from "../../types";
 
 export const common = {
 	store: function (toStore: number, address: number, size: TTransferSize) {
-    console.log("storing", toStore, `(${size})`, "at address", address)
     if (size === "word") {
       state.memory.wordView[address / 4] = toStore;
     }

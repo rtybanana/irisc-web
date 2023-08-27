@@ -5,40 +5,34 @@ import { state } from "../state";
 import { init } from "./init";
 import { memory } from "./memory";
 import { interaction } from "./interaction";
+import { cpu } from "./cpu";
+import { snapshots } from "./snapshots";
 
 export const runner = {
   /**
    * 
    */
-  run: async function () {
-    console.log("run!");
-
-    init.setEntryPoint();
-    memory.setStackHeight(0);
+  run: async function (skipToSleep?: boolean) {
+    if (!skipToSleep) {
+      init.setEntryPoint();
+      memory.setStackHeight(0);
+    }
 
     state.running = true;
     try {
-      console.log(state.running);
-
       while(state.running) {
-        console.log("inside while");
+        if (!skipToSleep) {
+          interaction.setStep(false);
+          let node: TInstructionNode = memory.instruction(state.cpu.registers[Register.PC]);
 
-        interaction.setStep(false);
-        console.log(state.step);
+          // if runtime instruction runoff
+          if (node === undefined) {
+            let last: TInstructionNode = state.currentInstruction!;
+            throw new RuntimeError("SIGSEG: Segmentation fault.", last.statement, last.lineNumber);
+          }
 
-        let node: TInstructionNode = memory.instruction(state.cpu.registers[Register.PC]);
-
-        console.log(node);
-
-
-        // if runtime instruction runoff
-        if (node === undefined) {
-          let last: TInstructionNode = state.currentInstruction!;
-          throw new RuntimeError("SIGSEG: Segmentation fault.", last.statement, last.lineNumber);
+          Interpreter.execute(node);
         }
-
-        Interpreter.execute(node);
-        await this.sleep();
 
         // check for bx lr to static exit point (one word after memory.size)
         if (state.cpu.registers[Register.PC] === state.memory.size + 4) {
@@ -51,6 +45,9 @@ export const runner = {
             interaction.pause();
           }
         }
+
+        skipToSleep = false;
+        await this.sleep();
       }
     }
     catch (e) {
@@ -67,8 +64,6 @@ export const runner = {
    * then move return so that the simulator may continue to the next instruction.
    */
   sleep: async function () {
-    console.log("sleep");
-
     let sleptfor: number = 0;
     while ((sleptfor < state.delay || state.paused) && state.running && !state.step) {
       await new Promise(r => setTimeout(r, 10));

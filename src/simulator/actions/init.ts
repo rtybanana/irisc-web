@@ -14,8 +14,6 @@ import { ReferenceError } from "@/interpreter";
 
 export const init = {
 	init: function (memSize?: number) {
-		console.log("initialising...");
-		
 		state.running = false;
 		state.paused = false;
 		state.step = false;
@@ -36,13 +34,21 @@ export const init = {
 		state.exitStatus = undefined;
 
 		state.currentInstruction = undefined;
-
-		state.snapshots = new Queue<TSimulatorSnapshot>(500, true);
-		snapshots.takeSnapshot();
 	},
 
 	initMemory: function (memSize?: number) {
     if (memSize !== undefined) state.memory.size = memSize;
+
+    state.memory.textHeight = 0;
+    state.memory.textMap = {};
+
+    state.memory.dataHeight = 0;
+    state.memory.dataMap = {};
+
+    state.memory.heapHeight = 0;
+    state.memory.heapMap = {};
+
+    state.memory.stackHeight = 0;
     
     state.memory.text = [];
     state.memory.buffer = new ArrayBuffer(state.memory.size);
@@ -53,21 +59,17 @@ export const init = {
     uninitialisedMemory.forEach((byte, address) => {
       state.memory.byteView[address] = byte;
     });
-    
-    state.memory.textHeight = 0;
-    state.memory.dataHeight = 0;
-    state.memory.stackHeight = 0;
-    state.memory.textMap = {};
 
+    // observe memory to make ArrayBuffer views Vue.Observable
+    memory.observeMemory();
+  
     state.errors = [];
     state.exitStatus = undefined;
 
-    memory.observeMemory();
+    state.snapshots = new Queue<TSimulatorSnapshot>(500, true);
   },
 
 	setEntryPoint: function () {
-    console.log(memory.hasLabel("main"));
-
     if (memory.hasLabel("main")) cpu.setRegister(Register.PC, memory.label("main"));
   },
 
@@ -87,6 +89,7 @@ export const init = {
     });
 
     memory.observeMemory();
+    snapshots.takeSnapshot();
   },
 
   addLabel: function (label: string, address: number) {

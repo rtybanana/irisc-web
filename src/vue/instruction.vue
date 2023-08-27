@@ -55,9 +55,10 @@
       <div class="px-4 py-1">
         <h4>state history</h4>
         
-        <div class="mt-3 position-relative">
+        <div class="position-relative mt-3">
           <div 
             v-for="snapshot in snapshots" 
+            :ref="`tick_${snapshot.tick}`"
             class="snapshot fenced clickable mb-4" 
             :class="currentTick === snapshot.tick ? 'current' : 'not-current'"
             @click="reinstate(snapshot.tick)"
@@ -97,9 +98,13 @@
 
           <div class="position-absolute" style="top: 0;">
             <transition name="slide-fade-right">
-              <div v-if="historyShown" class="position-fixed fenced control-box px-1 pb-1">
+              <div v-if="historyShown" class="position-fixed fenced control-box px-1 pb-1 pt-0">
                 <div class="pb-1">debugger</div>
-                <debug class="debugger" :tooltip.sync="debuggerTooltip"></debug>
+
+                <debug 
+                  class="debugger" 
+                  :tooltip.sync="debuggerTooltip"
+                ></debug>
 
                 <div v-show="debuggerTooltip" class="control-tooltip fenced px-1">
                   {{ debuggerTooltip }}
@@ -124,6 +129,7 @@ import { highlight, languages } from 'prismjs';
 import Vue from 'vue';
 import { BModal } from 'bootstrap-vue';
 import debug from "./debug.vue";
+import { nextTick } from 'vue/types/umd';
 
 /**
  * Extends IExplanation interface to include a portion of the instruction bitcode,
@@ -178,6 +184,8 @@ export default Vue.extend({
     }
   },
   computed: {
+    paused: SimulatorState.paused,
+    delay: SimulatorState.delay,
     currentInstruction: SimulatorState.currentInstruction,
     wasExecuted: SimulatorState.wasExecuted,
     currentTick: SimulatorState.currentTick,
@@ -251,8 +259,31 @@ export default Vue.extend({
 			}, 350);
     },
 
+    scrollToTick(tick: number, behavior: string) {
+      console.log(tick);
+
+      const snapshot = (this.$refs[`tick_${tick}`] as any[])?.[0];
+      if (snapshot) {
+        this.$nextTick(() => {
+          snapshot.scrollIntoView({ behavior, block: "start", inline: "nearest" });
+        });
+      }
+    },
+
     reinstate: function (tick: number) {
       SimulatorState.reinstateSnapshot(tick);
+    }
+  },
+
+  watch: {
+    currentTick: {
+      handler: function (tick: number) {
+        this.$nextTick(() => {
+          const scrollBehaviour = this.paused || this.delay > 100 ? "smooth" : "instant";
+          this.scrollToTick(tick, scrollBehaviour);
+          // console.log(this.$refs[`tick_${tick}`]);
+        });
+      }
     }
   }
 })
@@ -268,6 +299,7 @@ export default Vue.extend({
 
 .fenced {
   border: 1px dashed #cccdcd;
+  padding: 0.25rem 0.5rem;
 }
 
 .section {
@@ -319,8 +351,8 @@ export default Vue.extend({
 }
 
 .snapshot {
-  padding: 0.25rem 0.5rem;
   position: relative;
+  scroll-margin: 83px;
 }
 
 .snapshot:hover .reinstate {
@@ -367,7 +399,7 @@ export default Vue.extend({
 	left: -1px;
 	bottom: -27px;
 	background-color: #0d1117;
-  /* padding: 0 0.25rem 0.05rem 0.25rem; */
+  padding: 0 0.25rem;
   font-size: 14px;
 }
 

@@ -1,67 +1,28 @@
 <template>
 	<div class="d-inline-block">
-		<i 
-			class="button red fas fa-stop mr-1 clickable" 
-			@click="stop"
-			@mouseenter="tip('stop')"
-			@mouseleave="tip(undefined)"
-		></i>
+		<i class="button red fas fa-stop mr-1 clickable" @click="stop" @mouseenter="tip('stop')"
+			@mouseleave="tip(undefined)"></i>
 
 		<!-- run / pause / resume -->
 		<template>
-			<i 
-				v-show="!running"
-				class="button green fas fa-play mx-1 clickable" 
-				@click="run"
-				@mouseenter="tip('run')"
-				@mouseleave="tip(undefined)"
-			></i>
-			<i 
-				v-show="running && !paused"
-				class="button fas fa-pause mx-1 clickable" 
-				@click="pause"
-				@mouseenter="tip('pause')"
-				@mouseleave="tip(undefined)"
-			></i>
-			<i 
-				v-show="running && paused"
-				class="button green fas fa-play mx-1 clickable" 
-				@click="resume"
-				@mouseenter="tip('continue')"
-				@mouseleave="tip(undefined)"
-			></i>
+			<i v-show="!running" class="button green fas fa-play mx-1 clickable" @click="run" @mouseenter="tip('run')"
+				@mouseleave="tip(undefined)"></i>
+			<i v-show="running && !paused" class="button fas fa-pause mx-1 clickable" @click="pause" @mouseenter="tip('pause')"
+				@mouseleave="tip(undefined)"></i>
+			<i v-show="running && paused" class="button green fas fa-play mx-1 clickable" @click="resume"
+				@mouseenter="tip('continue')" @mouseleave="tip(undefined)"></i>
 		</template>
 
-		<i 
-			class="button amber step fas fa-step-backward mx-1 clickable"
-			@click="stepBack"
-			@mouseenter="tip('step back (ctrl + <)')"
-			@mouseleave="tip(undefined)"
-		></i>
+		<i class="button amber step fas fa-step-backward mx-1 clickable" @click="stepBack"
+			@mouseenter="tip('step back (ctrl + <)')" @mouseleave="tip(undefined)"></i>
 
-		<i 
-			class="button amber step fas fa-step-forward mx-1 clickable"
-			@click="stepForward"
-			@mouseenter="tip('step (ctrl + >)')"
-			@mouseleave="tip(undefined)"
-		></i>
+		<i class="button amber step fas fa-step-forward mx-1 clickable" @click="stepForward"
+			@mouseenter="tip('step (ctrl + >)')" @mouseleave="tip(undefined)"></i>
 
-		<div class="d-inline-block mx-1" style="width: 60px;">
-			<b-form-input 
-				style="margin-bottom: -5px;" 
-				type="range" 
-				inline
-				:value="1000 / delay"
-				min="0.5"
-				max="100"
-				step="0.1"
-				@input="setDelay"
-				@mouseenter="tip('tick rate')"
-				@mouseleave="tip(undefined)"
-			></b-form-input>
+		<div class="tick-rate d-inline-block mx-1" style="width: 60px;">
+			<b-form-input style="margin-bottom: -5px;" type="range" inline :value="1000 / delay" min="0.5" max="100" step="0.1"
+				@input="setDelay" @mouseenter="tip('tick rate')" @mouseleave="tip(undefined)"></b-form-input>
 		</div>
-
-		<!--  -->
 	</div>
 </template>
 
@@ -75,26 +36,29 @@ export default Vue.extend({
 	},
 	data() {
 		return {
-			
+
 		};
 	},
 	computed: {
+		currentTick: SimulatorState.currentTick,
 		running: SimulatorState.running,
-    paused: SimulatorState.paused,
-    delay: SimulatorState.delay,
+		paused: SimulatorState.paused,
+		delay: SimulatorState.delay,
 	},
 	methods: {
 		run: () => SimulatorState.start(),
-    stop: () => SimulatorState.stop(),
-    pause: () => SimulatorState.pause(),
-    resume: () => SimulatorState.resume(),
-    stepBack: () => SimulatorState.stepBack(),
-    stepForward: () => SimulatorState.stepForward(),
-    reset: () => SimulatorState.reset(),
+		stop: () => SimulatorState.stop(),
 
+		pause: () => SimulatorState.pause(),
+		resume: () => SimulatorState.resume(),
+
+		stepBack: () => SimulatorState.stepBack(),
+		stepForward: () => SimulatorState.stepForward(),
+
+		reset: () => SimulatorState.reset(),
 		setDelay: function (delay: number) {
-      SimulatorState.setDelay(1000 / delay)
-    },
+			SimulatorState.setDelay(1000 / delay)
+		},
 
 		tip(text?: string) {
 			this.$emit('update:tooltip', text);
@@ -105,23 +69,23 @@ export default Vue.extend({
 
 <style scoped>
 .button.red {
-  color: #d9484c;
+	color: #d9484c;
 }
 
 .button.green {
-  color:#1d8f46;
+	color: #1d8f46;
 }
 
 .button.amber {
-  color: #f9e1b3
+	color: #f9e1b3
 }
 
 .button.terminal {
-  color: #8b0c3c;
+	color: #8b0c3c;
 }
 
-.controls >>> .custom-range {
-  height: auto;
-  -webkit-padding-after: 2px;
+.tick-rate>>>.custom-range {
+	height: auto;
+	-webkit-padding-after: 2px;
 }
 </style>

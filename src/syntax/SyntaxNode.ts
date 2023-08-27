@@ -200,7 +200,7 @@ export class SyntaxNode {
   }
 
   /**
-   * This checks a specific edge case where a rotated immediate value is halfway through rolling round
+   * This checks a very specific edge case where a rotated immediate value is halfway through rolling round
    * the corner of the word. For example: 0xf000000f, where the valid 8-bit number 0xff has been rotated
    * by the equally valid value 4, but the immediate representation is disallowed because the distance
    * between the maximum set-bit (31) and the minimum set-bit (0) is greater than 8.

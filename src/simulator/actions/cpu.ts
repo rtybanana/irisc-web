@@ -10,7 +10,6 @@ export const cpu = {
   },
 	
   setRegister: function (register: Register, value: number) {
-    console.log("setting register", register, value);
     if (register === Register.PC) {
       state.previousPC = state.cpu.registers[Register.PC];
       state.currentInstruction = memory.instruction(state.cpu.registers[Register.PC]);
