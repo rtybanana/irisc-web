@@ -126,11 +126,11 @@ This is an example of how to list things you need to use the software and how to
 <!-- ROADMAP -->
 ## Roadmap
 
-- [ ] Memory visualiser
-  - [ ] Usage overview
+- [x] Memory visualiser
+  - [x] Usage overview
     - [x] Text
     - [x] Data
-    - [ ] Heap
+    - [x] Heap
     - [x] Stack
   - [x] Data explorer (byte view)
 - [ ] Assembly visualiser
@@ -139,13 +139,17 @@ This is an example of how to list things you need to use the software and how to
   - [x] Snapshot history modal
   - [x] Ability to reinstate old simulator states (go backwards)
 - [ ] Support for external C stdlib and stdio calls
-  - [x] putchar()
-  - [x] puts()
-  - [ ] printf() 
-    - [x] Support for %c, %d and %c
+  - [x] `putchar()`
+  - [x] `puts()`
+  - [ ] `printf()`
+    - [x] Support for %c, %d and %s
     - [ ] Support for other specifiers
-  - [ ] scanf()
-  - [ ] malloc() and free()
+  - [ ] `scanf()`
+  - [ ] dynamic allocation
+    - [x] `malloc()`
+    - [x] `calloc()`
+    - [ ] `realloc()`
+    - [x] `free()`
 - [ ] Tutorial
   - [x] Introduction
   - [x] Basics (instructions, immediate representation)
