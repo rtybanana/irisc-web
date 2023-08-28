@@ -38,7 +38,7 @@
   <p align="center">
     An interactive web-based ARMv7 assembly language interpreter and computer architecture simulator.
     <br />
-    <a href="https://github.com/rtybanana/irisc-web">Start Now!</a>
+    <a href="https://polysoftit.co.uk/irisc-web/">Start Now!</a>
     ·
     <a href="https://github.com/rtybanana/irisc-web/issues">Report Bug</a>
     ·
