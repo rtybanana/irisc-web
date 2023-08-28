@@ -47,6 +47,9 @@ export const runner = {
           Interpreter.execute(node);
         }
 
+        skipToSleep = false;
+        await this.sleep();
+
         // check for bx lr to static exit point (one word after memory.size)
         if (state.cpu.registers[Register.PC] === state.memory.size + 4) {
           interaction.setExitStatus(0);
@@ -58,9 +61,6 @@ export const runner = {
             interaction.pause();
           }
         }
-
-        skipToSleep = false;
-        await this.sleep();
       }
     }
     catch (e) {

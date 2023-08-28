@@ -87,12 +87,12 @@
             
             <!-- memory write summary -->
             <div v-if="snapshot.memWrite" class="ml-3">
-              bytes written in range: {{ snapshot.memWrite.base }} - {{ snapshot.memWrite.limit }}
+              bytes <u>written</u> in range: {{ snapshot.memWrite.base }} - {{ snapshot.memWrite.limit }}
             </div>
 
             <!-- memory read summary -->
             <div v-if="snapshot.memRead" class="ml-3">
-              bytes read in range: {{ snapshot.memRead.base }} - {{ snapshot.memRead.limit }}
+              bytes <u>read</u> in range: {{ snapshot.memRead.base }} - {{ snapshot.memRead.limit }}
             </div>
           </div>
 

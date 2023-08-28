@@ -1,23 +1,23 @@
 <template>
 	<div class="d-inline-block">
-		<i class="button red fas fa-stop mr-1 clickable" @click="stop" @mouseenter="tip('stop')"
+		<i class="button red fas fa-stop mr-1 clickable" @click="stop" @mouseenter="tip('stop  (ctrl + ↑)')"
 			@mouseleave="tip(undefined)"></i>
 
 		<!-- run / pause / resume -->
 		<template>
-			<i v-show="!running" class="button green fas fa-play mx-1 clickable" @click="run" @mouseenter="tip('run')"
+			<i v-show="!running" class="button green fas fa-play mx-1 clickable" @click="run" @mouseenter="tip('run (ctrl + ↓)')"
 				@mouseleave="tip(undefined)"></i>
-			<i v-show="running && !paused" class="button fas fa-pause mx-1 clickable" @click="pause" @mouseenter="tip('pause')"
+			<i v-show="running && !paused" class="button fas fa-pause mx-1 clickable" @click="pause" @mouseenter="tip('pause (ctrl + ↓)')"
 				@mouseleave="tip(undefined)"></i>
 			<i v-show="running && paused" class="button green fas fa-play mx-1 clickable" @click="resume"
-				@mouseenter="tip('continue')" @mouseleave="tip(undefined)"></i>
+				@mouseenter="tip('continue (ctrl + ↓)')" @mouseleave="tip(undefined)"></i>
 		</template>
 
 		<i class="button amber step fas fa-step-backward mx-1 clickable" @click="stepBack"
-			@mouseenter="tip('step back (ctrl + <)')" @mouseleave="tip(undefined)"></i>
+			@mouseenter="tip('step back (ctrl + ←)')" @mouseleave="tip(undefined)"></i>
 
 		<i class="button amber step fas fa-step-forward mx-1 clickable" @click="stepForward"
-			@mouseenter="tip('step (ctrl + >)')" @mouseleave="tip(undefined)"></i>
+			@mouseenter="tip('step (ctrl + →)')" @mouseleave="tip(undefined)"></i>
 
 		<div class="tick-rate d-inline-block mx-1" style="width: 60px;">
 			<b-form-input style="margin-bottom: -5px;" type="range" inline :value="1000 / delay" min="0.5" max="100" step="0.1"

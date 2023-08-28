@@ -234,7 +234,7 @@ export default Vue.extend({
 					`
 				},
 				text: {
-					title: `the <span class="label-text">text</span> section`,
+					title: `<span class="label-text">text</span>`,
 					detail: // html
 					`\
 						This region, situated in the lowest addresses of the program's virtual address space, contains the machine code\
@@ -245,7 +245,7 @@ export default Vue.extend({
 					`
 				},
 				data: {
-					title: `the <span class="label-data">data</span> section`,
+					title: `<span class="label-data">data</span>`,
 					detail: // html
 					`\
 						This region, which immediately follows the <span class="label-text">text</span> region, contains all static data\
@@ -260,7 +260,7 @@ export default Vue.extend({
 					`
 				},
 				heap: {
-					title: `the <span class="label-heap">heap</span>`,
+					title: `<span class="label-heap">heap</span>`,
 					detail: // html
 					`\
 						This region is the <span class="label-heap">heap</span> and contains data which has been dynamically allocated during the execution of your program.
@@ -279,7 +279,7 @@ export default Vue.extend({
 					`
 				},
 				stack: {
-					title: `the <span class="label-stack">stack</span>`,
+					title: `<span class="label-stack">stack</span>`,
 					detail: // html
 					`\
 						The stack is located in the highest addressess of the owning program's virtual address space. As items are pushed onto\

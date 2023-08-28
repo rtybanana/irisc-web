@@ -15,7 +15,7 @@ export enum Call {
   PUTCHAR, PUTS, PRINTF, 
   
   // allocation
-  MALLOC, FREE
+  MALLOC, CALLOC, FREE
 }
 
 export const callMap: Record<string, Call> = {
@@ -23,6 +23,7 @@ export const callMap: Record<string, Call> = {
   "puts": Call.PUTS,
   "printf": Call.PRINTF,
   "malloc": Call.MALLOC,
+  "calloc": Call.CALLOC,
   "free": Call.FREE
 }
 

@@ -70,7 +70,10 @@
           <div class="placeholder"></div>
         </div>
 
-        <div class="flex-grow-1 sector uninitialised">
+        <div 
+          class="d-flex flex-column sector uninitialised"
+          :style="`width: ${uninitWidth}%`"
+        >
           <div 
             class="region"
             @mouseenter="tip('uninitialised')"
@@ -223,6 +226,10 @@ export default Vue.extend({
 
     heapWidth: function (): number {
       return this.memory.heapHeight / this.memory.size * 100;
+    },
+
+    uninitWidth: function (): number {
+      return 100 - this.textWidth - this.dataWidth - this.heapWidth - this.stackWidth;
     },
 
     stackWidth: function (): number {

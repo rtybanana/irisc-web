@@ -394,7 +394,7 @@ export default Vue.extend({
      * 
      */
     highlightExecuting: function (lines: string[]) {
-      if (this.currentInstruction) {
+      if (this.running && this.currentInstruction) {
         let executing = lines[this.currentInstruction!.lineNumber];
 
         if (executing !== undefined) {

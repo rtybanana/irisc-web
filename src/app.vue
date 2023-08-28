@@ -349,16 +349,31 @@ export default Vue.extend({
     keyListener: function (e: KeyboardEvent) {
       if (this.env !== EnvironmentType.EDITOR) return;
 
-      if (e.code === "Period" && (e.ctrlKey || e.metaKey)) {
+      if (e.code === "ArrowDown" && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         
+        if (!this.running) {
+          SimulatorState.start();
+        }
+        else {
+          if (this.paused) SimulatorState.resume();
+          else SimulatorState.pause();
+        }
+      }
+
+      else if (e.code === "ArrowUp" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        SimulatorState.stop();
+      }
+
+      else if (e.code === "ArrowRight" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
         SimulatorState.stepForward();
       }
 
-      else if (e.code === "Comma" && (e.ctrlKey || e.metaKey)) {
+      else if (e.code === "ArrowLeft" && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
-        
-        SimulatorState.reinstateSnapshot(this.currentTick - 1);
+        SimulatorState.stepBack();
       }
     }
   },

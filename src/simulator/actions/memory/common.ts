@@ -5,6 +5,7 @@ import { TInstructionNode } from "@/syntax/types";
 import { Register, TTransferSize, addressModeGroup } from "@/constants";
 import { TransferNode, BlockTransferNode, SingleTransferNode } from "@/syntax";
 import { TSimulatorSnapshot } from "../../types";
+import { TByteRange } from "@/explainer/types";
 
 export const common = {
   align(size: number): number {
@@ -27,7 +28,7 @@ export const common = {
     state.memory.observableWordView = Array.from(state.memory.wordView);
   },
 
-	getMemoryAccessRange: function (transfer: TransferNode, snapshot?: TSimulatorSnapshot) {
+	getMemoryAccessRange: function (transfer: TransferNode, snapshot?: TSimulatorSnapshot): TByteRange | undefined {
     if (!snapshot) {
       snapshot = state as TSimulatorSnapshot;
     }

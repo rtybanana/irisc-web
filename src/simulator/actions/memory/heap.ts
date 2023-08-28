@@ -38,11 +38,18 @@ export const heap = {
 
 		// if a free block exists that can hold $size, split the block
 		// else allocate to the top of the heap
-		if (ptr) splitBlock(ptr, size);
-		else ptr = allocate(getters.heapBase() + state.memory.heapHeight, size);
+		if (ptr) {
+			splitBlock(ptr, size);
+		}
+		else {
+			ptr = allocate(getters.heapBase() + state.memory.heapHeight, size);
+		}
 
-		// set bytes in allocated range to 0
-		clear(ptr, size);
+		// if allocation succeeded, set bytes in allocated range to 0
+		if (ptr !== 0) {
+			clear(ptr, size);
+			memory.observeMemory();
+		}
 
 		return ptr;
 	},
