@@ -14,9 +14,9 @@ import { ReferenceError } from "@/interpreter";
 
 export const init = {
 	init: function (memSize?: number) {
-		// state.running = false;
-		// state.paused = false;
-		// state.step = false;
+		state.running = false;
+		state.paused = false;
+		state.step = false;
 
 		this.initMemory(memSize);
 		this.reset();
@@ -27,10 +27,6 @@ export const init = {
   },
 
 	reset: function () {
-    state.running = false;
-		state.paused = false;
-		state.step = false;
-
 		state.cpu.registers = new Uint32Array(new ArrayBuffer(4 * 16));
 		cpu.setRegister(Register.SP, state.memory.size);
 		cpu.setRegister(Register.LR, state.memory.size + 4);    // one word after total memory

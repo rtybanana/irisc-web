@@ -164,17 +164,9 @@ export default Vue.extend({
     },
 
     execute: function (input: string) {
+      if (this.specialInput(input)) return;
+
       try {
-        if (input === ":reset" || input === ":r") {
-          SimulatorState.reset();
-          return;
-        }
-
-        if (input === ":clear" || input === ":c") {
-          this.output = replWelcome;
-          return;
-        }
-
         let line = Assembler.parse(input)[0];
         let node = Assembler.compileOne(line, 0);
 
@@ -193,6 +185,30 @@ export default Vue.extend({
         }
         else throw e;
       }
+    },
+
+    specialInput(input: string) {
+      if ([':reset', ':r'].includes(input)) {
+        SimulatorState.reset();
+        return true;
+      }
+
+      if ([':clear', ':c'].includes(input)) {
+        this.output = replWelcome;
+        return true;
+      }
+
+      if (['vi', 'vim', 'nvim', 'nano', 'ne', 'emacs -nw', 'micro', 'tilde'].includes(input)) {
+        this.$emit('switch');
+        return true;
+      }
+
+      if (input === './program') {
+        SimulatorState.start();
+        return true;
+      }
+
+      return false;
     },
 
     printError: function (e: IriscError) {

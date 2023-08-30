@@ -9,7 +9,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "deploy": "npm run build && push-dir --dir=dist --branch=deploy && git tag v%npm_package_version% && git push origin v%npm_package_version%",
+    "deploy": "npm run build && git tag v%npm_package_version% && git push origin v%npm_package_version% && push-dir --dir=dist --branch=deploy",
     "test": "jest"
   },
   "dependencies": {
@@ -26,6 +26,7 @@
     "prismjs": "^1.29.0",
     "shepherd.js": "^11.1.1",
     "textarea-caret": "^3.1.0",
+    "v-click-outside": "^3.2.0",
     "vue": "^2.6.11",
     "vue-prism-editor": "^1.2.2"
   },

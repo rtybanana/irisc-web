@@ -26,7 +26,7 @@
               <registers style="height: calc(100% - 22px);"></registers>
 
               <div class="d-inline-block float-left mt-1">
-                New here? <a href="#" class="text-white" @click="startTour">Take the tour!</a>
+                New here? <a class="link text-white clickable" @click="startTour">Take the tour!</a>
               </div>
             </div>
             <div class="col-7 col-md-8 col-lg-9 pl-1" style="height: calc(100% - 232px);">

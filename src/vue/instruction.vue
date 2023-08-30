@@ -273,8 +273,6 @@ export default Vue.extend({
     },
 
     scrollToTick(tick: number, behavior: string) {
-      console.log(tick);
-
       const snapshot = (this.$refs[`tick_${tick}`] as any[])?.[0];
       if (snapshot) {
         this.$nextTick(() => {
