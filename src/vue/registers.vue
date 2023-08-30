@@ -4,6 +4,7 @@
     <div 
       v-for="(value, index) in registers" 
       class="register text-truncate"
+      :tour-item="regName[index]"
       @mouseover="registerTip(index)"
       @mouseleave="untip"
       :key="index"

@@ -23,7 +23,11 @@
           </div>
           <div class="row px-0" style="height: calc(100% - 36px);">
             <div class="col-5 col-md-4 col-lg-3 pr-1">
-              <registers></registers>
+              <registers style="height: calc(100% - 22px);"></registers>
+
+              <div class="d-inline-block float-left mt-1">
+                New here? <a href="#" class="text-white" @click="startTour">Take the tour!</a>
+              </div>
             </div>
             <div class="col-7 col-md-8 col-lg-9 pl-1" style="height: calc(100% - 232px);">
               <div class="row px-0 h-100">
@@ -67,8 +71,8 @@
                 </div>
                 <div class="col-6 pl-1 text-left">
                   <h5 class="mb-0 d-inline-block">memory</h5>
-                  <div class="d-inline-block float-right">
-                    created by <a href="https://polysoftit.co.uk/" class="text-white">polysoft it</a>
+                  <div class="d-inline-block float-right mt-1">
+                    created by <a href="https://polysoftit.co.uk/" class="text-white">polysoft it</a> // <a href="https://github.com/rtybanana/irisc-web" class="text-white">src</a>
                   </div>
                 </div>
               </div>
@@ -188,10 +192,14 @@ import { editor, terminal, registers, memory, instruction, tutorial } from "@/vu
 import { SimulatorState } from "@/simulator";
 import { Interpreter, RuntimeError } from '@/interpreter';
 import { Register, EnvironmentType } from "@/constants"
+import { createTour } from './utilities';
 
 import './assets/generic.css';
 import './assets/syntax.css';
+import './assets/shepherd.css';
+
 import { TInstructionNode } from '@/syntax/types';
+import Shepherd from 'shepherd.js';
 
 export default Vue.extend({
   name: 'emulator',
@@ -244,103 +252,17 @@ export default Vue.extend({
       localStorage.setItem('environment', this.env);
     },
 
-    // /**
-    //  * 
-    //  */
-    // start: function () {
-    //   if (this.running) {
-    //     if (!this.step) SimulatorState.resume();
-    //     return;
-    //   }
-      
-    //   // reset emulator state
-    //   SimulatorState.reset();
+    startTour: function () {
+      this.env = EnvironmentType.TERMINAL;
+      createTour().start();
 
-    //   // report errors (alert is temporary)
-    //   if (this.errors.length > 0) {
-    //     alert(`This code has errors!\n\n\t${this.errors.map(e => `${e.constructHelper()}`).join("\n\t")}`);
-    //     return;
-    //   } 
-      
-    //   // run the program
-    //   this.run();
-    // },
-
-    // /**
-    //  * 
-    //  */
-    // run: async function () {
-    //   SimulatorState.setEntryPoint();
-    //   SimulatorState.setStackHeight(0);
-    //   SimulatorState.start();
-
-    //   try {
-    //     while(this.running) {
-    //       SimulatorState.setStep(false);
-    //       let node: TInstructionNode = SimulatorState.instruction(this.registers[Register.PC]);
-
-    //       // if runtime instruction runoff
-    //       if (node === undefined) {
-    //         let last: TInstructionNode = SimulatorState.currentInstruction()!;
-    //         throw new RuntimeError("SIGSEG: Segmentation fault.", last.statement, last.lineNumber);
-    //       }
-
-    //       Interpreter.execute(node);
-    //       await this.sleep();
-
-    //       // check for bx lr to static exit point
-    //       if (this.registers[Register.PC] === this.memory.exitPoint) {
-    //         SimulatorState.setExitStatus(0);
-    //       }
-    //       else {
-    //         // check for breakpoint
-    //         const nextInstruction: TInstructionNode = SimulatorState.instruction(this.registers[Register.PC]);
-    //         if (this.breakpoints.find(e => e.lineNumber === nextInstruction.lineNumber)) {
-    //           SimulatorState.pause();
-    //         }
-    //       }
-    //     }
-    //   }
-    //   catch (e) {
-    //     if (e instanceof RuntimeError) {
-    //       SimulatorState.setExitStatus(e);
-    //     }
-    //   }
-    // },
-
-    // /**
-    //  * Checks every 50ms to see if tick speed (delay) value has changed. If the delay has elapsed
-    //  * then move return so that the simulator may continue to the next instruction.
-    //  */
-    // sleep: async function () {
-    //   let sleptfor: number = 0;
-    //   while ((sleptfor < this.delay || this.paused) && this.running && !this.step) {
-    //     await new Promise(r => setTimeout(r, 10));
-    //     sleptfor += 10;
-    //   }
-
-    //   return;
-    // },
-
-    // /**
-    //  * 
-    //  */
-    // stepForward: function () {
-    //   if (this.running && this.paused) {
-    //     SimulatorState.setStep(true);
-    //     return
-    //   }
-      
-    //   SimulatorState.pause();
-    //   if (!this.running) {
-    //     SimulatorState.reset();
-    //     this.run();
-    //   }
-    // },
-
-    // stepBack: function () {
-    //   SimulatorState.reinstateSnapshot(this.currentTick - 1);
-    // },
+      Shepherd.activeTour?.once(
+        'complete', 
+        () => { 
+          localStorage.setItem('doneTour', 'true');
+          SimulatorState.reset(); 
+        });
+    },
 
     windowSizeListener: function () {
       this.windowSize = window.innerWidth;
@@ -382,14 +304,18 @@ export default Vue.extend({
     SimulatorState.init();
     SimulatorState.setVueInstance(this)
 
-    this.env = (localStorage.getItem('environment') as EnvironmentType) ?? EnvironmentType.TERMINAL;
-    
     window.addEventListener("resize", this.windowSizeListener);
     this.windowSizeListener();
   },
 
   mounted: function () {
     document.addEventListener('keydown', this.keyListener.bind(this));
+
+    let doneTour = localStorage.getItem('doneTour') ?? false;
+    if (!doneTour) this.startTour();
+    else {
+      this.env = (localStorage.getItem('environment') as EnvironmentType) ?? EnvironmentType.TERMINAL;
+    }
   },
 
   beforeDestroy: function () {

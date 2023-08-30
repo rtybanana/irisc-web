@@ -1,11 +1,11 @@
 <template>
-	<div class="d-inline-block">
+	<div tour-item="debugger" class="d-inline-block">
 		<i class="button red fas fa-stop mr-1 clickable" @click="stop" @mouseenter="tip('stop  (ctrl + ↑)')"
 			@mouseleave="tip(undefined)"></i>
 
 		<!-- run / pause / resume -->
 		<template>
-			<i v-show="!running" class="button green fas fa-play mx-1 clickable" @click="run" @mouseenter="tip('run (ctrl + ↓)')"
+			<i v-show="!running" tour-item="debug-run" class="button green fas fa-play mx-1 clickable" @click="run" @mouseenter="tip('run (ctrl + ↓)')"
 				@mouseleave="tip(undefined)"></i>
 			<i v-show="running && !paused" class="button fas fa-pause mx-1 clickable" @click="pause" @mouseenter="tip('pause (ctrl + ↓)')"
 				@mouseleave="tip(undefined)"></i>
@@ -83,5 +83,11 @@ export default Vue.extend({
 .tick-rate>>>.custom-range {
 	height: auto;
 	-webkit-padding-after: 2px;
+}
+</style>
+
+<style>
+.disabled .button {
+	pointer-events: none;
 }
 </style>

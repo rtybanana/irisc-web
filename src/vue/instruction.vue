@@ -1,5 +1,8 @@
 <template>
-  <div class="d-flex flex-column container text-left p-3">
+  <div 
+    tour-item="assembler"
+    class="d-flex flex-column container text-left p-3"
+  >
     <div class="mb-3">
       <span 
         v-for="(section, index) in sections" 
@@ -17,7 +20,11 @@
         </span>
       </span>
 
-      <div class="history clickable" @click="showHistory">
+      <div 
+        tour-item="history" 
+        class="history clickable" 
+        @click="showHistory"
+      >
         <i class="button fas fa-history"></i>
       </div>
     </div>
@@ -48,17 +55,19 @@
 
     <b-modal
       ref="history"
+      id="state-history"
       hide-header 
       hide-footer
       body-class="irisc-modal p-1"
     >
-      <div class="px-4 py-1">
+      <div class="px-4 py-1" tour-item="state-history">
         <h4>state history</h4>
         
         <div class="position-relative mt-3">
           <div 
             v-for="snapshot in snapshots" 
             :ref="`tick_${snapshot.tick}`"
+            :tour-item="`state-history-tick-${snapshot.tick}`"
             class="snapshot fenced clickable mb-4" 
             :class="currentTick === snapshot.tick ? 'current' : 'not-current'"
             @click="reinstate(snapshot.tick)"
@@ -98,7 +107,11 @@
 
           <div class="position-absolute" style="top: 0;">
             <transition name="slide-fade-right">
-              <div v-if="historyShown" class="position-fixed fenced control-box px-1 pb-1 pt-0">
+              <div 
+                v-if="historyShown" 
+                tour-item="state-history-debug"
+                class="position-fixed fenced control-box px-1 pb-1 pt-0"
+              >
                 <div class="pb-1">debugger</div>
 
                 <debug 

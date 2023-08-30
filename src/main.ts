@@ -3,6 +3,8 @@ import app from './app.vue'
 
 import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue'
 
+import 'shepherd.js/dist/css/shepherd.css';
+
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import '@fortawesome/fontawesome-free/css/all.css'

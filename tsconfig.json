@@ -14,7 +14,8 @@
     "types": [
       "webpack-env", 
       "jest",
-      "bootstrap-vue"
+      "bootstrap-vue",
+      "vue-shepherd"
     ],
     "paths": {
       "@/*": [
@@ -38,6 +39,7 @@
     "tests/**/*.ts",
     "tests/**/*.tsx",
     "decs.d.ts", 
+    "vue-shepherd.d.ts",
     "src/assets/printf.js"  
   ],
   "exclude": [

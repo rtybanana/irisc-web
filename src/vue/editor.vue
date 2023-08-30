@@ -2,6 +2,7 @@
   <!-- @click="click" -->
   <div 
     class="prism-container pl-1 pr-0 py-1 position-relative" 
+    tour-item="editor"
     @mouseover="hover"
     @click="click"
     @dblclick="dblclick"
@@ -14,6 +15,7 @@
       :highlight="highlighter" 
       :tab-size="1" 
       :insert-spaces="false" 
+      :readonly="tourActive"
       line-numbers
       @input="save"
     ></prism-editor>
@@ -23,7 +25,7 @@
 
       <i 
         class="button terminal fas fa-terminal ml-1 clickable" 
-        @click="$emit('switch')"
+        @click="!tourActive && $emit('switch')"
         @mouseenter="controlTooltip = 'terminal'"
         @mouseleave="controlTooltip = undefined"
       ></i>
@@ -51,7 +53,7 @@
       </div>
     </div>
 
-    <div class="samples">
+    <div v-show="!tourActive" class="samples">
       <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
         <a v-if="!showFiles" class="link clickable" style="color: #f9e1b3;" @click="showFiles = true">files</a>
         <div v-else>
@@ -79,6 +81,7 @@ import Vue from 'vue';
 import { PrismEditor } from 'vue-prism-editor';
 import 'vue-prism-editor/dist/prismeditor.min.css';
 import debug from './debug.vue';
+import Shepherd from 'shepherd.js';
 
 type TPoint = {
   x: number;
@@ -113,6 +116,7 @@ export default Vue.extend({
         "buggymess.s"
       ],
 
+      tourActive: false,
       controlTooltip: undefined as string | undefined
     }
   },
@@ -123,6 +127,8 @@ export default Vue.extend({
     delay: SimulatorState.delay,
     currentInstruction: SimulatorState.currentInstruction,
     currentTick: SimulatorState.currentTick,
+
+    activeTour: () => !!Shepherd.activeTour,
 
     output: SimulatorState.output,
     hasOutput: function () : boolean {
@@ -485,6 +491,7 @@ export default Vue.extend({
      * Save editor content to local storage so that it persists on this device
      */
     save: debounce((program: string) => {
+      if (Shepherd.activeTour) return;
       localStorage.setItem('program', program);
     }),
 
@@ -512,6 +519,21 @@ export default Vue.extend({
 
     textarea.addEventListener('errorClick', this.moveCaretToCursor);
     textarea.addEventListener('errorDblClick', this.highlightWordAtCursor);
+  },
+
+  updated: function () {
+    if (Shepherd.activeTour && !this.tourActive) {
+      this.tourActive = true;
+      this.loadSampleProgram('helloworld.s');
+
+      Shepherd.activeTour.once(
+        'inactive', 
+        () => {
+          this.tourActive = false;
+          this.load();
+        }
+      );
+    }
   },
 
   /**

@@ -1,0 +1,21 @@
+body .shepherd-content {
+	font-family: 'Ubuntu Mono', monospace;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	background-color: #0d1117;
+	border: 1px dashed #DCDCDC;
+	border-radius: 0;
+}
+
+body .shepherd-text {
+	color: #DCDCDC;
+}
+
+body .shepherd-header {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+body .shepherd-text .text-green {
+	color: #1d8f46;
+}

@@ -30,5 +30,6 @@ export const getters = {
   hoveredError: () => state.hoveredError,
   exitStatus: () => state.exitStatus,
 
-  snapshots: () => state.snapshots
+  snapshots: () => state.snapshots,
+  vue: () => state.vue
 }

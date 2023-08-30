@@ -1,5 +1,9 @@
 <template>
-  <div ref="container" class="container p-2 text-left">
+  <div 
+    ref="container" 
+    tour-item="tutorial"
+    class="container p-2 text-left"
+  >
     <div>
       <div class="title px-1">{{ pageData.title }}</div>
       <div class="content mt-2 mb-5 p-1" v-html="pageData.content"></div>

@@ -11,7 +11,12 @@ body {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
+.text-irisc {
+  color: #e02f72;
+}
+
 body .btn,
+body .shepherd-button,
 body .btn-group-toggle .btn {
   background-color: transparent;
   border: 1px dashed #cccdcd;
@@ -19,6 +24,7 @@ body .btn-group-toggle .btn {
   padding: 0 10px;
 }
 
+body .shepherd-button:active,
 body .btn-secondary:not(:disabled):not(.disabled):active,
 body .btn-secondary:not(:disabled):not(.disabled).active {
   background-color: transparent;
@@ -28,10 +34,12 @@ body .btn-secondary:not(:disabled):not(.disabled).active {
 }
 
 
+body .shepherd-button:active,
 body .btn:active .btn.active {
   background-color: transparent;
 }
 
+body .shepherd-button:focus,
 body .btn:focus, body .btn.focus {
   outline: 0;
   box-shadow: none;
@@ -41,6 +49,7 @@ body .form-group .col-form-label {
   padding-bottom: 0;
 }
 
+body .shepherd-button:not(:disabled):hover,
 body .btn:hover {
   background-color: transparent;
   border: 1px dashed #8b0c3c;

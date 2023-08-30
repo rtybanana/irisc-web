@@ -1,6 +1,7 @@
 <template>
   <div 
     ref="container"
+    tour-item="terminal"
     class="container px-2" 
     @click="focus"
   >
@@ -25,13 +26,14 @@
 
     <!-- environment controls -->
     <div class="controls">
-      <div>
-        <i 
-          class="button code fas fa-code clickable" 
-          @click="$emit('switch')"
-          @mouseenter="controlTooltip = 'editor'"
-          @mouseleave="controlTooltip = undefined"
-        ></i>
+      <div 
+        tour-item="editor-switch"
+        class="clickable"
+        @click="$emit('switch')"
+        @mouseenter="controlTooltip = 'editor'"
+        @mouseleave="controlTooltip = undefined"
+      >
+        <i class="button code fas fa-code"></i>
       </div>
 
       <div v-show="controlTooltip" class="control-tooltip">{{ controlTooltip }}</div>
@@ -69,6 +71,7 @@ export default Vue.extend({
   },
   computed: {
     errors: SimulatorState.errors,
+    currentInstruction: SimulatorState.currentInstruction,
 
     highlitInput: function () : string {
       let line = this.input.replace(/(\r\n|\n|\r)/gm, "");

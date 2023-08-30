@@ -1,5 +1,5 @@
 <template>
-	<b-modal ref="modal" centered hide-header hide-footer body-class="irisc-modal p-1">
+	<b-modal ref="modal" id="memory-explorer" centered hide-header hide-footer body-class="irisc-modal p-1">
 		<div class="px-4 py-1">
 			<h4>memory explorer</h4>
 
@@ -9,7 +9,10 @@
 						<div v-for="(_, index) in memSize / 4" class="word-index" :key="index">{{ index * 4 }}</div>
 					</div>
 
-					<div class="col pl-0">
+					<div 
+						class="col pl-0"
+						tour-item="memory-data"
+					>
 						<div class="position-relative ">
 							<!-- actual data printout -->
 							<div>
@@ -183,6 +186,7 @@ import { TInstructionNode } from '@/syntax/types';
 import debug from './debug.vue';
 import { TAllocation } from '@/simulator/types';
 import clone from "lodash.clonedeep";
+import Shepherd from 'shepherd.js';
 
 type TTip = {
 	title: string;
@@ -396,7 +400,25 @@ export default Vue.extend({
 			setTimeout(() => {
 				v.shown = true;
 			}, 350);
+
+			// Shepherd.activeTour?.on(
+			// 	'hide', 
+			// 	this.onTourComplete
+			// );
 		},
+
+		// onTourComplete: function () {
+		// 	console.log("check memory explorer tour complete");
+
+		// 	if (Shepherd.activeTour?.getCurrentStep()?.id === "memory-data") {
+		// 		(this.$refs.modal as BModal).hide();
+
+		// 		Shepherd.activeTour?.off(
+		// 			'hide', 
+		// 			this.onTourComplete
+		// 		);
+		// 	}
+		// },
 
 		byteValue: function (wordIndex: number, byteIndex: number): number {
 			const index = (wordIndex * 4) + this.endianify(byteIndex);

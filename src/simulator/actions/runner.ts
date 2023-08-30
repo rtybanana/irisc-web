@@ -34,6 +34,8 @@ export const runner = {
     state.running = true;
     try {
       while(state.running) {
+        console.log("running");
+        
         if (!skipToSleep) {
           interaction.setStep(false);
           let node: TInstructionNode = memory.instruction(state.cpu.registers[Register.PC]);

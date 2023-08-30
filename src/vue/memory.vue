@@ -1,7 +1,13 @@
 <template>
-  <div class="d-flex flex-column container text-center p-3">
+  <div 
+    class="d-flex flex-column container text-center p-3"
+    tour-item="memory"
+  >
     <div class="dashed mb-3 px-2 py-1">
-      <div class="d-flex align-items-end position-relative w-100">
+      <div 
+        class="d-flex align-items-end position-relative w-100"
+        tour-item="memory-usage"
+      >
         <div 
           class="d-flex flex-column sector text"
           :style="`width: ${textWidth}%;`"
