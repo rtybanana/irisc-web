@@ -53,19 +53,31 @@
       </div>
     </div>
 
-    <div v-show="!tourActive" class="samples">
-      <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
+    <div v-show="!tourActive" class="files">
+      <files @open="open"></files>
+      <!-- <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
         <a v-if="!showFiles" class="link clickable" style="color: #f9e1b3;" @click="showFiles = true">files</a>
         <div v-else>
-          <div v-for="file in files" :key="file">
-            <a class="link text-white clickable" @click="loadSampleProgram(file)">{{ file }}</a>
-          </div>
+          <template v-if="">
+            <div class="mb-1">
+              /
+            </div>
+
+            <div>
+              <a class="link text-white clickable" @click="changeDirectory('/myfiles/')"><i>myfiles/</i></a>
+            </div>
+
+            <div v-for="file in files" :key="file">
+              <a class="link text-white clickable" @click="loadSampleProgram(file)">{{ file }}</a>
+            </div>
+          </template>
+
 
           <div class="mt-2">
             <a class="link clickable" style="color: #f9e1b3;" @click="showFiles = false">hide</a>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -75,13 +87,16 @@ import { debounce } from "@/assets/functions";
 import { Assembler, IriscError, RuntimeError } from "@/interpreter";
 import { SimulatorState } from "@/simulator";
 import { highlight, languages } from 'prismjs';
-import 'prismjs/themes/prism.css'; // import syntax highlighting styles
-import getCaretCoordinates from "textarea-caret";
-import Vue from 'vue';
 import { PrismEditor } from 'vue-prism-editor';
-import 'vue-prism-editor/dist/prismeditor.min.css';
+import getCaretCoordinates from "textarea-caret";
 import debug from './debug.vue';
+import files from './files.vue';
 import Shepherd from 'shepherd.js';
+import Vue from 'vue';
+
+import 'prismjs/themes/prism.css'; // import syntax highlighting styles
+import 'vue-prism-editor/dist/prismeditor.min.css';
+
 
 type TPoint = {
   x: number;
@@ -98,23 +113,25 @@ export default Vue.extend({
   name: 'editor',
   components: {
     PrismEditor,
-    debug
+    debug,
+    files
   },
   data() {
     return {
       program: '' as string,
       tooltip: { title: '', color: '', message: '' } as TTooltip,
       
-      showFiles: false,
-      files: [
-        "helloworld.s",
-        "typewriter.s",
-        "strlen.s",
-        "recursion.s",
-        "stackoverflow!.s",
-        "bubblesort.s",
-        "buggymess.s"
-      ],
+      // showFiles: false,
+      // directory: '/',
+      // sampleFiles: [
+      //   "helloworld.s",
+      //   "typewriter.s",
+      //   "strlen.s",
+      //   "recursion.s",
+      //   "stackoverflow!.s",
+      //   "bubblesort.s",
+      //   "buggymess.s"
+      // ],
 
       tourActive: false,
       controlTooltip: undefined as string | undefined
@@ -475,17 +492,27 @@ export default Vue.extend({
       }
     },
 
-    loadSampleProgram: function (path: string) {
-      this.stop();
+    // changeDirectory: function (dirPath: string = '/') {
+      
+    // },
 
-      fetch(`samples/${path}`)
-      .then(res => res.text())
-      .then(text => {
-        this.program = text;
-        this.showFiles = false;
-        this.reset();
-      });
+    open: function (text: string) {
+      this.program = text;
+      this.showFiles = false;
+      this.reset();
     },
+
+    // loadSampleProgram: function (path: string) {
+    //   this.stop();
+
+    //   fetch(`samples/${path}`)
+    //   .then(res => res.text())
+    //   .then(text => {
+    //     this.program = text;
+    //     this.showFiles = false;
+    //     this.reset();
+    //   });
+    // },
 
     /**
      * Save editor content to local storage so that it persists on this device
@@ -524,7 +551,14 @@ export default Vue.extend({
   updated: function () {
     if (Shepherd.activeTour && !this.tourActive) {
       this.tourActive = true;
-      this.loadSampleProgram('helloworld.s');
+
+      // this.loadSampleProgram('helloworld.s');
+      fetch('samples/helloworld.s')
+      .then(res => res.text())
+      .then(text => {
+        this.open(text);
+        
+      });
 
       Shepherd.activeTour.once(
         'inactive', 
@@ -614,7 +648,7 @@ export default Vue.extend({
   padding: 0.25rem 0.5rem 0.5rem 0.25rem;
 }
 
-.samples {
+.files {
   position: absolute;
   bottom: 0;
   right: 0;

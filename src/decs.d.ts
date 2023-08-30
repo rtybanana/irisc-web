@@ -1,4 +1,5 @@
 declare module 'textarea-caret';
+declare module 'v-click-outside';
 
 declare global {
 	import Shepherd from 'shepherd.js';
@@ -6,6 +7,7 @@ declare global {
 		Shepherd: Shepherd;
 	}
 }
+
 // declare module 'vue-shepherd';
 
 // declare module 'vue/types/vue' {

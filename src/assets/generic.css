@@ -11,8 +11,12 @@ body {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
+body .text-grey {
+  color: #DCDCDC !important;
+}
+
 .text-irisc {
-  color: #e02f72;
+  color: #e02f72 !important;
 }
 
 body .btn,

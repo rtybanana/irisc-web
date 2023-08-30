@@ -26,7 +26,11 @@
     </div>
 
     <div class="contents">
-      <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
+      <div 
+        class="p-1" 
+        style="border-radius: 0.3rem; background-color: #191d21;"
+        v-click-outside="() => showContents = false"
+      >
         <a v-if="!showContents" class="link clickable" style="color: #f9e1b3;" @click="openContents">contents</a>
         <template v-else>
           <div v-for="contentsLink in contentsSlice" :key="contentsLink.index">
