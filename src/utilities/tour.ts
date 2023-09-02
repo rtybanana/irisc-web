@@ -4,6 +4,7 @@ import { SimulatorState } from '@/simulator';
 import Vue from 'vue';
 import { TInstructionNode } from '@/syntax/types';
 import { Register } from '@/constants';
+import { highlight, languages } from 'prismjs';
 
 
 export function createTour() {
@@ -21,7 +22,10 @@ export function createTour() {
 			},
 			{ 
 				text: "start tour",
-				action: function () { this.next(); } 
+				action: function () { 
+					SimulatorState.reset();
+					this.next(); 
+				} 
 			}
 		]
 	});
@@ -58,10 +62,6 @@ export function createTour() {
 		],
 		when: {
 			show: function () {
-				// const successHtml;
-
-				// const failHtml;
-
 				const currentStep = Shepherd.activeTour?.getCurrentStep();
 				const currentStepElement = currentStep?.getElement();
 				const content = currentStepElement?.querySelector('.shepherd-content');
@@ -70,8 +70,8 @@ export function createTour() {
 				const textEl = document.createElement('div');
 				textEl.className = 'shepherd-text';
 
-				const r1 = SimulatorState.registers()[Register.R1];
-				if (r1 === 1) {
+				
+				if (tourVm.currentInstruction?.text === 'mov r1, #1') {
 					textEl!.innerHTML = // html 
 					`
 						<div>Nice!</div> 
@@ -83,16 +83,33 @@ export function createTour() {
 					`;
 				}
 				else {
-					textEl!.innerHTML = // html 
-					`
-						<div>...</div> 
+					const highlitInstruction = highlight(tourVm.currentInstruction!.text, languages.armv7, 'ARMv7');
+
+					const r1 = SimulatorState.registers()[Register.R1];
+					if (r1 === 1) {
+						textEl!.innerHTML = // html 
+						`
+							<div>${highlitInstruction}?</div> 
+							
+							<div class="mt-3">
+								There's a one in here at least, so that's something.
+							</div>
+						`;
 						
-						<div class="mt-3">
-							Well, that was ${r1} but you tried. Moving on!
-						</div>
-					`;
-					
-					button!.innerText = 'oops';
+						button!.innerHTML = 'your way was boring';
+					}
+					else {
+						textEl!.innerHTML = // html 
+						`
+							<div>...</div> 
+							
+							<div class="mt-3">
+								Guess we'll just use ${highlitInstruction} as our example instead...
+							</div>
+						`;
+						
+						button!.innerText = 'oops';
+					}
 				}
 
 				content?.insertBefore(textEl, content.querySelector('.shepherd-footer'));
@@ -463,7 +480,7 @@ export function createTour() {
 			currentInstruction: function (instruction: TInstructionNode) {
 				if (this.isStep("terminal")) {
 					// 
-					if (instruction?.text.startsWith('mov')) {
+					if (instruction) {
 						tour.next();
 					}
 				}

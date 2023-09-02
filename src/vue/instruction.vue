@@ -292,7 +292,6 @@ export default Vue.extend({
         this.$nextTick(() => {
           const scrollBehaviour = this.paused || this.delay > 100 ? "smooth" : "instant";
           this.scrollToTick(tick, scrollBehaviour);
-          // console.log(this.$refs[`tick_${tick}`]);
         });
       }
     }

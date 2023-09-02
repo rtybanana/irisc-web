@@ -235,7 +235,7 @@ export default Vue.extend({
     },
 
     uninitWidth: function (): number {
-      return 100 - this.textWidth - this.dataWidth - this.heapWidth - this.stackWidth;
+      return Math.max(100 - this.textWidth - this.dataWidth - this.heapWidth - this.stackWidth, 0);
     },
 
     stackWidth: function (): number {

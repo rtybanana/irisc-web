@@ -14,12 +14,27 @@ export const common = {
 
 	store: function (toStore: number, address: number, size: TTransferSize) {
     if (size === "word") {
-      state.memory.wordView[address / 4] = toStore;
+      const buffer = new ArrayBuffer(4);
+      const word = new Uint32Array(buffer);
+      const bytes = new Uint8Array(buffer);
+      word.set([toStore], 0);
+
+      state.memory.byteView.set(bytes, address);
+      // state.memory.wordView[address / 4] = toStore;
     }
     else if (size === "byte") {
       state.memory.byteView[address] = toStore;
     }
 
+    this.observeMemory();
+  },
+
+  storeBytes: function (toStore: number[], ptr: number) {
+    if (ptr + toStore.length > state.memory.size - state.memory.stackHeight) {
+      throw new RuntimeError("SIGSEG: Segmentation fault.", state.currentInstruction!.statement, state.currentInstruction!.lineNumber);
+    }
+
+    state.memory.byteView.set(toStore, ptr);
     this.observeMemory();
   },
 

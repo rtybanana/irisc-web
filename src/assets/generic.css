@@ -41,6 +41,9 @@ body .btn:active .btn.active {
 
 body .shepherd-button:focus,
 body .btn:focus, body .btn.focus {
+  border-style: dashed;
+  border-color: #8b0c3c;
+  color: #8b0c3c;
   outline: 0;
   box-shadow: none;
 }
@@ -57,7 +60,9 @@ body .btn:hover {
   color: #8b0c3c;
 }
 
-
+div.modal .modal-dialog.modal-600 {
+  max-width: 600px !important;
+}
 
 /* transitions */
 .slide-fade-left-enter-active,

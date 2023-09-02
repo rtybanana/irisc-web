@@ -15,7 +15,6 @@ export const runner = {
    */
   run: async function (skipToSleep?: boolean) {
     if (state.errors.length > 0) {
-      console.log("attempting to show modal");
       state.vue!.$root.$emit('bv::show::modal', 'errors-modal');
       return;
     }
@@ -34,8 +33,6 @@ export const runner = {
     state.running = true;
     try {
       while(state.running) {
-        console.log("running");
-        
         if (!skipToSleep) {
           interaction.setStep(false);
           let node: TInstructionNode = memory.instruction(state.cpu.registers[Register.PC]);
@@ -46,7 +43,7 @@ export const runner = {
             throw new RuntimeError("SIGSEG: Segmentation fault.", last.statement, last.lineNumber);
           }
 
-          Interpreter.execute(node);
+          await Interpreter.execute(node);
         }
 
         skipToSleep = false;

@@ -11,21 +11,16 @@ import { memory } from ".";
 export const heap = {
 	malloc: function (size: number): number {
 		size = memory.align(size);
-		console.log("aligned size:", size);
 
 		let ptr = findFirstSpace(size);
-		console.log("ptr of first space", ptr);
-
 
 		// if a free block exists that can hold $size, split the block
 		// else allocate to the top of the heap
 		if (ptr) {
 			ptr = splitBlock(ptr, size);
-			console.log("unallocated block split at ptr:", ptr);
 		}
 		else {
 			ptr = allocate(getters.heapBase() + state.memory.heapHeight, size);
-			console.log("allocated to end of heap at ptr:", ptr);
 		}
 
 		return ptr;
@@ -89,8 +84,6 @@ export const heap = {
 	
 		state.memory.heapHeight = top - state.memory.textHeight - state.memory.dataHeight;
 		state.memory.heapMap = new Map(state.memory.heapMap)
-	
-		console.log("new heap height:", state.memory.heapHeight);
 	}
 }
 
@@ -106,7 +99,6 @@ export const heap = {
  */
 function findFirstSpace(size: number): number | null {
 	let firstPtr: number | null = null;
-	console.log(state.memory.heapMap);
 
 	// find pointer of first available space that is large enough to hold $size
 	for (let [ptr, allocation] of state.memory.heapMap) {
@@ -120,6 +112,7 @@ function findFirstSpace(size: number): number | null {
 	return firstPtr;
 }
 
+// TODO: implement mergeEmptyBlocks()
 function mergeEmptyBlocks() {
 	const orderedBlocks = Array.from(state.memory.heapMap)
 		.sort(([aPtr, _a], [bPtr, _b]) => {
@@ -169,8 +162,6 @@ function splitBlock(ptr: number, size: number): number {
 }
 
 function allocate(ptr: number, size: number, free?: boolean): number {
-	console.log(`allocating ${size} bytes at address: ${ptr}`);
-
 	// if there is no space - return a null (0)
 	if (ptr + size > state.memory.size - state.memory.stackHeight) return 0;
 

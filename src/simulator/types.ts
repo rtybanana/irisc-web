@@ -48,6 +48,7 @@ type TSimulatorStateBase = {
   currentInstruction?: TInstructionNode;
   wasExecuted: boolean;
 
+  stdin?: string;
   output: string[];
   exitStatus: TExitStatus | undefined;
 }
@@ -62,6 +63,8 @@ export type TSimulatorState = TSimulatorStateBase & {
   errors: IriscError[];
   breakpoints: TInstructionNode[];
   hoveredError: IriscError | null;
+
+  interrupted: boolean;
 
   snapshots: Queue<TSimulatorSnapshot>;
   vue: Vue | undefined;

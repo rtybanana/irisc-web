@@ -23,6 +23,9 @@ export const getters = {
   previousPC: () => state.previousPC,
   wasExecuted: () => state.wasExecuted,
 
+  interrupted: () => state.interrupted,
+  stdin: () => state.stdin,
+
   output: () => state.output,
   errors: () => state.errors,
   breakpoints: () => state.breakpoints,

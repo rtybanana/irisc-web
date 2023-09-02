@@ -44,6 +44,9 @@ export const state = Vue.observable<TSimulatorState>({
   currentInstruction: undefined,
   wasExecuted: false,
 
+  stdin: undefined,
+  interrupted: false,
+
   output: [""],
   errors: [],
   breakpoints: [],

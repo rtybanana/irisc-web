@@ -25,12 +25,12 @@ const state = {
  * 
  * @param instruction the instruction to be executed
  */
-export function execute(instruction: TInstructionNode, incPC: boolean = true) : boolean {
+export async function execute(instruction: TInstructionNode, incPC: boolean = true) : Promise<boolean> {
   let executed: boolean = false;
   SimulatorState.setCurrentInstruction(instruction);
 
   if (instruction instanceof BranchNode) {
-    executed = executeBranch(instruction);
+    executed = await executeBranch(instruction);
 
     // only increment to the next instruction if branch didn't already (not executed)
     if (!executed && incPC) SimulatorState.setRegister(Register.PC, state.registers[Register.PC] + 4);
@@ -242,7 +242,7 @@ function executeShift(instruction: ShiftNode) : boolean {
  * @param instruction 
  * @returns 
  */
-function executeBranch(instruction: BranchNode) : boolean {
+async function executeBranch(instruction: BranchNode) : Promise<boolean> {
   const [op, cond, addr] = instruction.unpack();
   if (!SimulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
@@ -251,7 +251,7 @@ function executeBranch(instruction: BranchNode) : boolean {
     address = SimulatorState.label(addr as string);
     if (address === callAddress) {
 
-      let callExecuted = executeCall(instruction, callMap[addr as string]);
+      let callExecuted = await executeCall(instruction, callMap[addr as string]);
       if (callExecuted) {
         // if branch with link, set the link register
         if (op === Operation.BL) {
@@ -434,7 +434,7 @@ export function generateLabelOffset(label: string, instruction: TInstructionNode
     return (state.memory.textMap[label] - state.previousPC) / 4;
   }
 
-  throw new ReferenceError(`Missing reference to '${label}'`, instruction.statement, instruction.lineNumber, -1)
+  throw new ReferenceError(`Missing reference to '${label}'.`, instruction.statement, instruction.lineNumber, -1)
 }
 
 export { state };

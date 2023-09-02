@@ -5,6 +5,8 @@ import { TInstructionNode } from "@/syntax/types";
 import { printf } from './printf';
 import { putchar } from "./putchar";
 import { puts } from './puts';
+import { gets } from './gets';
+import { scanf } from './scanf';
 import { malloc, free, calloc } from './allocation';
 
 /**
@@ -19,12 +21,16 @@ export function randomiseScratch() {
 	SimulatorState.setRegister(Register.R3, Math.floor(Math.random() * randomRange));
 }
 
-export function executeCall(instruction: TInstructionNode, call: Call) : boolean {
+export async function executeCall(instruction: TInstructionNode, call: Call) : Promise<boolean> {
 
-  // output
+  // stdout
   if (call === Call.PUTCHAR) return putchar();
   if (call === Call.PUTS) return puts();
   if (call === Call.PRINTF) return printf();
+
+  // stdin
+  if (call === Call.GETS) return await gets();
+  if (call === Call.SCANF) return await scanf();
 
   // allocation
   if (call === Call.MALLOC) return malloc();
