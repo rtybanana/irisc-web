@@ -155,6 +155,7 @@ This is an example of how to list things you need to use the software and how to
   - [x] Basics (instructions, immediate representation)
   - [ ] Intermediate (loops, conditionals, static allocation)
   - [ ] Advanced (AAPCS, dynamic allocation)
+  - [ ] Challenges and quizzes
 
 See the [open issues](https://github.com/rtybanana/irisc-web/issues) for a full list of proposed features (and known issues).
 
