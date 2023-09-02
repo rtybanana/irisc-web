@@ -34,6 +34,9 @@ export const init = {
 
 		state.cpu.tick = 0;
 		state.cpu.cpsr = Vue.observable([false, false, false, false]);
+
+    state.stdin = undefined;
+    state.interrupted = false;
 		state.output = [""];
 		state.exitStatus = undefined;
 

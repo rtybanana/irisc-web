@@ -7,6 +7,7 @@
     @click="click"
     @dblclick="dblclick"
     @keydown.ctrl.191.capture.prevent.stop="lineComment"
+    @keydown.esc="!tourActive && $emit('switch')"
   >
     <prism-editor 
       ref="prism"
@@ -33,7 +34,7 @@
       <div v-show="controlTooltip" class="control-tooltip">{{ controlTooltip }}</div>
     </div>
 
-    <div class="output">
+    <div class="popup-output">
       <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
         <div v-if="hasOutput">
           <!-- <div style="color: #f9e1b3;">output</div> -->
@@ -47,7 +48,7 @@
           <div>{{ computedTooltip.message }}</div>
         </div>
 
-        <div v-else-if="errors.length > 0">
+        <div v-else-if="errors.length > 0" class="clickable hoverable rounded px-1" @click="run">
           {{ errors.length }} errors
         </div>
       </div>
@@ -75,6 +76,7 @@ import { debounce } from "@/assets/functions";
 import { Assembler, IriscError, RuntimeError } from "@/interpreter";
 import { SimulatorState } from "@/simulator";
 import { highlight, languages } from 'prismjs';
+import { TTooltip } from '@/utilities';
 import 'prismjs/themes/prism.css'; // import syntax highlighting styles
 import getCaretCoordinates from "textarea-caret";
 import Vue from 'vue';
@@ -86,12 +88,6 @@ import Shepherd from 'shepherd.js';
 type TPoint = {
   x: number;
   y: number;
-}
-
-type TTooltip = {
-  title: string;
-  color: string;
-  message: string;
 }
 
 export default Vue.extend({
@@ -127,6 +123,7 @@ export default Vue.extend({
     delay: SimulatorState.delay,
     currentInstruction: SimulatorState.currentInstruction,
     currentTick: SimulatorState.currentTick,
+    interrupted: SimulatorState.interrupted,
 
     activeTour: () => !!Shepherd.activeTour,
 
@@ -144,6 +141,12 @@ export default Vue.extend({
     exitStatus: SimulatorState.exitStatus,
 
     computedTooltip: function () : TTooltip {
+      if (this.interrupted) return {
+        title: 'Interrupted',
+        color: '#7dad7d',
+        message: 'Switch to the terminal to provide input.'
+      }
+
       if (this.tooltip.title !== "") return this.tooltip;
       if (this.exitStatus instanceof RuntimeError) {
         return {
@@ -483,8 +486,23 @@ export default Vue.extend({
       .then(text => {
         this.program = text;
         this.showFiles = false;
+
         this.reset();
+        this.focus();
       });
+    },
+
+    focus: function () {
+      const prismEditor = this.$refs.prism as any;    // casting to any :(
+      const textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
+
+      textarea.focus();
+
+      // // ridiculous necessary hack to prevent all text being selected?
+      // this.$nextTick(() => {
+      //   window.getSelection()?.removeAllRanges();
+      //   document.getSelection()?.empty();
+      // });
     },
 
     /**
@@ -534,6 +552,10 @@ export default Vue.extend({
         }
       );
     }
+  },
+
+  activated: function () {
+    this.focus();
   },
 
   /**
@@ -606,7 +628,7 @@ export default Vue.extend({
   opacity: 1;
 }
 
-.output {
+.popup-output {
   /* width: 100%; */
   max-width: 600px;
   position: absolute;

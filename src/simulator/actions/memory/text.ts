@@ -15,8 +15,6 @@ export const text = {
   },
 
   setInstructions: function (instructions: TInstructionNode[]) {
-    console.log("set instructions");
-
     state.memory.text = instructions;
     this.validate();
 
@@ -28,7 +26,7 @@ export const text = {
         state.memory.wordView.set([deccode], index);
       }
       catch (e) { 
-        console.log("skipping instruction");
+        console.warn(`skipping instruction: ${instruction.lineNumber} : ${instruction.text}`);
       }
     });
 
@@ -73,19 +71,19 @@ export const text = {
     state.memory.text.forEach(ins => {
       if (ins instanceof LabelNode) {
         if (state.memory.textMap[ins.identifier] === undefined) {
-          interaction.addError(new ReferenceError(`Missing reference to '${ins.identifier}'`, ins.statement, ins.lineNumber, 1));
+          interaction.addError(new ReferenceError(`Missing reference to '${ins.identifier}'.`, ins.statement, ins.lineNumber, 1));
         }
       }
       else if (ins instanceof BranchNode) {
         if (typeof ins.Rd === 'string') {
           if (state.memory.textMap[ins.Rd] === undefined) {
-            interaction.addError(new ReferenceError(`Missing reference to '${ins.Rd}'`, ins.statement, ins.lineNumber, 1));
+            interaction.addError(new ReferenceError(`Missing reference to '${ins.Rd}'.`, ins.statement, ins.lineNumber, 1));
           }
         }
       }
       else if (ins instanceof SingleTransferNode && ins.isLiteral) {
         if (state.memory.dataMap[ins.literal] === undefined) {
-          interaction.addError(new ReferenceError(`Missing reference to '${ins.literal}'`, ins.statement, ins.lineNumber, 3));
+          interaction.addError(new ReferenceError(`Missing reference to '${ins.literal}'.`, ins.statement, ins.lineNumber, 3));
         }
       }
     });

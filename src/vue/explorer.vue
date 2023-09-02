@@ -400,25 +400,7 @@ export default Vue.extend({
 			setTimeout(() => {
 				v.shown = true;
 			}, 350);
-
-			// Shepherd.activeTour?.on(
-			// 	'hide', 
-			// 	this.onTourComplete
-			// );
 		},
-
-		// onTourComplete: function () {
-		// 	console.log("check memory explorer tour complete");
-
-		// 	if (Shepherd.activeTour?.getCurrentStep()?.id === "memory-data") {
-		// 		(this.$refs.modal as BModal).hide();
-
-		// 		Shepherd.activeTour?.off(
-		// 			'hide', 
-		// 			this.onTourComplete
-		// 		);
-		// 	}
-		// },
 
 		byteValue: function (wordIndex: number, byteIndex: number): number {
 			const index = (wordIndex * 4) + this.endianify(byteIndex);

@@ -27,6 +27,38 @@ export class IriscError extends Error {
   constructHelper() : string {
     return `${this.lineNumber + 1} : ${this.message}`;
   }
+
+  constructHelperHTML() : string {
+    const lineContent = this.statement
+      .map((token, index) => {
+        let content = `
+          <span 
+            class="token ${token.alias} ${token.type} ${index === this.tokenIndex ? 'error' : ''}"
+            style="text-decoration-color: ${this.color}"
+          >
+            ${token.content}
+          </span>
+        `;
+
+        if (!(index === 0 || token.type === 'comma')) return ` ${content}`
+        return content;
+      })
+      .join("");
+
+    return ` 
+      <div style="color: ${this.color}">${this.type}</div>
+      <div>${this.message}</div>
+      ${
+        lineContent 
+          ? `
+            <div class="ml-4">
+              ${this.lineNumber + 1} : ${lineContent}
+            </div>
+          `
+          : ''
+      }
+    `;
+  }
 }
 
 /**

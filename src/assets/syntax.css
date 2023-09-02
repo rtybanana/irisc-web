@@ -57,21 +57,32 @@ body .token.string {
 body .token.error,
 body .line.error {
 	text-decoration: underline wavy 1px;
-	border-radius: 0.15rem;
-	pointer-events: auto;
-	cursor: help;
-	user-select: none;
 }
 
-body .token.error:hover,
-body .line.error:hover {
+body .prism-editor__editor .error,
+body .prism-editor__editor .line.error {
+	user-select: none;
+	border-radius: 0.15rem;
+	pointer-events: auto;
+}
+
+body .prism-editor__editor .error:hover,
+body .prism-editor__editor .line.error:hover {
 	background-color: rgba(240, 128, 128, 0.5);
+	cursor: help;
 }
 
 body .line.executing {
 	border-radius: 0.15rem;
 	background-color: rgba(255, 255, 255, 0.2);
 	padding-right: 0.25rem;
+}
+
+body .line.executing.interrupted {
+	background-color: rgba(180, 255, 180, 0.2);
+	pointer-events: auto;
+	cursor: help;
+	user-select: none;
 }
 
 body .line.breakpoint {
@@ -115,4 +126,8 @@ body .line.breakpoint {
 .prism-editor-wrapper .prism-editor__textarea {
 	overflow: hidden;
 	white-space: pre;
+}
+
+.prism-editor-wrapper .prism-editor__line-numbers {
+	height: auto;
 }

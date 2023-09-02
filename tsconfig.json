@@ -6,6 +6,7 @@
     "jsx": "preserve",
     "importHelpers": true,
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -40,7 +41,8 @@
     "tests/**/*.tsx",
     "decs.d.ts", 
     "vue-shepherd.d.ts",
-    "src/assets/printf.js"  
+    "src/assets/scanf/scanf.js",
+    "src/assets/printf/printf.js"  
   ],
   "exclude": [
     "node_modules"

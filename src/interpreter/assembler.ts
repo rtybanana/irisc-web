@@ -2,7 +2,7 @@ import { SimulatorState } from '@/simulator';
 import { AllocationNode, BiOperandNode, BlockTransferNode, BranchNode, DirectiveNode, InstructionNode, LabelNode, ShiftNode, SingleTransferNode, SyntaxNode, TriOperandNode } from '@/syntax';
 import { languages, Token, tokenize } from 'prismjs';
 import { AssemblyError, IriscError, SyntaxError } from './error';
-import { callAddress } from '@/constants';
+import { Directive, callAddress } from '@/constants';
 
 const state = {
   get memory() { return SimulatorState.memory(); }
@@ -129,11 +129,27 @@ function load(nodes: (SyntaxNode | null)[]) {
   let mode: Mode = Mode.Text;
   nodes.forEach((node, index) => {
     if (node instanceof DirectiveNode) {
-      if (node.isText) mode = Mode.Text;
-      if (node.isData) mode = Mode.Data;
-      if (node.isExtern) {
-        SimulatorState.addLabel(node.identifier!, callAddress);
+      switch (node.directive) {
+        case Directive.TEXT:
+          mode = Mode.Text;
+          break;
+        case Directive.DATA:
+          mode = Mode.Data;
+          break;
+        case Directive.EXTERN:
+          SimulatorState.addLabel(node.identifier!, callAddress);
+          break;
+        case Directive.BALIGN:
+          // align current heap height to next multiple of .balign parameter
+          heapHeight = Math.ceil(heapHeight / node.value) * node.value;
+          break;
       }
+      // if (node.isText) mode = Mode.Text;
+      // if (node.isData) mode = Mode.Data;
+      // if (node.isExtern) {
+      //   SimulatorState.addLabel(node.identifier!, callAddress);
+      // }
+      // if
     }
 
     // TODO: memory allocation validation
@@ -142,9 +158,14 @@ function load(nodes: (SyntaxNode | null)[]) {
         SimulatorState.addError(new AssemblyError("Cannot declare data allocations outside of the .data section.", node.statement, node.lineNumber, -1));
       }
 
+      if (SimulatorState.hasLabel(node.identifier) || dataMap[node.identifier] !== undefined) {
+        SimulatorState.addError(new AssemblyError(`Cannot declare multiple labels with the same name: '${node.identifier}'.`, node.statement, node.lineNumber, -1));
+      }
+
       data.set(node.data, heapHeight);
       dataMap[node.identifier] = heapHeight; 
-      heapHeight = Math.ceil((heapHeight + node.data.length) / 4) * 4;    // new heap height with word alignment 
+      // heapHeight = Math.ceil((heapHeight + node.data.length) / 4) * 4;    // new heap height with word alignment 
+      heapHeight = heapHeight + node.data.length;
     }
 
     else if (node instanceof LabelNode) {
@@ -152,7 +173,7 @@ function load(nodes: (SyntaxNode | null)[]) {
         SimulatorState.addError(new AssemblyError("Cannot declare branchable labels outside of the .text section.", node.statement, node.lineNumber, 0));
       }
 
-      if (SimulatorState.hasLabel(node.identifier)) {
+      if (SimulatorState.hasLabel(node.identifier) || dataMap[node.identifier] !== undefined) {
         SimulatorState.addError(new AssemblyError(`Cannot declare multiple labels with the same name: '${node.identifier}'.`, node.statement, node.lineNumber, 0));
       }
       else SimulatorState.addLabel(node.identifier, instructions.length * 4);
@@ -171,17 +192,14 @@ function load(nodes: (SyntaxNode | null)[]) {
   if (instructions.length % 2 !== 0) {
     const nop = "andeq r0, r0, r0";
     const tokens = parse(nop) as Token[][];
-    console.log(tokens);
-
+    
     const nopnode = compileOne(tokens[0], -1) as InstructionNode;
-    console.log(nopnode);
-
     instructions.push(nopnode);
   }
 
   SimulatorState.setTextHeight(instructions.length * 4);
   SimulatorState.allocateData(data, heapHeight, dataMap);
-  SimulatorState.setInstructions(instructions);
+  SimulatorState.setInstructions(instructions);  
   
   // SimulatorState.validate();
   // SimulatorState.setTextSection(instructions);
