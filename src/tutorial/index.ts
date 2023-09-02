@@ -18,12 +18,11 @@ export const tutorialPages = chapters
 
 export const contentsPage = tutorialPages
   .map((page, index) => {
+    let matches = [...page.title.matchAll(/([\d-]+)(?::\s)(.*)/g)][0];
     let chapter = chapters.findIndex(e => e.includes(page));
-    let pageNum = /(?:(?<=\s))(.+)(?=:)/.exec(page.title)!;
-    let pageName = /(?:(?<=: ))(.*)/.exec(page.title)!;
 
     let contentsLink: TContentsLink = {
-      title: `${chapter}-${pageNum[0]} ${pageName[0]}`,
+      title: `${chapter}-${matches[1]} ${matches[2]}`,
       index: index
     };
 
