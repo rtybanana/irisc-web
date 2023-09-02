@@ -1,7 +1,7 @@
 import { Register } from "@/constants";
 import { SimulatorState } from "@/simulator";
 import { state } from "@/interpreter/interpreter";
-import { printf as cprintf, getTokens} from "@/assets/printf";
+import { printf as cprintf, getTokens} from "@/assets/printf/printf";
 import { RuntimeError } from "@/interpreter";
 import { randomiseScratch } from ".";
 
@@ -23,11 +23,11 @@ export function printf(): boolean {
 
 	let useStack = false;
 	let currentRegister = Register.R1;
-	let currentOffset = 0;
+	let currentStackOffset = 0;
 	const args = tokens.map((token, index) => {
 		let data: any;
 		let register: Register = currentRegister;
-		let offset: number = currentOffset;         // byte view offset
+		let offset: number = currentStackOffset;         // byte view offset
 
 		if (!useStack && currentRegister > Register.R3) useStack = true;
 
@@ -38,13 +38,13 @@ export function printf(): boolean {
 		}
 
 		if (token.specifier === 'c') {
-			[data, register, offset] = getChar(useStack, currentRegister, currentOffset);
+			[data, register, offset] = getChar(useStack, currentRegister, currentStackOffset);
 		}
 		else if (token.specifier === 's') {
-			[data, register, offset] = getString(useStack, currentRegister, currentOffset);
+			[data, register, offset] = getString(useStack, currentRegister, currentStackOffset);
 		}
 		else if (['i', 'd'].includes(token.specifier)) {
-			[data, register, offset] = getDecimal(useStack, currentRegister, currentOffset);
+			[data, register, offset] = getDecimal(useStack, currentRegister, currentStackOffset);
 		}
 
 		// TODO: implement other format specifiers
@@ -54,7 +54,7 @@ export function printf(): boolean {
 		}
 
 		currentRegister = register;
-		currentOffset = offset;
+		currentStackOffset = offset;
 		return data;
 	});
 
@@ -107,11 +107,13 @@ function getString(useStack: boolean, register: Register, offset: number): [stri
 	return [data, register, offset];
 }
 
-function getDecimal(useStack: boolean, register: Register, offset: number): [number, Register, number] {
+function getDecimal(useStack: boolean, register: Register, offset: number, signed: boolean = true): [number, Register, number] {
 	let data: number;
 
 	if (!useStack) {
-		data = state.registers[register];
+		if (signed) data = -(~state.registers[register] + 1);		// invert and add one to get absolute signed value
+		else data = state.registers[register];
+
 		register = (register + 1) as Register;
 	}
 	else {

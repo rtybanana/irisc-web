@@ -50,6 +50,7 @@ export const interaction = {
   },
 
   stop: function () {
+    state.interrupted = false;
     state.running = false;
     state.paused = false;
   },

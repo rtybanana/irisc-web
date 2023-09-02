@@ -6,6 +6,7 @@ export * from "./flags";
 export * from "./transfer";
 export * from "./allocation";
 export * from "./directives";
+export * from "./terminal";
 // export { pages as tutorialPages, TTutorialPage } from "../tutorial/tutorial";
 
 
@@ -34,13 +35,3 @@ export enum EnvironmentType {
   EDITOR = "editor"
 }
 
-export const replWelcome = // html
-`
-  <span class="welcome">\
-    Welcome to the iRISC 2.0 repl interface.
-
-    Here you are able to execute single ARMv7 commands and immediately see the effect using a command-line interface.\
-    Simply type a valid ARM instruction on the prompt below to begin.\
-  </span>
-  &nbsp;\
-`

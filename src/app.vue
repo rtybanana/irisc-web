@@ -162,24 +162,26 @@
     <b-modal
 			ref="errors"
       id="errors-modal"
+      size="600"
       hide-header 
       hide-footer
       centered
       body-class="irisc-modal p-1"
 		>
       <template #default="{ hide }">
-        This code has errors!
+        <div class="mx-2 my-1">
+          Assembly failed due to following error(s).
 
-        <div class="mt-3 ml-5">
-          <div v-for="(summary, index) in errorSummary" :key="index">
-            {{ summary }}
+          <div class="mt-3 ml-3">
+            <div v-for="(summary, index) in errorSummary" class="mb-3" v-html="summary" :key="index">
+            </div>
           </div>
-        </div>
 
-        <div class="text-center mt-4 mb-2">
-          <b-button @click="hide">
-            fix
-          </b-button>
+          <div class="text-center mt-4 mb-2">
+            <b-button @click="hide">
+              fix
+            </b-button>
+          </div>
         </div>
       </template>
     </b-modal>
@@ -229,7 +231,7 @@ export default Vue.extend({
     breakpoints: SimulatorState.breakpoints,
     errors: SimulatorState.errors,
     errorSummary: function (): string[] {
-      return this.errors.map(e => `${e.constructHelper()}`)
+      return this.errors.map(e => `${e.constructHelperHTML()}`)
     },
     
     running: SimulatorState.running,
@@ -239,7 +241,10 @@ export default Vue.extend({
 
     isTooSmall: function (): boolean {
       return !this.dismissTooSmall && this.windowSize < 1250;
-    }
+    },
+
+    // hack so we can access the enum in dom
+    EnvironmentType: () => EnvironmentType,
   },
   methods: {
     /**
@@ -315,6 +320,10 @@ export default Vue.extend({
     if (!doneTour) this.startTour();
     else {
       this.env = (localStorage.getItem('environment') as EnvironmentType) ?? EnvironmentType.TERMINAL;
+
+      // hack to prompt editor to load any code from localStorage on refresh
+      this.switchEnvironment();
+      this.$nextTick(() => this.switchEnvironment());
     }
   },
 
