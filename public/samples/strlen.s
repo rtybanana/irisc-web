@@ -4,7 +4,7 @@
 
 .data
 greeting: 	.asciz "hello world!"
-strlen_str: .asciz "\"%s\" has %d characters"
+strlen_str: .asciz "\"%s\" has %d characters.\n"
 
 .extern puts
 .extern printf
