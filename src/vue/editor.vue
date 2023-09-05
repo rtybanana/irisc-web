@@ -8,6 +8,7 @@
     @dblclick="dblclick"
     @keydown.ctrl.191.capture.prevent.stop="lineComment"
     @keydown.esc="!tourActive && $emit('switch')"
+    @keydown.ctrl.83.capture.prevent.stop="$refs.save.show()"
   >
     <prism-editor 
       ref="prism"
@@ -18,7 +19,7 @@
       :insert-spaces="false" 
       :readonly="tourActive"
       line-numbers
-      @input="save"
+      @input="autoSave"
     ></prism-editor>
 
     <div class="controls">
@@ -56,30 +57,31 @@
 
     <div v-show="!tourActive" class="files">
       <files @open="open"></files>
-      <!-- <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
-        <a v-if="!showFiles" class="link clickable" style="color: #f9e1b3;" @click="showFiles = true">files</a>
-        <div v-else>
-          <template v-if="">
-            <div class="mb-1">
-              /
-            </div>
+    </div>
 
-            <div>
-              <a class="link text-white clickable" @click="changeDirectory('/myfiles/')"><i>myfiles/</i></a>
-            </div>
+    <b-modal 
+      ref="save"
+      centered 
+      hide-header 
+      hide-footer
+      body-class="irisc-modal p-1"
+    >
+      <template #default="{ hide }">
+        <div class="mx-2 my-1">
+          <h4>save</h4>
 
-            <div v-for="file in files" :key="file">
-              <a class="link text-white clickable" @click="loadSampleProgram(file)">{{ file }}</a>
-            </div>
-          </template>
+          <div class="text-center mt-4 mb-2">
+            <b-button class="mr-2" @click="hide">
+              cancel
+            </b-button>
 
-
-          <div class="mt-2">
-            <a class="link clickable" style="color: #f9e1b3;" @click="showFiles = false">hide</a>
+            <b-button @click="save">
+              save
+            </b-button>
           </div>
         </div>
-      </div> -->
-    </div>
+      </template>
+    </b-modal>
   </div>
 </template>
 
@@ -89,8 +91,9 @@ import { Assembler, IriscError, RuntimeError } from "@/interpreter";
 import { SimulatorState } from "@/simulator";
 import { highlight, languages } from 'prismjs';
 import { TTooltip } from '@/utilities';
-import getCaretCoordinates from "textarea-caret";
 import { PrismEditor } from 'vue-prism-editor';
+import { BModal } from 'bootstrap-vue';
+import getCaretCoordinates from "textarea-caret";
 import debug from './debug.vue';
 import files from './files.vue';
 import Shepherd from 'shepherd.js';
@@ -98,6 +101,8 @@ import Vue from 'vue';
 
 import 'prismjs/themes/prism.css'; // import syntax highlighting styles
 import 'vue-prism-editor/dist/prismeditor.min.css';
+import { TFile } from "@/files";
+import { FileSystemState, helloWorldSample } from "@/files";
 
 
 type TPoint = {
@@ -141,6 +146,7 @@ export default Vue.extend({
     currentInstruction: SimulatorState.currentInstruction,
     currentTick: SimulatorState.currentTick,
     interrupted: SimulatorState.interrupted,
+    currentFile: FileSystemState.currentFile,
 
     activeTour: () => !!Shepherd.activeTour,
 
@@ -499,10 +505,8 @@ export default Vue.extend({
       
     // },
 
-    open: function (text: string) {
-      this.program = text;
-      // this.showFiles = false;
-      this.reset();
+    open: function (file: TFile) {
+      
     },
 
     // loadSampleProgram: function (path: string) {
@@ -530,10 +534,14 @@ export default Vue.extend({
       // });
     },
 
+    save: function () {
+
+    },
+
     /**
      * Save editor content to local storage so that it persists on this device
      */
-    save: debounce((program: string) => {
+    autoSave: debounce((program: string) => {
       if (Shepherd.activeTour) return;
       localStorage.setItem('program', program);
     }),
@@ -567,14 +575,7 @@ export default Vue.extend({
   updated: function () {
     if (Shepherd.activeTour && !this.tourActive) {
       this.tourActive = true;
-
-      // this.loadSampleProgram('helloworld.s');
-      fetch('samples/helloworld.s')
-      .then(res => res.text())
-      .then(text => {
-        this.open(text);
-        
-      });
+      FileSystemState.openFile(helloWorldSample);
 
       Shepherd.activeTour.once(
         'inactive', 
@@ -612,6 +613,11 @@ export default Vue.extend({
      */
     memory: function (val, old) {
       if (val.size !== old.size) Assembler.build(this.program);
+    },
+
+    currentFile: function (file) {
+      this.program = file.content ?? "";
+      this.reset();
     }
   }
 })

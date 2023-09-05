@@ -142,6 +142,25 @@ export class RuntimeError extends IriscError {
   }
 }
 
+/**
+ * Error during interaction with localStorage filesystem
+ */
+export class FileSystemError extends IriscError {
+  get type() : string { return 'FileSystemError'; }
+
+  constructor(message: string) {
+    super(message, [], -1, -1);
+  }
+}
+
+export class NotImplementedError extends IriscError {
+  get type() : string { return 'NotImplementedError'; }
+
+  constructor() {
+    super("Sorry! This hasn't been implemented yet.", [], -1, -1);
+  }
+}
+
 // /**
 //  * LexicalError is slightly different from other errors in that its problem refers to a character within a
 //  */

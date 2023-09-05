@@ -43,10 +43,10 @@
             </a>
           </div>
 
-          <div class="mt-2">
-            <a class="link clickable" style="color: #f9e1b3;" @click="showContents = false">hide</a>
+          <div class="mt-1 text-right">
+            <!-- <a class="link clickable" style="color: #f9e1b3;" @click="showContents = false">hide</a> -->
 
-            <span class="float-right">
+            <span class="">
               <i 
                 class="fas fa-chevron-left fa-sm p-1 clickable hoverable rounded-sm"
                 @click="contentsPage > 0 && contentsPage--"
