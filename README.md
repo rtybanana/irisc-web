@@ -142,9 +142,12 @@ This is an example of how to list things you need to use the software and how to
   - [x] `putchar()`
   - [x] `puts()`
   - [ ] `printf()`
-    - [x] Support for %c, %d and %s
+    - [x] Support for %c, %d, %u and %s
     - [ ] Support for other specifiers
+  - [x] `gets()`
   - [ ] `scanf()`
+    - [x] Support for %c, %d, %u and %s
+    - [ ] Support for other specifiers
   - [ ] dynamic allocation
     - [x] `malloc()`
     - [x] `calloc()`
