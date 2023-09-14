@@ -571,7 +571,7 @@ export default Vue.extend({
 }
 
 .repl.output >>> .error-type {
-  color: #dc143c;
+  color: #de3759;
 }
 
 .repl.output >>> .directory {

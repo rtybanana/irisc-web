@@ -37,13 +37,17 @@ export const getters = {
 
 export const actions = {
   init: function () {
+    console.log("initting");
+    
     filesystem.openDirectory = filesystem;
 
     // set sample directories and connect to parent
     filesystem.directories = sampleDirectories;
     filesystem.directories.forEach(e => e.parent = filesystem);
+    filesystem.directories.forEach(d => d.files.forEach(f => f.parent = d));
 
     this.loadLocal();
+    this.reopen();
   },
 
   loadLocal: function () {
@@ -51,8 +55,12 @@ export const actions = {
       .filter(e => e.startsWith('/'))
       .sort();
 
+    console.log(keys);
+
     // split paths and create directories
     keys.forEach(key => {
+      console.log(key);
+
       const tokens = key.split('/').slice(1);
 
       let currentDir = filesystem;
@@ -61,6 +69,8 @@ export const actions = {
         if (i === tokens.length - 1) isDir = false;
 
         if (isDir) {
+          console.log("added directory:", token, "in parent:", currentDir.name);
+
           // add new directory if none exists
           let nextDir = currentDir.directories.find(e => e.name === token);
           if (!nextDir) {
@@ -78,19 +88,50 @@ export const actions = {
           currentDir = nextDir;
         }
         else {
+          console.log("added file:", token, "in parent:", currentDir.name);
+
           currentDir.files.push({
             name: token,
-            isStatic: false,
+            parent: currentDir,
+            static: false,
             content: localStorage.getItem(key) ?? undefined,
             writeable: true
           });
         }
       });
     });
+
+    console.log(filesystem);
+  },
+
+  reopen: function () {
+    try {
+      const openPath = localStorage.getItem('openFile') ?? "";
+      const target = this.resolvePath(openPath);
+
+      if (isDirectory(target)) throw new FileSystemError("");
+
+      this.openDirectory(target.parent!);
+      this.openFile(target);
+    }
+    catch (e) {
+      console.trace();
+      console.error("Could not reopen file from local storage.");
+
+      console.info("Restoring cached editor program.");
+
+      // const program = localStorage.getItem('program') ?? "";
+      // filesystem.openFile = {
+      //   name: 'temp',
+      //   content: program,
+      //   writeable: false, 
+      //   static: false
+      // };
+    }
   },
 
   openFile: async function (file: TFile) {
-    if (!file.content && file.isStatic) {
+    if (!file.content && file.static) {
       file.content = await fetch(`samples/${file.name}`)
         .then(res => res.text())
         .then(code => {
@@ -98,6 +139,10 @@ export const actions = {
         });
     }
     
+    const path = fullPath(file);
+    if (path === null) throw new FileSystemError("Could not find file in local directory tree.");
+
+    localStorage.setItem('openFile', path);
     filesystem.openFile = file;
   },
 
@@ -149,54 +194,67 @@ export const actions = {
   },
 
   addDirectory: function (directory: TDirectory, parent: TDirectory) {
+    if (parent.directories.includes(directory)) return;   // already exists
+
     directory.parent = parent;
     parent.directories.push(directory);
   },
 
+  newFile: function (name: string, content: string): TFile {
+    return {
+      name, 
+      content, 
+      writeable: true,
+      static: false
+    };
+  },
+
   addFile: function (file: TFile, parent: TDirectory) {
+    if (parent.files.some(e => e.name === file.name)) return;   // already exists
+
+    file.parent = parent;
     parent.files.push(file);
   },
 
-  save: function (file: TFile, parent: TDirectory) {
+  save: function (file: TFile, content: string) {
     if (!file.writeable) throw new FileSystemError("Permission denied.");
 
-    this.addFile(file, parent);
-
-    const fullPath = this.fullPath(file);
-    if (fullPath === null) throw new FileSystemError("Could not find file in local directory tree.");
+    const path = fullPath(file);
+    if (path === null) throw new FileSystemError("Could not find file in local directory tree.");
     
-    localStorage.setItem(fullPath, file.content ?? "");
-  },
-
-  fullPath: function (file: TFile): string | null {
-    const dirPath = depthFirstSearch(filesystem, file);
-    if (dirPath.length === 0) return null;
-
-    return dirPath
-      .map(e => e.name)
-      .concat([file.name])
-      .join('/');
-  },
-
-  
+    file.content = content;
+    localStorage.setItem(path, file.content ?? "");
+  }
 }
 
-function depthFirstSearch(directory: TDirectory, file: TFile): TDirectory[] {
-  if (!directory) {
-    return [];
-  }
-  
-  if (directory.files.includes(file)) {
-    return [directory];
+function fullPath(file: TFile): string | null {
+  const pathArr = [file.parent?.name, file.name];
+
+  let parent = file.parent
+  while (parent?.parent) {
+    pathArr.unshift(parent.parent.name);
+    parent = parent.parent;
   }
 
-  for (let dir of directory.directories) {
-    const foundPath = depthFirstSearch(dir, file);
-    if (foundPath.length > 0) return [directory, ...foundPath];
-  }
-
-  return [];
+  return pathArr.join('/');
 }
+
+// function depthFirstSearch(directory: TDirectory, file: TFile): TDirectory[] {
+//   if (!directory) {
+//     return [];
+//   }
+  
+//   if (directory.files.includes(file)) {
+//     return [directory];
+//   }
+
+//   for (let dir of directory.directories) {
+//     const foundPath = depthFirstSearch(dir, file);
+//     if (foundPath.length > 0) return [directory, ...foundPath];
+//   }
+
+//   return [];
+// }
 
 
 const isDirectory = (x: TFile | TDirectory | undefined): x is TDirectory => (x as TDirectory)?.files !== undefined;

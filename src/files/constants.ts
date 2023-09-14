@@ -13,7 +13,7 @@ import { TDirectory, TFile } from "./types";
 
 export const helloWorldSample: TFile = {
   name: "helloworld.s", 
-  isStatic: true,
+  static: true,
   writeable: false
 }
 
@@ -36,9 +36,8 @@ export const sampleDirectories: TDirectory[] = [
     directories: [],
     files: [
       {
-        name: 'info.txt',
-        isStatic: false,
-        content: "// your files go here here :)",
+        name: 'readme.s',
+        static: true,
         writeable: false
       }
     ],
@@ -51,12 +50,12 @@ export const sampleDirectories: TDirectory[] = [
     directories: [],
     files: [
       helloWorldSample,
-      { name: "typewriter.s", isStatic: true, writeable: false },
-      { name: "strlen.s", isStatic: true, writeable: false },
-      { name: "recursion.s", isStatic: true, writeable: false },
-      { name: "stackoverflow!.s", isStatic: true, writeable: false },
-      { name: "bubblesort.s", isStatic: true, writeable: false },
-      { name: "buggymess.s", isStatic: true, writeable: false }
+      { name: "typewriter.s", static: true, writeable: false },
+      { name: "strlen.s", static: true, writeable: false },
+      { name: "recursion.s", static: true, writeable: false },
+      { name: "stackoverflow!.s", static: true, writeable: false },
+      { name: "bubblesort.s", static: true, writeable: false },
+      { name: "buggymess.s", static: true, writeable: false }
     ],
     writeable: false
   }

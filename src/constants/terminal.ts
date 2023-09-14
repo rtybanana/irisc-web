@@ -43,8 +43,8 @@ export const terminalHelpString = `
 
 <div class="border-left">\
   vi          \t switch to the editor using your favourite text editor
-  vim         \t     'esc' to return to terminal from editor
-  nano
+  vim         \t     press 'esc' to return to terminal from editor
+  nano        \t     provide a path as a parameter to open a specific file
   nvim
   emacs -nw
   ne

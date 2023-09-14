@@ -289,7 +289,8 @@ const intermediate6: TTutorialPage = {
     <div class="hmm">\
       <div class="token label mb-1">Hint</div>\
       You should see that only the <span class="irisc">negative</span> (N) condition flag has been set. If you're\
-      seeing something different, check that your <span class="token operation">cmp</span> instruction is correct.
+      seeing something different, check that you have reset the terminal with ':r' and that your\
+      <span class="token operation">cmp</span> instruction is correct.
     </div>\
 
     Now try using the <span class="token operation">eq</span> condition suffix on an instruction of your choosing.\
@@ -300,7 +301,8 @@ const intermediate6: TTutorialPage = {
     </div>\
 
     In the <span class="irisc">assembler</span> window, you should see that the instruction has been marked as\
-    <span class="not-executed">Not Executed</span>. 
+    <span class="not-executed">Not Executed</span>. The CPU has skipped this instruction because the\
+    <span class="token operation">eq</span> condition was not met.
 
     <div class="hmm">\
       <div class="token label mb-1">Remember</div>\

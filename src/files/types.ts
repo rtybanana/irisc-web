@@ -1,6 +1,7 @@
 export type TFile = {
   name: string;
-  isStatic: boolean;
+  parent?: TDirectory;
+  static: boolean;
   content?: string;
   writeable: boolean;
 }

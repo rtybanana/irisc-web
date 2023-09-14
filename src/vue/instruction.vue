@@ -71,7 +71,7 @@
             class="snapshot fenced clickable mb-4" 
             :class="currentTick === snapshot.tick ? 'current' : 'not-current'"
             @click="reinstate(snapshot.tick)"
-            :key="snapshot.tick"
+            :key="snapshot.key"
           >
             <!-- tick number -->
             <span class="d-inline-block tick rounded py-1">{{ snapshot.tick }}</span>
@@ -273,12 +273,12 @@ export default Vue.extend({
     },
 
     scrollToTick(tick: number, behavior: string) {
-      const snapshot = (this.$refs[`tick_${tick}`] as any[])?.[0];
-      if (snapshot) {
-        this.$nextTick(() => {
+      this.$nextTick(() => {
+        const snapshot = (this.$refs[`tick_${tick}`] as any[])?.[0];
+        if (snapshot) {
           snapshot.scrollIntoView({ behavior, block: "start", inline: "nearest" });
-        });
-      }
+        }
+      });
     },
 
     reinstate: function (tick: number) {

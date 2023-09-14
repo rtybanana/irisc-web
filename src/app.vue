@@ -2,9 +2,6 @@
   <div id="app">
     <div class="container-fluid h-100">
       <div class="row h-100">
-        <!-- <div class="col-12 mt-3 mb-0">
-          <h1>iRISC</h1>
-        </div> -->
         <div id="emulator" class="col-12 h-100">
           <div class="row px-0" style="height: 24px;">
             <div class="col-5 col-md-4 col-lg-3 pr-1 text-left">
@@ -31,50 +28,51 @@
             </div>
             <div class="col-7 col-md-8 col-lg-9 pl-1" style="height: calc(100% - 232px);">
               <div class="row px-0 h-100">
+
                 <div class="col-8 pr-1 h-100">
-                  <!-- <editor @run="start($event)"></editor> -->
-                  <!-- @step="doStep" -->
                   <keep-alive>
                     <component 
                       :is="env" 
                       @switch="switchEnvironment"
                     ></component>
                   </keep-alive>
-
-                  <!-- @run="start"
-                      @forward="stepForward"
-                      @back="stepBack" -->
                 </div>
+
                 <div class="col-4 pl-1 h-100">
-                  <!-- <h5 class="mb-0">memory</h5> -->
                   <tutorial></tutorial>
                 </div>
+
               </div>
               
 
               <div class="row px-0 pt-2" style="height: 210px;">
+
                 <div class="col-6 pr-1" style="max-height: 100%;">
                   <instruction></instruction>
                 </div>
+
                 <div class="col-6 pl-1" style="max-height: 100%;">
                   <memory></memory>
 
                   <div class="settings clickable" @click="$refs.settings.show()">
-                    <!-- <i class="button fas fa-info clickable" @click="$refs.settings.show()"></i> -->
                     <i class="button fas fa-sliders-h"></i>
                   </div>
                 </div>
+
               </div>
               <div class="row px-0" style="height: 24px;">
+
                 <div class="col-6 pr-1 text-left">
                   <h5 class="mb-0">assembler</h5>
                 </div>
+
                 <div class="col-6 pl-1 text-left">
                   <h5 class="mb-0 d-inline-block">memory</h5>
                   <div class="d-inline-block float-right mt-1">
                     created by <a href="https://polysoftit.co.uk/" class="text-white">polysoft it</a> // <a href="https://github.com/rtybanana/irisc-web" class="text-white">src</a>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
@@ -102,7 +100,7 @@
           </div>
           <b-form-input 
             :value="1000 / delay"
-            @change="emulator.setDelay(1000 / $event)"
+            @change="simulatorState.setDelay(1000 / $event)"
             type="range"
             min="0.5"
             max="50"
@@ -116,19 +114,27 @@
           </div>
           <b-form-input 
             :value="memory.sizes.findIndex(e => e === memory.size)"
-            @change="emulator.init(memory.sizes[+$event])"
+            @change="simulatorState.init(memory.sizes[+$event])"
             type="range"
             min="0"
             :max="memory.sizes.length - 1"
           ></b-form-input>
+
+          <!-- <div>
+            crt effect (epilepsy warning)
+          </div>
+          <b-form-checkbox :checked="settings.crtEffect" @change="settingsState.setCrtEffect($event)" name="crt-effect" switch>
+            {{ settings.crtEffect ? 'on' : 'off' }} 
+          </b-form-checkbox> -->
         </div>
       </div>
     </b-modal>
 
     <b-modal 
       ref="about" 
-      centered hide-header 
-      hide-footer hide-backdrop
+      centered 
+      hide-header 
+      hide-footer
       body-class="irisc-modal p-1"
     >
 
@@ -140,11 +146,11 @@
     </b-modal>
 
     <b-modal 
-      centered hide-header 
-      hide-footer
       :visible="isTooSmall"
+      centered 
+      hide-header 
+      hide-footer
       body-class="irisc-modal p-1"
-
     >
       <h4>oh no!</h4>
       <div class="mt-3">
@@ -194,7 +200,7 @@ import { editor, terminal, registers, memory, instruction, tutorial } from "@/vu
 import { SimulatorState } from "@/simulator";
 import { Interpreter, RuntimeError } from '@/interpreter';
 import { Register, EnvironmentType } from "@/constants"
-import { createTour } from './utilities';
+import { createTour, SettingsState } from '@/utilities';
 
 import './assets/generic.css';
 import './assets/syntax.css';
@@ -202,6 +208,7 @@ import './assets/shepherd.css';
 
 import { TInstructionNode } from '@/syntax/types';
 import Shepherd from 'shepherd.js';
+import { FileSystemState } from './files';
 
 export default Vue.extend({
   name: 'emulator',
@@ -216,10 +223,10 @@ export default Vue.extend({
   data() {
     return {
       env: EnvironmentType.TERMINAL,
-      emulator: SimulatorState,
+      simulatorState: SimulatorState,
+      settingsState: SettingsState,
 
       dismissTooSmall: false,
-
       windowSize: 0
     }
   },
@@ -238,6 +245,8 @@ export default Vue.extend({
     paused: SimulatorState.paused,
     delay: SimulatorState.delay,
     step: SimulatorState.step,
+
+    settings: SettingsState.settings,
 
     isTooSmall: function (): boolean {
       return !this.dismissTooSmall && this.windowSize < 1250;
@@ -307,6 +316,7 @@ export default Vue.extend({
 
   created: function () {
     SimulatorState.init();
+    FileSystemState.init();
     SimulatorState.setVueInstance(this)
 
     window.addEventListener("resize", this.windowSizeListener);
@@ -330,6 +340,14 @@ export default Vue.extend({
   beforeDestroy: function () {
     window.removeEventListener("resize", this.windowSizeListener);
     document.removeEventListener('keydown', this.keyListener);
+  },
+
+  watch: {
+    crtEffect: function (on: boolean) {
+      const element: Element = document.getElementsByTagName('html')[0];
+      if (on) element.classList.add("crt");
+      else element.classList.remove("crt");
+    }
   }
 })
 </script>
@@ -374,5 +392,6 @@ html, body {
   background-color: #0d1117;
   border: 1px dashed #DCDCDC;
   color: #DCDCDC;
+  text-align: left;
 }
 </style>

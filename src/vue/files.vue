@@ -5,7 +5,7 @@
     :class="showFiles ? 'min-width' : ''"
     v-click-outside="close"
   >
-    <a v-if="!showFiles" class="link clickable" style="color: #f9e1b3;" @click="showFiles = true">files</a>
+    <a v-if="!forceShow && !showFiles" class="link clickable" style="color: #f9e1b3;" @click="showFiles = true">files</a>
     <div v-else>
       <div class="mb-1">
         /{{ currentDirectory.name }}
@@ -15,42 +15,21 @@
         <a class="link text-grey clickable" @click="openDirectory(directory)"><i>{{ directory.name }}/</i></a>
       </div>
 
-      <div v-for="file in files" :key="file.name">
-        <a 
-          class="link text-white clickable" 
-          :class="currentFile === file ? 'open' : ''"
-          @click="openFile(file)"
-        >
-          {{ file.name }}
-        </a>
-      </div>
+      <template v-if="!hideFiles">
+        <div v-for="file in files" :key="file.name">
+          <a 
+            class="link text-white clickable" 
+            :class="{ open: !selectedFile && currentFile === file, selected: selectedFile === file }"
+            @click="openFile(file)"
+          >
+            {{ file.name }}
+          </a>
+        </div>
+      </template>
 
       <div v-if="currentDirectory.parent">
         <a class="link text-grey clickable" @click="openDirectory(currentDirectory.parent)">..</a>
       </div>
-
-      <!-- <template v-if="directory === '/'">
-        <div>
-          <a class="link text-grey clickable" @click="changeDirectory('/myfiles/')"><i>myfiles/</i></a>
-        </div>
-
-        <div v-for="file in sampleFiles" :key="file">
-          <a class="link text-white clickable" @click="loadSample(file)">{{ file }}</a>
-        </div>
-      </template> -->
-
-      <!-- <template v-else-if="directory === '/myfiles/'">
-        <div v-if="getLocal().length === 0"><i>empty</i></div>
-
-        <div v-for="file in getLocal()" :key="file">
-          <a class="link text-white clickable" @click="loadLocal(file)">{{ file }}</a>
-        </div>
-      </template> -->
-
-
-      <!-- <div class="mt-2">
-        <a class="link clickable" style="color: #f9e1b3;" @click="close">hide</a>
-      </div> -->
     </div>
   </div>
 </template>
@@ -60,10 +39,15 @@ import Vue from 'vue';
 import { FileSystemState } from '@/files';
 import { TFile, TDirectory } from '@/files/types';
 
-
-
 export default Vue.extend({
   name: "files",
+  props: {
+    forceShow: Boolean,
+    hideFiles: Boolean,
+    preventDefaultFile: Boolean,
+    preventDefaultDirectory: Boolean,
+    selectedFile: Object
+  },
   data() {
     return {
       showFiles: false,
@@ -77,9 +61,13 @@ export default Vue.extend({
     },
 
     files: function (): TFile[] {
-      return this.currentDirectory.files
+      let files = this.currentDirectory.files
         .slice()
         .sort();
+
+      console.log(files);
+
+      return files;
     },
 
     directories: function (): TDirectory[] {
@@ -89,15 +77,27 @@ export default Vue.extend({
     }
   },
   methods: {
-    openDirectory: FileSystemState.openDirectory,
-    openFile: FileSystemState.openFile,
+    openDirectory: function (directory: TDirectory) {
+      if (this.preventDefaultDirectory) {
+        this.$emit('open:directory', directory);
+        return;
+      }
+
+      FileSystemState.openDirectory(directory);
+    },
+
+    openFile: function (file: TFile) {
+      if (this.preventDefaultFile) {
+        this.$emit('open:file', file);
+        return;
+      }
+
+      FileSystemState.openFile(file);
+    },
 
     close: function () {
       this.showFiles = false;
     }
-  },
-  created: function () {
-    FileSystemState.init();
   },
   watch: {
     currentFile: function (value) {
@@ -117,7 +117,7 @@ export default Vue.extend({
   min-width: 120px;
 }
 
-.open {
+.open, .selected {
   color: #e02f72 !important;
 }
 </style>

@@ -1,5 +1,4 @@
 <template>
-  <!-- @click="click" -->
   <div 
     class="prism-container pl-1 pr-0 py-1 position-relative" 
     tour-item="editor"
@@ -8,7 +7,7 @@
     @dblclick="dblclick"
     @keydown.ctrl.191.capture.prevent.stop="lineComment"
     @keydown.esc="!tourActive && $emit('switch')"
-    @keydown.ctrl.83.capture.prevent.stop="$refs.save.show()"
+    @keydown.ctrl.83.capture.prevent.stop="save"
   >
     <prism-editor 
       ref="prism"
@@ -56,7 +55,7 @@
     </div>
 
     <div v-show="!tourActive" class="files">
-      <files @open="open"></files>
+      <files></files>
     </div>
 
     <b-modal 
@@ -68,14 +67,34 @@
     >
       <template #default="{ hide }">
         <div class="mx-2 my-1">
-          <h4>save</h4>
+          <h4>save as</h4>
+
+          <files 
+            class="file-explorer mt-3" 
+            force-show
+            prevent-default-file
+            :selected-file="selectedFile"
+            @open:file="filename = $event.name"
+          ></files>
+          <div v-show="!currentDirectory.writeable"><small class="token operation">folder is write protected.</small></div>
+
+          <div class="mt-3">filename</div>
+          <b-form-input v-model="filename" @keydown="saveAllowChar"></b-form-input>
+
+          <template v-if="selectedFile">
+            <div v-if="!selectedFile.writeable"><small class="token operation">file is write protected.</small></div>
+            <div v-else><small class="token label">overwriting an existing file.</small></div>
+          </template>
+          <div v-else><small class="token line-comment">creating a new file.</small></div>
+          
+          
 
           <div class="text-center mt-4 mb-2">
             <b-button class="mr-2" @click="hide">
               cancel
             </b-button>
 
-            <b-button @click="save">
+            <b-button @click="saveAs">
               save
             </b-button>
           </div>
@@ -93,6 +112,7 @@ import { highlight, languages } from 'prismjs';
 import { TTooltip } from '@/utilities';
 import { PrismEditor } from 'vue-prism-editor';
 import { BModal } from 'bootstrap-vue';
+import scrollIntoView from 'scroll-into-view-if-needed';
 import getCaretCoordinates from "textarea-caret";
 import debug from './debug.vue';
 import files from './files.vue';
@@ -134,6 +154,8 @@ export default Vue.extend({
       //   "buggymess.s"
       // ],
 
+      filename: "",
+
       tourActive: false,
       controlTooltip: undefined as string | undefined
     }
@@ -147,6 +169,14 @@ export default Vue.extend({
     currentTick: SimulatorState.currentTick,
     interrupted: SimulatorState.interrupted,
     currentFile: FileSystemState.currentFile,
+    currentDirectory: FileSystemState.currentDirectory,
+
+    fileNames: function () : string[] {
+      return this.currentDirectory.files.map(e => e.name);
+    },
+    selectedFile: function () : TFile | undefined {
+      return this.currentDirectory.files.find(e => e.name === this.filename);
+    },
 
     activeTour: () => !!Shepherd.activeTour,
 
@@ -432,6 +462,18 @@ export default Vue.extend({
         if (executing !== undefined) {
           lines[this.currentInstruction!.lineNumber] = `<span class="line executing">${executing}</span>`;
         }
+        
+        this.$nextTick(() => {
+          const node = document.querySelector('.line.executing');
+
+          if (node) {
+            scrollIntoView(node, {
+              scrollMode: 'if-needed',
+              block: 'nearest',
+              inline: 'nearest',
+            });
+          }
+        })
       }
     },
 
@@ -501,48 +543,73 @@ export default Vue.extend({
       }
     },
 
-    // changeDirectory: function (dirPath: string = '/') {
-      
-    // },
-
-    open: function (file: TFile) {
-      
-    },
-
-    // loadSampleProgram: function (path: string) {
-    //   this.stop();
-
-    //   fetch(`samples/${path}`)
-    //   .then(res => res.text())
-    //   .then(text => {
-    //     this.program = text;
-    //     this.showFiles = false;
-    //     this.reset();
-    //   });
-    // },
-
     focus: function () {
       const prismEditor = this.$refs.prism as any;    // casting to any :(
       const textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
 
       textarea.focus();
-
-      // // ridiculous necessary hack to prevent all text being selected?
-      // this.$nextTick(() => {
-      //   window.getSelection()?.removeAllRanges();
-      //   document.getSelection()?.empty();
-      // });
     },
 
-    save: function () {
+    // quicksave: function () {
+    //   if (this.currentFile?.writeable) {
+    //     FileSystemState.save(this.currentFile)
+    //   }
+    // },
 
+    save: function () {
+      if (Shepherd.activeTour) return;
+
+      this.filename = this.currentFile?.name ?? "";
+      (this.$refs.save as BModal).show();
+
+      // // save to filesystem
+      // if (this.currentFile?.writeable) {
+      //   FileSystemState.save(this.currentFile, this.program);
+      // }
+      // else {
+        
+      // }
+    },
+
+    saveAllowChar: function (e: KeyboardEvent) {
+      if (/^[^\d\w._]$/.test(e.key)) {
+        e.preventDefault();
+      }
+    },
+
+    saveAs: function () {
+      if (!this.currentDirectory.writeable || (this.selectedFile && !this.selectedFile.writeable)) {
+        return;
+      }
+
+      let file = this.selectedFile;
+      if (!file) {
+        file = FileSystemState.newFile(this.filename, "");
+        FileSystemState.addFile(file, this.currentDirectory);
+        
+      }
+
+      FileSystemState.save(file, this.program);
+      FileSystemState.openFile(file);
+
+      (this.$refs.save as BModal).hide();
     },
 
     /**
      * Save editor content to local storage so that it persists on this device
      */
-    autoSave: debounce((program: string) => {
+    autoSave: debounce(function (program: string) {
       if (Shepherd.activeTour) return;
+
+      console.log("autosaving");
+
+      // // save to filesystem
+      // const currentFile = FileSystemState.currentFile();
+      // if (currentFile?.writeable) {
+      //   FileSystemState.save(currentFile, program);
+      // }
+
+      // save to program cache
       localStorage.setItem('program', program);
     }),
 
@@ -618,6 +685,10 @@ export default Vue.extend({
     currentFile: function (file) {
       this.program = file.content ?? "";
       this.reset();
+    },
+
+    filename: function (name: string) {
+      this.filename = name.replace(/[^\d\w._]/g, "");
     }
   }
 })
@@ -686,7 +757,7 @@ export default Vue.extend({
 }
 
 .button.green {
-  color:#1d8f46;
+  color: #1d8f46;
 }
 
 .button.amber {

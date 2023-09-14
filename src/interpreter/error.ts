@@ -1,6 +1,6 @@
 import { Token } from 'prismjs';
 
-const red = "#dc143c";
+const red = "#de3759";
 const blue = "#6A5ACD";
 const amber = "#ffbf00";
 type TErrorColour = typeof red | typeof blue | typeof amber;
