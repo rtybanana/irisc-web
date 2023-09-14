@@ -1,5 +1,12 @@
 <template>
-	<b-modal ref="modal" id="memory-explorer" centered hide-header hide-footer body-class="irisc-modal p-1">
+	<b-modal 
+		ref="modal" 
+		id="memory-explorer" 
+		centered 
+		hide-header 
+		hide-footer 
+		body-class="irisc-modal p-1"
+	>
 		<div class="px-4 py-1">
 			<h4>memory explorer</h4>
 

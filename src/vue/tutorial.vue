@@ -26,7 +26,11 @@
     </div>
 
     <div class="contents">
-      <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
+      <div 
+        class="p-1" 
+        style="border-radius: 0.3rem; background-color: #191d21;"
+        v-click-outside="() => showContents = false"
+      >
         <a v-if="!showContents" class="link clickable" style="color: #f9e1b3;" @click="openContents">contents</a>
         <template v-else>
           <div v-for="contentsLink in contentsSlice" :key="contentsLink.index">
@@ -39,10 +43,10 @@
             </a>
           </div>
 
-          <div class="mt-2">
-            <a class="link clickable" style="color: #f9e1b3;" @click="showContents = false">hide</a>
+          <div class="mt-1 text-right">
+            <!-- <a class="link clickable" style="color: #f9e1b3;" @click="showContents = false">hide</a> -->
 
-            <span class="float-right">
+            <span class="">
               <i 
                 class="fas fa-chevron-left fa-sm p-1 clickable hoverable rounded-sm"
                 @click="contentsPage > 0 && contentsPage--"

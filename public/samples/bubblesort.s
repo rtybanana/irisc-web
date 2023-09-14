@@ -7,7 +7,7 @@ string: 	.asciz 	"gdacbfe"    // try out other strings by changing the data
 worst: 	.asciz 	"gfedcba"
 best: 	.asciz 	"abcdefg"
 
-format_str: .asciz "%s (%d swaps)"
+format_str: .asciz "%s (%d swaps)\n"
 
 .extern printf
 

@@ -3,7 +3,7 @@
 // It prints like a typewriter!
 
 .data
-greeting: .asciz "typewriter!\nclick, clack, ding!"
+greeting: .asciz "typewriter!\nclick, clack, ding!\n"
 
 // include putchar()
 .extern putchar

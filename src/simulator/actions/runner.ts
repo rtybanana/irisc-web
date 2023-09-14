@@ -37,6 +37,9 @@ export const runner = {
           interaction.setStep(false);
           let node: TInstructionNode = memory.instruction(state.cpu.registers[Register.PC]);
 
+          state.previousPC = state.cpu.registers[Register.PC];
+          cpu.setRegister(Register.PC, state.cpu.registers[Register.PC] + 4);
+
           // if runtime instruction runoff
           if (node === undefined) {
             let last: TInstructionNode = state.currentInstruction!;

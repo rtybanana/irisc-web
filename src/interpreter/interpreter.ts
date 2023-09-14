@@ -29,14 +29,8 @@ export async function execute(instruction: TInstructionNode, incPC: boolean = tr
   let executed: boolean = false;
   SimulatorState.setCurrentInstruction(instruction);
 
-  if (instruction instanceof BranchNode) {
-    executed = await executeBranch(instruction);
-
-    // only increment to the next instruction if branch didn't already (not executed)
-    if (!executed && incPC) SimulatorState.setRegister(Register.PC, state.registers[Register.PC] + 4);
-  }
-  else {
-    if (incPC) SimulatorState.setRegister(Register.PC, state.registers[Register.PC] + 4);
+  {
+    if (instruction instanceof BranchNode) executed = await executeBranch(instruction);
 
     if (instruction instanceof BiOperandNode) executed = executeBiOperand(instruction);
     if (instruction instanceof TriOperandNode) executed = executeTriOperand(instruction);
@@ -255,7 +249,7 @@ async function executeBranch(instruction: BranchNode) : Promise<boolean> {
       if (callExecuted) {
         // if branch with link, set the link register
         if (op === Operation.BL) {
-          SimulatorState.setRegister(Register.LR, state.registers[Register.PC] + 4);
+          SimulatorState.setRegister(Register.LR, state.registers[Register.PC]);
         }
 
         // move to link register
@@ -273,7 +267,7 @@ async function executeBranch(instruction: BranchNode) : Promise<boolean> {
       SimulatorState.setRegister(Register.PC, address);
       break;
     case Operation.BL:
-      SimulatorState.setRegister(Register.LR, state.registers[Register.PC] + 4);
+      SimulatorState.setRegister(Register.LR, state.registers[Register.PC]);
       SimulatorState.setRegister(Register.PC, address);
       break;
   }

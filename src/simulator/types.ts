@@ -53,7 +53,7 @@ type TSimulatorStateBase = {
   exitStatus: TExitStatus | undefined;
 }
 
-export type TSimulatorSnapshot = TSimulatorStateBase;
+export type TSimulatorSnapshot = TSimulatorStateBase & { key: number; };
 
 export type TSimulatorState = TSimulatorStateBase & {
   paused: boolean;

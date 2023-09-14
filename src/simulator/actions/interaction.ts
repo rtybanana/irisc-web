@@ -14,6 +14,9 @@ export const interaction = {
       if (!state.step) this.resume();
       return;
     }
+
+    snapshots.reinstateSnapshot(0);
+    state.paused = false;
     
     // reset emulator state and run simulation
     init.reset();

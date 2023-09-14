@@ -19,6 +19,7 @@ export class Queue<T> implements IQueue<T> {
 			for (let i = 0; i < this.storage.length; i++) {
 				if (replacementPredicate(this.storage[i])) {
 					this.storage[i] = item;
+					this.storage = [...this.storage];
 					return;
 				}
 			}

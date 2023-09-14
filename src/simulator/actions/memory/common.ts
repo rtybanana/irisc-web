@@ -45,7 +45,7 @@ export const common = {
 
 	getMemoryAccessRange: function (transfer: TransferNode, snapshot?: TSimulatorSnapshot): TByteRange | undefined {
     if (!snapshot) {
-      snapshot = state as TSimulatorSnapshot;
+      snapshot = { ...state, key: 0 } as TSimulatorSnapshot;
     }
 
     if (transfer instanceof BlockTransferNode) {
