@@ -1,5 +1,8 @@
 <template>
-  <div class="terminal-container pl-1 py-1">
+  <div 
+    class="terminal-container pl-1 py-1"
+    :class="{ crt: settings.crtEffect }"
+  >
     <div 
       ref="container"
       tour-item="terminal"
@@ -66,7 +69,7 @@ import { InstructionNode } from '@/syntax';
 import { BranchNode } from '@/syntax/flow/BranchNode';
 import { BIconTelephoneMinus } from "bootstrap-vue";
 import { highlight, languages } from 'prismjs';
-import { TTooltip, getCaretPosition, setCaretPosition } from '@/utilities';
+import { SettingsState, TTooltip, getCaretPosition, setCaretPosition } from '@/utilities';
 import Shepherd from "shepherd.js";
 import Vue from 'vue';
 import { FileSystemState } from "@/files";
@@ -99,6 +102,7 @@ export default Vue.extend({
     }
   },
   computed: {
+    settings: SettingsState.settings,
     errors: SimulatorState.errors,
     currentInstruction: SimulatorState.currentInstruction,
     running: SimulatorState.running,

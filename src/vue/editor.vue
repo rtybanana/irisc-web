@@ -1,6 +1,7 @@
 <template>
   <div 
     class="prism-container pl-1 pr-0 py-1 position-relative" 
+    :class="{ crt: settings.crtEffect }"
     tour-item="editor"
     @mouseover="hover"
     @click="click"
@@ -109,7 +110,7 @@ import { debounce } from "@/assets/functions";
 import { Assembler, IriscError, RuntimeError } from "@/interpreter";
 import { SimulatorState } from "@/simulator";
 import { highlight, languages } from 'prismjs';
-import { TTooltip } from '@/utilities';
+import { SettingsState, TTooltip } from '@/utilities';
 import { PrismEditor } from 'vue-prism-editor';
 import { BModal } from 'bootstrap-vue';
 import scrollIntoView from 'scroll-into-view-if-needed';
@@ -161,6 +162,7 @@ export default Vue.extend({
     }
   },
   computed: {
+    settings: SettingsState.settings,
     memory: SimulatorState.memory,
     running: SimulatorState.running,
     paused: SimulatorState.paused,
