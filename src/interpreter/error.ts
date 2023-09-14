@@ -1,6 +1,6 @@
 import { Token } from 'prismjs';
 
-const red = "#dc143c";
+const red = "#de3759";
 const blue = "#6A5ACD";
 const amber = "#ffbf00";
 type TErrorColour = typeof red | typeof blue | typeof amber;
@@ -139,6 +139,25 @@ export class RuntimeError extends IriscError {
 
   constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
     super(message, statement, lineNumber, tokenIndex);
+  }
+}
+
+/**
+ * Error during interaction with localStorage filesystem
+ */
+export class FileSystemError extends IriscError {
+  get type() : string { return 'FileSystemError'; }
+
+  constructor(message: string) {
+    super(message, [], -1, -1);
+  }
+}
+
+export class NotImplementedError extends IriscError {
+  get type() : string { return 'NotImplementedError'; }
+
+  constructor() {
+    super("Sorry! This hasn't been implemented yet.", [], -1, -1);
   }
 }
 

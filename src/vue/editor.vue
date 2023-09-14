@@ -1,13 +1,14 @@
 <template>
-  <!-- @click="click" -->
   <div 
     class="prism-container pl-1 pr-0 py-1 position-relative" 
+    :class="{ crt: settings.crtEffect }"
     tour-item="editor"
     @mouseover="hover"
     @click="click"
     @dblclick="dblclick"
     @keydown.ctrl.191.capture.prevent.stop="lineComment"
     @keydown.esc="!tourActive && $emit('switch')"
+    @keydown.ctrl.83.capture.prevent.stop="save"
   >
     <prism-editor 
       ref="prism"
@@ -18,7 +19,7 @@
       :insert-spaces="false" 
       :readonly="tourActive"
       line-numbers
-      @input="save"
+      @input="autoSave"
     ></prism-editor>
 
     <div class="controls">
@@ -54,20 +55,53 @@
       </div>
     </div>
 
-    <div v-show="!tourActive" class="samples">
-      <div class="p-1" style="border-radius: 0.3rem; background-color: #191d21;">
-        <a v-if="!showFiles" class="link clickable" style="color: #f9e1b3;" @click="showFiles = true">files</a>
-        <div v-else>
-          <div v-for="file in files" :key="file">
-            <a class="link text-white clickable" @click="loadSampleProgram(file)">{{ file }}</a>
-          </div>
+    <div v-show="!tourActive" class="files">
+      <files></files>
+    </div>
 
-          <div class="mt-2">
-            <a class="link clickable" style="color: #f9e1b3;" @click="showFiles = false">hide</a>
+    <b-modal 
+      ref="save"
+      centered 
+      hide-header 
+      hide-footer
+      body-class="irisc-modal p-1"
+    >
+      <template #default="{ hide }">
+        <div class="mx-2 my-1">
+          <h4>save as</h4>
+
+          <files 
+            class="file-explorer mt-3" 
+            force-show
+            prevent-default-file
+            :selected-file="selectedFile"
+            @open:file="filename = $event.name"
+          ></files>
+          <div v-show="!currentDirectory.writeable"><small class="token operation">folder is write protected.</small></div>
+
+          <div class="mt-3">filename</div>
+          <b-form-input v-model="filename" @keydown="saveAllowChar"></b-form-input>
+
+          <template v-if="selectedFile">
+            <div v-if="!selectedFile.writeable"><small class="token operation">file is write protected.</small></div>
+            <div v-else><small class="token label">overwriting an existing file.</small></div>
+          </template>
+          <div v-else><small class="token line-comment">creating a new file.</small></div>
+          
+          
+
+          <div class="text-center mt-4 mb-2">
+            <b-button class="mr-2" @click="hide">
+              cancel
+            </b-button>
+
+            <b-button @click="saveAs">
+              save
+            </b-button>
           </div>
         </div>
-      </div>
-    </div>
+      </template>
+    </b-modal>
   </div>
 </template>
 
@@ -76,14 +110,21 @@ import { debounce } from "@/assets/functions";
 import { Assembler, IriscError, RuntimeError } from "@/interpreter";
 import { SimulatorState } from "@/simulator";
 import { highlight, languages } from 'prismjs';
-import { TTooltip } from '@/utilities';
-import 'prismjs/themes/prism.css'; // import syntax highlighting styles
-import getCaretCoordinates from "textarea-caret";
-import Vue from 'vue';
+import { SettingsState, TTooltip } from '@/utilities';
 import { PrismEditor } from 'vue-prism-editor';
-import 'vue-prism-editor/dist/prismeditor.min.css';
+import { BModal } from 'bootstrap-vue';
+import scrollIntoView from 'scroll-into-view-if-needed';
+import getCaretCoordinates from "textarea-caret";
 import debug from './debug.vue';
+import files from './files.vue';
 import Shepherd from 'shepherd.js';
+import Vue from 'vue';
+
+import 'prismjs/themes/prism.css'; // import syntax highlighting styles
+import 'vue-prism-editor/dist/prismeditor.min.css';
+import { TFile } from "@/files";
+import { FileSystemState, helloWorldSample } from "@/files";
+
 
 type TPoint = {
   x: number;
@@ -94,29 +135,34 @@ export default Vue.extend({
   name: 'editor',
   components: {
     PrismEditor,
-    debug
+    debug,
+    files
   },
   data() {
     return {
       program: '' as string,
       tooltip: { title: '', color: '', message: '' } as TTooltip,
       
-      showFiles: false,
-      files: [
-        "helloworld.s",
-        "typewriter.s",
-        "strlen.s",
-        "recursion.s",
-        "stackoverflow!.s",
-        "bubblesort.s",
-        "buggymess.s"
-      ],
+      // showFiles: false,
+      // directory: '/',
+      // sampleFiles: [
+      //   "helloworld.s",
+      //   "typewriter.s",
+      //   "strlen.s",
+      //   "recursion.s",
+      //   "stackoverflow!.s",
+      //   "bubblesort.s",
+      //   "buggymess.s"
+      // ],
+
+      filename: "",
 
       tourActive: false,
       controlTooltip: undefined as string | undefined
     }
   },
   computed: {
+    settings: SettingsState.settings,
     memory: SimulatorState.memory,
     running: SimulatorState.running,
     paused: SimulatorState.paused,
@@ -124,6 +170,15 @@ export default Vue.extend({
     currentInstruction: SimulatorState.currentInstruction,
     currentTick: SimulatorState.currentTick,
     interrupted: SimulatorState.interrupted,
+    currentFile: FileSystemState.currentFile,
+    currentDirectory: FileSystemState.currentDirectory,
+
+    fileNames: function () : string[] {
+      return this.currentDirectory.files.map(e => e.name);
+    },
+    selectedFile: function () : TFile | undefined {
+      return this.currentDirectory.files.find(e => e.name === this.filename);
+    },
 
     activeTour: () => !!Shepherd.activeTour,
 
@@ -409,6 +464,18 @@ export default Vue.extend({
         if (executing !== undefined) {
           lines[this.currentInstruction!.lineNumber] = `<span class="line executing">${executing}</span>`;
         }
+        
+        this.$nextTick(() => {
+          const node = document.querySelector('.line.executing');
+
+          if (node) {
+            scrollIntoView(node, {
+              scrollMode: 'if-needed',
+              block: 'nearest',
+              inline: 'nearest',
+            });
+          }
+        })
       }
     },
 
@@ -478,38 +545,73 @@ export default Vue.extend({
       }
     },
 
-    loadSampleProgram: function (path: string) {
-      this.stop();
-
-      fetch(`samples/${path}`)
-      .then(res => res.text())
-      .then(text => {
-        this.program = text;
-        this.showFiles = false;
-
-        this.reset();
-        this.focus();
-      });
-    },
-
     focus: function () {
       const prismEditor = this.$refs.prism as any;    // casting to any :(
       const textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
 
       textarea.focus();
+    },
 
-      // // ridiculous necessary hack to prevent all text being selected?
-      // this.$nextTick(() => {
-      //   window.getSelection()?.removeAllRanges();
-      //   document.getSelection()?.empty();
-      // });
+    // quicksave: function () {
+    //   if (this.currentFile?.writeable) {
+    //     FileSystemState.save(this.currentFile)
+    //   }
+    // },
+
+    save: function () {
+      if (Shepherd.activeTour) return;
+
+      this.filename = this.currentFile?.name ?? "";
+      (this.$refs.save as BModal).show();
+
+      // // save to filesystem
+      // if (this.currentFile?.writeable) {
+      //   FileSystemState.save(this.currentFile, this.program);
+      // }
+      // else {
+        
+      // }
+    },
+
+    saveAllowChar: function (e: KeyboardEvent) {
+      if (/^[^\d\w._]$/.test(e.key)) {
+        e.preventDefault();
+      }
+    },
+
+    saveAs: function () {
+      if (!this.currentDirectory.writeable || (this.selectedFile && !this.selectedFile.writeable)) {
+        return;
+      }
+
+      let file = this.selectedFile;
+      if (!file) {
+        file = FileSystemState.newFile(this.filename, "");
+        FileSystemState.addFile(file, this.currentDirectory);
+        
+      }
+
+      FileSystemState.save(file, this.program);
+      FileSystemState.openFile(file);
+
+      (this.$refs.save as BModal).hide();
     },
 
     /**
      * Save editor content to local storage so that it persists on this device
      */
-    save: debounce((program: string) => {
+    autoSave: debounce(function (program: string) {
       if (Shepherd.activeTour) return;
+
+      console.log("autosaving");
+
+      // // save to filesystem
+      // const currentFile = FileSystemState.currentFile();
+      // if (currentFile?.writeable) {
+      //   FileSystemState.save(currentFile, program);
+      // }
+
+      // save to program cache
       localStorage.setItem('program', program);
     }),
 
@@ -542,7 +644,7 @@ export default Vue.extend({
   updated: function () {
     if (Shepherd.activeTour && !this.tourActive) {
       this.tourActive = true;
-      this.loadSampleProgram('helloworld.s');
+      FileSystemState.openFile(helloWorldSample);
 
       Shepherd.activeTour.once(
         'inactive', 
@@ -580,6 +682,15 @@ export default Vue.extend({
      */
     memory: function (val, old) {
       if (val.size !== old.size) Assembler.build(this.program);
+    },
+
+    currentFile: function (file) {
+      this.program = file.content ?? "";
+      this.reset();
+    },
+
+    filename: function (name: string) {
+      this.filename = name.replace(/[^\d\w._]/g, "");
     }
   }
 })
@@ -636,7 +747,7 @@ export default Vue.extend({
   padding: 0.25rem 0.5rem 0.5rem 0.25rem;
 }
 
-.samples {
+.files {
   position: absolute;
   bottom: 0;
   right: 0;
@@ -648,7 +759,7 @@ export default Vue.extend({
 }
 
 .button.green {
-  color:#1d8f46;
+  color: #1d8f46;
 }
 
 .button.amber {

@@ -1,5 +1,8 @@
 <template>
-  <div class="terminal-container pl-1 py-1">
+  <div 
+    class="terminal-container pl-1 py-1"
+    :class="{ crt: settings.crtEffect }"
+  >
     <div 
       ref="container"
       tour-item="terminal"
@@ -66,9 +69,10 @@ import { InstructionNode } from '@/syntax';
 import { BranchNode } from '@/syntax/flow/BranchNode';
 import { BIconTelephoneMinus } from "bootstrap-vue";
 import { highlight, languages } from 'prismjs';
-import { TTooltip, getCaretPosition, setCaretPosition } from '@/utilities';
+import { SettingsState, TTooltip, getCaretPosition, setCaretPosition } from '@/utilities';
 import Shepherd from "shepherd.js";
 import Vue from 'vue';
+import { FileSystemState } from "@/files";
 
 const prompt = "irisc:~$ ";
 
@@ -98,6 +102,7 @@ export default Vue.extend({
     }
   },
   computed: {
+    settings: SettingsState.settings,
     errors: SimulatorState.errors,
     currentInstruction: SimulatorState.currentInstruction,
     running: SimulatorState.running,
@@ -133,7 +138,10 @@ export default Vue.extend({
       }
 
       return {} as TTooltip;
-    }    
+    },
+
+    currentFile: FileSystemState.currentFile,
+    currentDirectory: FileSystemState.currentDirectory
   },
   methods: {
     stop: SimulatorState.stop,
@@ -156,8 +164,11 @@ export default Vue.extend({
       let actualInput = el.innerText.substring(this.leadingLine.length);
       let caretOffset = getCaretPosition(el) - this.leadingLine.length;
       if (caretOffset < 0) {
-        actualInput = e.data + actualInput.substring(1);
-        caretOffset = 1;
+        caretOffset = 0;
+        if (e.data) {
+          actualInput = e.data + actualInput.substring(1);
+          caretOffset = 1;
+        }
       }
 
       this.input = `${this.leadingLine}${actualInput}`;
@@ -296,12 +307,16 @@ export default Vue.extend({
         return true;
       }
 
-      if (['vi', 'vim', 'nvim', 'nano', 'ne', 'emacs -nw', 'micro', 'tilde'].includes(input)) {
+      const textEditRegex = /^(vi|vim|nvim|nano|ne|emacs -nw|micro|tilde)($|\s)/g;
+      const textEditParam = input.replace(textEditRegex, "");
+      if (textEditParam !== input) {
         if (Shepherd.activeTour) {
           throw new InteractiveError("Can't switch to the editor yet. Do the tour! You'll get there.", [], -1, -1);
         }
 
+        if (textEditParam !== '') FileSystemState.textEdit(textEditParam);
         this.$emit('switch');
+
         return true;
       }
 
@@ -311,7 +326,28 @@ export default Vue.extend({
       }
 
       if (input === 'pwd') {
-        this.output += `\n/irisc/simulator`;
+        this.output += `\n${FileSystemState.pwd()}`;
+        return true;
+      }
+
+      if (input === 'ls') {
+        const directories = this.currentDirectory.directories.map(e => `<span class="col-3 directory">${e.name}</span>`);
+        const files = this.currentDirectory.files.map(e => `<span class="col-3 file">${e.name}</span>`);
+        const ls = [
+          '<span class="col-3 directory">.</span>', 
+          ...[this.currentDirectory.parent && '<span class="col-3 directory">..</span>'],
+          ...directories.sort(), 
+          ...files.sort()
+        ]
+
+        this.output += `\n<div class="row">${ls.join("\t")}</div>`;
+        return true;
+      }
+
+      if (input.startsWith('cd')) {
+        const param = input.substring(3).trim();
+        FileSystemState.cd(param);
+
         return true;
       }
 
@@ -539,7 +575,15 @@ export default Vue.extend({
 }
 
 .repl.output >>> .error-type {
-  color: #dc143c;
+  color: #de3759;
+}
+
+.repl.output >>> .directory {
+  color: #07a;
+}
+
+.repl.output >>> .file {
+  color: #dcdcdc;
 }
 
 </style>

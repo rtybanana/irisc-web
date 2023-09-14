@@ -170,7 +170,7 @@ export function createTour() {
 			</div>
 
 			<div class="mt-3">
-				Add a breakpoint to line #19 to continue.
+				Add a breakpoint to line #20 to continue.
 			</div>
 		`,
 		floatingUIOptions: {
@@ -488,10 +488,10 @@ export function createTour() {
 
 			breakpoints: function (breakpoints: TInstructionNode[]) {
 				if (this.isStep("editor")) {
-					if (breakpoints.find(e => e.lineNumber === 18)) {		// zero-indexed line #19
+					if (breakpoints.find(e => e.lineNumber === 19)) {		// zero-indexed line #20
 						// remove all other breakpoints
 						SimulatorState.removeBreakpoints();
-						SimulatorState.toggleBreakpoint(18);
+						SimulatorState.toggleBreakpoint(19);
 
 						tour.next();
 					}

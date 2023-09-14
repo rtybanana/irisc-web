@@ -2,9 +2,10 @@
 // A helloworld implementation using a single puts() call.
 
 .data
-greeting: .asciz "hello world!"
+greeting: .asciz "hello world!"		// notice the lack of \n character
 
-// include puts()
+// include puts() 
+// sends a string pointer to stdout with a trailing newline
 .extern puts
 
 .text

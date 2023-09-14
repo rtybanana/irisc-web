@@ -6,8 +6,9 @@ import { runner } from "./runner";
 
 export const snapshots = {
   takeSnapshot: function () {
-		
     const snapshot: TSimulatorSnapshot = {
+      key: Date.now(),
+
       cpu: clone(state.cpu),
       memory: clone(state.memory),
 
@@ -30,13 +31,21 @@ export const snapshots = {
     const snapshot = state.snapshots.data().find(e => e.cpu.tick === tick);
     if (!snapshot) throw Error;
 
+    const wasRunning = state.running;
 
     state.cpu = clone(snapshot.cpu);
-    state.memory = clone(snapshot.memory);
 
-    if (snapshot.running && !state.running) {
-      runner.run(true);
-    }
+    const buffer = new ArrayBuffer(snapshot.memory.size);
+    const byteView = new Uint8Array(buffer);
+
+    byteView.set(snapshot.memory.byteView);
+    state.memory = {
+      ...clone(snapshot.memory),
+      buffer,
+      byteView,
+      wordView: new Uint32Array(buffer)
+    };
+
     state.running = snapshot.running;
     state.paused = true;
 
@@ -48,5 +57,9 @@ export const snapshots = {
     state.exitStatus = clone(snapshot.exitStatus);
 
     memory.observeMemory();
+
+    if (snapshot.running && !wasRunning) {
+      runner.run(true);
+    }
   },
 }

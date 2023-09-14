@@ -6,6 +6,8 @@ export type TByteRange = {
 }
 
 export type TSnapshotExplanation = {
+    key: number;
+    
     tick: number;
     instruction: string;
 

@@ -8,6 +8,8 @@ import { TransferNode } from "@/syntax";
 
 export function explain(snapshot: TSimulatorSnapshot, prevSnapshot: TSimulatorSnapshot | undefined): TSnapshotExplanation {
 	const explanation = {
+		key: snapshot.key,
+		
 		tick: snapshot.cpu.tick,
 		instruction: snapshot.currentInstruction
 			? highlight(snapshot.currentInstruction.text, languages.armv7, 'ARMv7')

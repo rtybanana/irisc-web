@@ -10,10 +10,10 @@ export const cpu = {
   },
 	
   setRegister: function (register: Register, value: number) {
-    if (register === Register.PC) {
-      state.previousPC = state.cpu.registers[Register.PC];
-      state.currentInstruction = memory.instruction(state.cpu.registers[Register.PC]);
-    }
+    // if (register === Register.PC) {
+    //   state.previousPC = state.cpu.registers[Register.PC];
+    //   state.currentInstruction = memory.instruction(state.cpu.registers[Register.PC]);
+    // }
     Vue.set(state.cpu.registers, register, value);
 
     this.observeRegisters();
