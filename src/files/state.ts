@@ -37,8 +37,6 @@ export const getters = {
 
 export const actions = {
   init: function () {
-    console.log("initting");
-    
     filesystem.openDirectory = filesystem;
 
     // set sample directories and connect to parent
@@ -55,12 +53,8 @@ export const actions = {
       .filter(e => e.startsWith('/'))
       .sort();
 
-    console.log(keys);
-
     // split paths and create directories
     keys.forEach(key => {
-      console.log(key);
-
       const tokens = key.split('/').slice(1);
 
       let currentDir = filesystem;
@@ -69,8 +63,6 @@ export const actions = {
         if (i === tokens.length - 1) isDir = false;
 
         if (isDir) {
-          console.log("added directory:", token, "in parent:", currentDir.name);
-
           // add new directory if none exists
           let nextDir = currentDir.directories.find(e => e.name === token);
           if (!nextDir) {
@@ -88,8 +80,6 @@ export const actions = {
           currentDir = nextDir;
         }
         else {
-          console.log("added file:", token, "in parent:", currentDir.name);
-
           currentDir.files.push({
             name: token,
             parent: currentDir,
@@ -100,8 +90,6 @@ export const actions = {
         }
       });
     });
-
-    console.log(filesystem);
   },
 
   reopen: function () {
@@ -117,16 +105,6 @@ export const actions = {
     catch (e) {
       console.trace();
       console.error("Could not reopen file from local storage.");
-
-      console.info("Restoring cached editor program.");
-
-      // const program = localStorage.getItem('program') ?? "";
-      // filesystem.openFile = {
-      //   name: 'temp',
-      //   content: program,
-      //   writeable: false, 
-      //   static: false
-      // };
     }
   },
 
@@ -172,8 +150,6 @@ export const actions = {
     }
 
     const tokens = path.split('/').filter(e => e !== '');
-    console.log(tokens);
-
     tokens.forEach((token, i) => {
       let next: TDirectory | TFile | undefined;
 
