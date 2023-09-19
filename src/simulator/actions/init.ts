@@ -50,7 +50,7 @@ export const init = {
     state.memory.textMap = {};
 
     state.memory.dataHeight = 0;
-    state.memory.dataMap = {};
+    state.memory.dataTable = {};
 
     state.memory.heapHeight = 0;
     state.memory.heapMap = new Map<number, TAllocation>();

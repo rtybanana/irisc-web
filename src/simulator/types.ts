@@ -7,6 +7,13 @@ export type TAllocation = {
 	allocated: boolean;
 }
 
+export type TDeclaration = {
+  label: string;
+  size: number;
+  offset: number;
+  data: Uint8Array;
+}
+
 type TMemory = {
   size: number;
   sizes: number[];
@@ -22,7 +29,8 @@ type TMemory = {
   textMap: Record<string, number>;
 
   dataHeight: number;
-  dataMap: Record<string, number>;
+  dataTable: Record<string, number>;
+  dataMap: Map<number, TDeclaration>;
   
   heapMap: Map<number, TAllocation>;
   heapHeight: number;

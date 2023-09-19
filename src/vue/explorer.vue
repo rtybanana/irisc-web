@@ -146,6 +146,8 @@
 									</b-form-radio-group>
 								</b-form-group>
 							</div>
+
+							{{ dataBlocks }}
 						</div>
 
 						<transition name="slide-fade-left">
@@ -191,7 +193,7 @@ import Vue from 'vue';
 import { highlight, languages } from 'prismjs';
 import { TInstructionNode } from '@/syntax/types';
 import debug from './debug.vue';
-import { TAllocation } from '@/simulator/types';
+import { TAllocation, TDeclaration } from '@/simulator/types';
 import clone from "lodash.clonedeep";
 import Shepherd from 'shepherd.js';
 
@@ -368,6 +370,15 @@ export default Vue.extend({
 		uninitOffset: function (): number { return this.heapOffset + this.heapWordHeight; },
 		stackOffset: function (): number { return this.uninitOffset + this.uninitWordHeight; },
 
+		dataMap: () => SimulatorState.memory().dataMap,
+		dataBlocks: function (): TDeclaration[] {
+			return Array.from(this.dataMap)
+				.sort(([aPtr, _a], [bPtr, _b]) => {
+					return aPtr - bPtr;
+				})
+				.map(e => e[1]);
+		},
+
 		heapMap: () => SimulatorState.memory().heapMap,
 		heapBlocks: function (): TAllocation[] {
 			return Array.from(this.heapMap)
@@ -376,7 +387,6 @@ export default Vue.extend({
 				})
 				.map(e => e[1]);
 		},
-
 		heapContiguousBlocks: function (): TAllocation[] {
 			return this.heapBlocks
 				.reduce((contig, block, index, allocations) => {
@@ -390,6 +400,8 @@ export default Vue.extend({
 					return contig;
 				}, [] as TAllocation[])
 		},
+
+
 
 		instructions: () => SimulatorState.memory().text,
 		instruction: function (): TInstructionNode | undefined {
