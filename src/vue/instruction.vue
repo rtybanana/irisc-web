@@ -89,19 +89,19 @@
 
             <!-- register change summary -->
             <div class="ml-3">
-              <div v-for="[register, oldValue] in snapshot.registersHit" :key="register">
-                {{ regName[register] }}: {{ oldValue }} >> {{ snapshot.registers[register] }}
+              <div v-for="[register, oldValue] in snapshot.difference.registersHit" :key="register">
+                {{ regName[register] }}: {{ oldValue }} >> {{ snapshot.difference.registers[register] }}
               </div>
             </div>
             
             <!-- memory write summary -->
-            <div v-if="snapshot.memWrite" class="ml-3">
-              bytes <u>written</u> in range: {{ snapshot.memWrite.base }} - {{ snapshot.memWrite.limit }}
+            <div v-if="snapshot.difference.memWrite" class="ml-3">
+              bytes <u>written</u> in range: {{ snapshot.difference.memWrite.base }} - {{ snapshot.difference.memWrite.limit }}
             </div>
 
             <!-- memory read summary -->
-            <div v-if="snapshot.memRead" class="ml-3">
-              bytes <u>read</u> in range: {{ snapshot.memRead.base }} - {{ snapshot.memRead.limit }}
+            <div v-if="snapshot.difference.memRead" class="ml-3">
+              bytes <u>read</u> in range: {{ snapshot.difference.memRead.base }} - {{ snapshot.difference.memRead.limit }}
             </div>
           </div>
 

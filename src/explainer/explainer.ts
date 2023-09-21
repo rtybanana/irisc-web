@@ -1,5 +1,5 @@
 import { TSimulatorSnapshot } from "@/simulator/types";
-import { TByteRange, TSnapshotExplanation } from "./types";
+import { TByteRange, TSnapshotExplanation, TSnapshotDifference } from "./types";
 import { Flag, Register } from "@/constants";
 import { highlight, languages } from "prismjs";
 import { zip } from "@/assets/functions";
@@ -7,20 +7,28 @@ import { SimulatorState } from "@/simulator";
 import { TransferNode } from "@/syntax";
 
 export function explain(snapshot: TSimulatorSnapshot, prevSnapshot: TSimulatorSnapshot | undefined): TSnapshotExplanation {
-	const explanation = {
+	const difference = getDifference(snapshot, prevSnapshot);
+	
+	return {
 		key: snapshot.key,
 		
 		tick: snapshot.cpu.tick,
 		instruction: snapshot.currentInstruction
 			? highlight(snapshot.currentInstruction.text, languages.armv7, 'ARMv7')
 			: "Base State",
+		
+		difference
+	}
+}
 
+function getDifference(snapshot: TSimulatorSnapshot, prevSnapshot: TSimulatorSnapshot | undefined): TSnapshotDifference {
+	const explanation = {
 		registers: snapshot.cpu.observableRegisters,
 		flags: snapshot.cpu.cpsr,
 
 		registersHit: new Map<Register, number>(),
 		flagsHit: new Map<Flag, boolean>(),
-	} as TSnapshotExplanation;
+	} as TSnapshotDifference;
 
 	if (prevSnapshot) {
 		// determine which registers were hit
@@ -39,7 +47,7 @@ export function explain(snapshot: TSimulatorSnapshot, prevSnapshot: TSimulatorSn
 
 
 		// discover which range of memory was accessed
-		if (snapshot.currentInstruction instanceof TransferNode) {
+		if (snapshot.wasExecuted && snapshot.currentInstruction instanceof TransferNode) {
 			const range = SimulatorState.getMemoryAccessRange(snapshot.currentInstruction, prevSnapshot);
 			if (snapshot.currentInstruction.isRead) {
 				explanation.memRead = range;
