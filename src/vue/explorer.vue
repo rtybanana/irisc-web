@@ -48,7 +48,7 @@
 								>
 									<div 
 										v-for="(n, index) in textWordHeight" 
-										class="word" 
+										class="word hoverable" 
 										@mouseenter="instructionIndex = index;" 
 										@mouseleave="instructionIndex = undefined;"
 										:key="n"
@@ -62,7 +62,18 @@
 									@mouseenter="tip('data')" 
 									@mouseleave="untip"
 								>
-									<div v-for="n in dataWordHeight" class="word" :key="n"></div>
+									<div v-for="(w, wIndex) in dataWordHeight" class="row word no-gutters" :key="w">
+										<template v-if="size === 'byte'">
+											<div 
+												v-for="(b, bIndex) in 4"
+												class="col byte"
+												:class="highlitData.includes((wIndex * 4) + bIndex) ? 'highlight' : ''"
+												@mouseenter="dataHover(wIndex, bIndex)"
+												@mouseleave="highlitData = []; hoveredDeclaration = undefined;"
+												:key="b"
+											></div>
+										</template>
+									</div>
 								</div>
 
 								<div
@@ -146,26 +157,45 @@
 									</b-form-radio-group>
 								</b-form-group>
 							</div>
-
-							{{ dataBlocks }}
 						</div>
 
 						<transition name="slide-fade-left">
-							<div v-if="shown" class="position-fixed fenced tooltip-box px-1 pb-1">
-								<template>
-									<div v-html="tooltip.title" class="pb-1"></div>
-									<div style="font-size: 14px;">
-										<div v-html="tooltip.detail"></div>
+							<template v-if="shown">
+								<div class="position-fixed tooltip-container">
 
-										<div v-if="instructionIndex !== undefined && instruction" class="ml-3 mt-3 mb-3">
-											<div>address: {{ instructionIndex * 4 }}</div>
-											<div v-html="highlight(instruction)"></div>
-											<div>0x{{ hexstr(wordView[instructionIndex], 8) }}</div>
-											<div>0b{{ binstr(wordView[instructionIndex], 32) }}</div>
+									<!-- base tooltip -->
+									<div class="fenced tooltip-box px-1 pb-1">
+										<div v-html="tooltip.title" class="pb-1"></div>
+										<div style="font-size: 14px;">
+											<div v-html="tooltip.detail"></div>
 										</div>
 									</div>
-								</template>
-							</div>
+
+									<!-- instruction tooltip -->
+									<div 
+										v-if="instructionIndex !== undefined && instruction" 
+										class="fenced tooltip-box mt-3 px-1 pb-1"
+										style="font-size: 14px;"
+									>
+										<div>src: <span v-html="highlight(instruction)"></span></div>
+										<div>adr: {{ instructionIndex * 4 }}</div>
+										<div>hex: {{ hexstr(wordView[instructionIndex], 8) }}</div>
+										<div>bin: {{ binstr(wordView[instructionIndex], 32) }}</div>
+									</div>
+
+									<!-- data tooltip -->
+									<div 
+										v-if="hoveredDeclaration" 
+										class="fenced tooltip-box mt-3 px-1 pb-1"
+										style="font-size: 14px;"
+									>
+										<div>labl: <span class="token label">{{ hoveredDeclaration.label }}</span></div>
+										<div>type: <span class="token directive">{{ hoveredDeclaration.type }}</span></div>
+										<div>addr: {{ hoveredDeclaration.offset + textHeight }}</div>
+										<div>size: {{ hoveredDeclaration.size }}</div>
+									</div>
+								</div>
+							</template>
 						</transition>
 
 						<transition name="slide-fade-right">
@@ -202,6 +232,13 @@ type TTip = {
 	detail: string;
 }
 
+type TBoundary = {
+	left?: number;
+	right?: number;
+	top: number[];
+	bottom: number[];
+}
+
 export default Vue.extend({
 	name: 'explorer',
 	components: {
@@ -231,6 +268,8 @@ export default Vue.extend({
 			],
 
 			instructionIndex: undefined as number | undefined,
+			highlitData: [] as number[],
+			hoveredDeclaration: undefined as TDeclaration | undefined,
 
 			tooltip: {} as TTip,
 			tips: {
@@ -371,7 +410,7 @@ export default Vue.extend({
 		stackOffset: function (): number { return this.uninitOffset + this.uninitWordHeight; },
 
 		dataMap: () => SimulatorState.memory().dataMap,
-		dataBlocks: function (): TDeclaration[] {
+		dataDeclarations: function (): TDeclaration[] {
 			return Array.from(this.dataMap)
 				.sort(([aPtr, _a], [bPtr, _b]) => {
 					return aPtr - bPtr;
@@ -456,6 +495,16 @@ export default Vue.extend({
 			return `${value?.toString(2).padStart(pad, '0')}`
 		},
 
+		dataHover(wordIndex: number, byteIndex: number) {
+			const offset = (wordIndex * 4) + byteIndex;
+			const declaration = this.dataDeclarations.find(e => e.offset <= offset && offset <= e.offset + e.size);
+
+			if (declaration) {
+				this.highlitData = Array.from(Array(declaration.offset + declaration.size).keys()).slice(declaration.offset);
+				this.hoveredDeclaration = declaration;
+			}
+		},
+
 		highlight: function (instruction: TInstructionNode): string {
 			return highlight(instruction.text, languages.armv7, 'ARMv7');
 		},
@@ -531,6 +580,11 @@ export default Vue.extend({
 	height: 22px;
 }
 
+.word.hoverable:hover,
+.byte.highlight  {
+	background-color: rgba(255, 255, 255, 0.05);
+}
+
 .region.heap .block:not(:first-child) {
 	border-top: 1px dashed #f9e1b3;
 	/* border-bottom: 1px dotted #cccdcd; */
@@ -558,10 +612,14 @@ export default Vue.extend({
 	cursor: help;
 }
 
-.tooltip-box {
-	background-color: #0d1117;
+.tooltip-container {
 	right: calc(50vw + (498px / 2) + 15px);
 	width: 280px;
+}
+
+.tooltip-box {
+	background-color: #0d1117;
+	
 	white-space: pre-line;
 }
 

@@ -159,6 +159,7 @@ function load(nodes: (SyntaxNode | null)[]) {
 
       declarationTable.push({
         label: node.identifier,
+        type: node.type,
         data: node.data,
         size: node.data.length,
         offset: dataHeight

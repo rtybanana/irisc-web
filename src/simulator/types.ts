@@ -9,6 +9,7 @@ export type TAllocation = {
 
 export type TDeclaration = {
   label: string;
+  type: string;
   size: number;
   offset: number;
   data: Uint8Array;

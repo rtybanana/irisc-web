@@ -6,11 +6,14 @@ import { SyntaxNode } from "./SyntaxNode";
 
 export class AllocationNode extends SyntaxNode {
   protected _identifier: string;
-  protected _type: DataType;
   protected _data: Uint8Array;
+
+  protected _type: DataType;
+  private _specificType!: string;
 
   get identifier() : string { return this._identifier; }
   get data() : Uint8Array { return this._data; }
+  get type() : string { return this._specificType; }
 
   constructor(statement: Token[], lineNumber: number, currentToken: number = 0) {
     super(statement, lineNumber, currentToken);
@@ -25,6 +28,8 @@ export class AllocationNode extends SyntaxNode {
   }
 
   parseData(token: Token) : Uint8Array {
+    this._specificType = this.previousToken().content as string;
+
     if (this.previousToken().content === ".asciz") return this.parseString(token);
     if (this.previousToken().content === ".byte") return this.parseByte(token);
     if (this.previousToken().content === ".hword") return this.parseHWord(token);
