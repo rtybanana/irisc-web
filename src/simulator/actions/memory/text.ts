@@ -82,7 +82,7 @@ export const text = {
         }
       }
       else if (ins instanceof SingleTransferNode && ins.isLiteral) {
-        if (state.memory.dataMap[ins.literal] === undefined) {
+        if (state.memory.dataTable[ins.literal] === undefined) {
           interaction.addError(new ReferenceError(`Missing reference to '${ins.literal}'.`, ins.statement, ins.lineNumber, 3));
         }
       }

@@ -1,5 +1,5 @@
 import { Queue } from '@/utilities';
-import { TAllocation, TSimulatorSnapshot, TSimulatorState } from './types';
+import { TAllocation, TDeclaration, TSimulatorSnapshot, TSimulatorState } from './types';
 import Vue from 'vue';
 
 export const state = Vue.observable<TSimulatorState>({
@@ -32,7 +32,8 @@ export const state = Vue.observable<TSimulatorState>({
     textMap: {},
 
     dataHeight: 0,
-    dataMap: {},
+    dataTable: {},
+    dataMap: new Map<number, TDeclaration>(),
     
     heapHeight: 0,
     heapMap: new Map<number, TAllocation>(),
