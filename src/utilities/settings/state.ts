@@ -1,3 +1,4 @@
+import { SimulatorState } from '@/simulator';
 import { TSettings } from './types';
 import Vue from 'vue';
 
@@ -6,30 +7,37 @@ const settings = Vue.observable<TSettings>({
 });
 
 export const getters = {
-  settings: () => settings
+  settings: () => ({
+    ...settings,
+    memSize: SimulatorState.memory().size,
+    delay: SimulatorState.delay()
+  })
 };
 
 export const actions = {
+  init: function () {
+    const localSettings = localStorage.getItem('settings');
+    if (localSettings) {
+      const state = JSON.parse(localSettings);
+
+      SimulatorState.setDelay(state.delay ?? 500);
+      SimulatorState.init(state.memSize ?? 256);
+
+      settings.crtEffect = state.crtEffect ?? false;
+    }
+  },
+
   setCrtEffect: function (value: boolean) {
-    console.log(value);
-
     settings.crtEffect = value;
-    updateStorage();
+  },
+
+  updateStorage: function () {
+    const toStore = {
+      ...settings,
+      delay: SimulatorState.delay(),
+      memSize: SimulatorState.memory().size
+    };
+  
+    localStorage.setItem('settings', JSON.stringify(toStore));
   }
 }
-
-function updateStorage() {
-  localStorage.setItem('settings', JSON.stringify(settings));
-}
-
-function _init() {
-  const localSettings = localStorage.getItem('settings');
-  if (localSettings) {
-    const state = JSON.parse(localSettings) as TSettings;
-    settings.crtEffect = state.crtEffect;
-  }
-}
-
-_init();
-console.log(settings.crtEffect);
-

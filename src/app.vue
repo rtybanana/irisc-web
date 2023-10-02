@@ -264,6 +264,7 @@ export default Vue.extend({
   },
 
   created: function () {
+    SettingsState.init();
     SimulatorState.init();
     FileSystemState.init();
     SimulatorState.setVueInstance(this)

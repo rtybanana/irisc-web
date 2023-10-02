@@ -603,14 +603,6 @@ export default Vue.extend({
     autoSave: debounce(function (program: string) {
       if (Shepherd.activeTour) return;
 
-      console.log("autosaving");
-
-      // // save to filesystem
-      // const currentFile = FileSystemState.currentFile();
-      // if (currentFile?.writeable) {
-      //   FileSystemState.save(currentFile, program);
-      // }
-
       // save to program cache
       localStorage.setItem('program', program);
     }),
@@ -686,6 +678,7 @@ export default Vue.extend({
 
     currentFile: function (file) {
       this.program = file.content ?? "";
+      localStorage.setItem('program', this.program);
       this.reset();
     },
 
