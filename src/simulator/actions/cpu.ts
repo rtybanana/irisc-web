@@ -1,8 +1,9 @@
 import { bitset } from "@/assets/bitset";
-import { Register, Condition, Flag } from "@/constants";
+import { Register, Condition, Flag, condNameMap, condDescribe } from "@/constants";
 import Vue from 'vue';
 import { state } from "../state";
 import { memory } from "./memory";
+import { uncapitalize } from "@/utilities";
 
 export const cpu = {
 	tick: function () {
@@ -44,11 +45,36 @@ export const cpu = {
       case Condition.GT: case Condition.LE:
         result = (cpsr[Flag.N] === cpsr[Flag.V]) && !cpsr[Flag.Z]; break;
       default:
-        return true;                                          // AL flag returns true regardless
+        result = true;                                          // AL flag returns true regardless
     }
 
-    // check top bit of condition code for logic reversal
-    if (bits[0] === 1) result = !result;
+    if (cond !== Condition.AL) {
+      // check top bit of condition code for logic reversal
+      if (bits[0] === 1) result = !result;
+
+      // explanation
+      const description = `\
+        The condition suffix <span class="token operation">${condNameMap[cond]}</span>\
+        indicates that ${uncapitalize(condDescribe[cond])}\
+      `;
+
+      const currentFlags = `
+        <div class="mt-2 ml-3">\
+          <span class="text-irisc">cpsr</span>:\
+          <sup class="px-1">n</sup>${+cpsr[0]} \
+          <sup class="px-1">z</sup>${+cpsr[1]} \
+          <sup class="px-1">c</sup>${+cpsr[2]} \
+          <sup class="px-1">v</sup>${+cpsr[3]} \
+        </div>\
+      `;
+
+      const status = result
+        ? `<span class="ml-3 executed">Executed</span>`
+        :	`<span class="ml-3 not-executed">Not Executed</span>`
+
+      state.explanation.conditional = description + currentFlags + status;
+    }
+
     return result;                                   
   },
   

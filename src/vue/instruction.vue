@@ -86,7 +86,7 @@
                 <i class="fas fa-share fa-rotate-180 fa-xs"></i>
               </span>
             </div>
-
+            
             <!-- register change summary -->
             <div class="ml-3">
               <div v-for="[register, oldValue] in snapshot.difference.registersHit" :key="register">
@@ -96,16 +96,77 @@
             
             <!-- memory write summary -->
             <div v-if="snapshot.difference.memWrite" class="ml-3">
-              bytes <u>written</u> in range: {{ snapshot.difference.memWrite.base }} - {{ snapshot.difference.memWrite.limit }}
+              <span v-if="snapshot.difference.memWrite.base === snapshot.difference.memWrite.limit">
+                byte <u>written</u> at address: {{ snapshot.difference.memWrite.base }}
+              </span>
+
+              <span v-else>
+                bytes <u>written</u> in address range: {{ snapshot.difference.memWrite.base }} - {{ snapshot.difference.memWrite.limit }}
+              </span>
             </div>
 
             <!-- memory read summary -->
             <div v-if="snapshot.difference.memRead" class="ml-3">
-              bytes <u>read</u> in range: {{ snapshot.difference.memRead.base }} - {{ snapshot.difference.memRead.limit }}
+              <span v-if="snapshot.difference.memRead.base === snapshot.difference.memRead.limit">
+                byte <u>read</u> at address: {{ snapshot.difference.memRead.base }}
+              </span>
+
+              <span v-else>
+                bytes <u>read</u> in address range: {{ snapshot.difference.memRead.base }} - {{ snapshot.difference.memRead.limit }}
+              </span>
+            </div>
+
+            <div v-if="!snapshot.wasExecuted && !(snapshot.tick === 0)" class="ml-3">
+              <span class="not-executed">Not Executed</span>
             </div>
           </div>
 
           <div class="position-absolute" style="top: 0;">
+            <transition name="slide-fade-left">
+							<div v-if="historyShown && currentSnapshot" class="position-fixed tooltip-container">
+                <div class="position-relative tooltip-box fenced mb-2">
+                  <div v-html="currentSnapshot.instruction"></div>
+                  <!-- <div 
+                    class="position-absolute clickable px-1" 
+                    style="top: 5px; right: 5px" 
+                    tabindex="0"
+                    @click="showSnapshotDescription = !showSnapshotDescription;"
+                    @keypress.enter="showSnapshotDescription = !showSnapshotDescription;"
+                  >
+                    <i v-show="!showSnapshotDescription" class="far fa-question-circle"></i>
+                    <i v-show="showSnapshotDescription" class="far fa-eye-slash"></i>
+                  </div> -->
+
+                  <template v-if="explanation">
+                    <div class="pt-1" style="font-size: 14px;">
+                      <!-- default explanation -->
+                      <div v-html="explanation.default"></div>
+
+                      <!-- supplementary information -->
+                      <div 
+                        v-show="explanation.supplement" 
+                        class="mt-2" 
+                        v-html="explanation.supplement"
+                      ></div>
+                    </div>
+                  </template>
+                </div>
+                
+                <div v-if="explanation" style="font-size: 14px;">
+                  <div v-if="explanation.conditional" class="tooltip-box fenced mb-2">
+                    <div v-html="explanation.conditional"></div>
+                  </div>
+
+                  <template v-if="currentSnapshot.wasExecuted">
+                    <div v-if="explanation.expression" class="tooltip-box fenced mb-2">
+                      <div v-show="explanation.expression.flex" v-html="explanation.expression.flex" class="mb-2"></div>
+                      <div v-html="explanation.expression.result"></div>
+                    </div>
+                  </template>
+                </div>
+							</div>
+						</transition>
+
             <transition name="slide-fade-right">
               <div 
                 v-if="historyShown" 
@@ -136,13 +197,12 @@ import { SimulatorState, TSimulatorSnapshot } from '@/simulator';
 import { zip } from '@/assets/functions';
 import { TransferNode } from '@/syntax';
 import { IExplanation, TAssembled } from '@/syntax/types';
-import { flagExplain, flagName, flagTitle, regExplain, Register, regName, regTitle, Flag } from "@/constants";
-import { explain, TSnapshotExplanation } from "@/explainer";
+import { flagDescribe, flagName, flagTitle, regDescribe, Register, regName, regTitle, Flag } from "@/constants";
+import { explain, TSnapshotDescription, TSnapshotExplanation } from "@/explainer";
 import { highlight, languages } from 'prismjs';
 import Vue from 'vue';
 import { BModal } from 'bootstrap-vue';
 import debug from "./debug.vue";
-import { nextTick } from 'vue/types/umd';
 
 /**
  * Extends IExplanation interface to include a portion of the instruction bitcode,
@@ -174,11 +234,11 @@ export default Vue.extend({
     return {
       regName,
       regTitle,
-      regExplain,
+      regDescribe,
 
       flagName, 
       flagTitle,
-      flagExplain,
+      flagDescribe,
 
       default: {
         bitcode: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -194,6 +254,7 @@ export default Vue.extend({
 
       historyShown: false,
       debuggerTooltip: undefined as string | undefined
+      // showSnapshotDescription: false
     }
   },
   computed: {
@@ -237,7 +298,7 @@ export default Vue.extend({
       }
     },
 
-    snapshots: function (): TSnapshotExplanation[] {
+    snapshots: function (): TSnapshotDescription[] {
       return SimulatorState.snapshots()
         .data()
         .slice()
@@ -246,8 +307,16 @@ export default Vue.extend({
 
           a.push(explain(snapshot, prevSnapshot));
           return a;
-        }, [] as TSnapshotExplanation[])
+        }, [] as TSnapshotDescription[])
         .reverse()
+    },
+    
+    currentSnapshot: function (): TSnapshotDescription | undefined {
+      return this.snapshots.find(e => e.tick === this.currentTick);
+    },
+
+    explanation: function (): TSnapshotExplanation | undefined {
+      return this.currentSnapshot?.explanation;
     }
   },
   methods: {
@@ -333,6 +402,7 @@ export default Vue.extend({
   display: inline-block;
 }
 
+.tooltip-container >>> .executed,
 .executed {
   background-color: #5d9455;
   color: #101821;
@@ -340,6 +410,7 @@ export default Vue.extend({
   border-radius: 0.15rem;
 }
 
+.tooltip-container >>> .not-executed,
 .not-executed {
   background-color: #ff5555;
   color: #101821;
@@ -397,6 +468,16 @@ export default Vue.extend({
 .snapshot.current .tick {
   background-color: #8b0c3c;
   color: white;
+}
+
+.tooltip-container {
+  right: calc(50vw + (498px / 2) + 15px);
+	width: 320px;
+}
+
+.tooltip-box {
+	background-color: #0d1117;
+	white-space: pre-line;
 }
 
 .control-box {

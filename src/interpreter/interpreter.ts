@@ -1,5 +1,5 @@
 import { rotr } from "@/assets/bitset";
-import { addressModeGroup, BlockTransfer, callAddress, callMap, Flag, Operation, Register, Shift, SingleTransfer, TTransferSize } from "@/constants";
+import { addressModeGroup, BlockTransfer, callAddress, callMap, Flag, Operation, opExplain, Register, Shift, SingleTransfer, TTransferSize } from "@/constants";
 import { SimulatorState } from "@/simulator";
 import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode, BranchNode, BlockTransferNode, SingleTransferNode } from "@/syntax";
 import { TInstructionNode } from "@/syntax/types";
@@ -16,7 +16,8 @@ const state = {
   get cpsr() { return SimulatorState.cpsr(); },
   get memory() { return SimulatorState.memory(); },
   get previousPC() { return SimulatorState.previousPC(); },
-  get breakpoints() { return SimulatorState.breakpoints(); }
+  get breakpoints() { return SimulatorState.breakpoints(); },
+  get explanation() { return SimulatorState.explanation(); }
 }
 
 /**
@@ -28,6 +29,7 @@ const state = {
 export async function execute(instruction: TInstructionNode, incPC: boolean = true) : Promise<boolean> {
   let executed: boolean = false;
   SimulatorState.setCurrentInstruction(instruction);
+  SimulatorState.initExplanation();
 
   {
     if (instruction instanceof BranchNode) executed = await executeBranch(instruction);
@@ -240,11 +242,45 @@ async function executeBranch(instruction: BranchNode) : Promise<boolean> {
   const [op, cond, addr] = instruction.unpack();
   if (!SimulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
+  state.explanation.default = opExplain[instruction.op];
+
   let address: number;
   if (typeof addr === 'string') {
     address = SimulatorState.label(addr as string);
+    
+    // explanation -- overwritten by library call explanation if address is callAddress
+    state.explanation.expression = {
+      result: `\
+        The expression given is a <span class="token label">label</span>. The assembler calculates the byte offset between the\
+        addresses of the branch instruction and the target label (<span class="token label">${addr}</span>). This offset\
+        (<span class="token immediate">${generateLabelOffset(addr, instruction) * 4}</span>) is added to the current <span class="token register">pc</span>\
+        (<span class="token immediate">${state.registers[Register.PC] - 4}</span>) to give the address of the next instruction: <span class="text-irisc">${address}</span>.\
+      `
+    };
+
     if (address === callAddress) {
 
+      // explanation
+      state.explanation.supplement = `\
+				This particular branch instruction is to an external C standard library function <span class="token label">${addr}</span>.\
+				The contents of the scratch registers (<span class="token register">r0</span>-<span class="token register">r3</span>) are\
+				<u>not guaranteed</u> to stay the same (<a href="https://community.arm.com/arm-community-blogs/b/architectures-and-processors-blog/posts/on-the-aapcs-with-an-application-to-efficient-parameter-passing" target="_blank">AAPCS</a>).\
+			`;
+
+      state.explanation.expression = {
+				result: `\
+					The expression given is a <span class="token label">label</span>. The assembler calculates the byte offset between the\
+					addresses of the branch instruction and the target label (<span class="token label">${addr}</span>). This offset is added\
+					to the current <span class="token register">pc</span> to give the address of the next instruction.\
+
+					<div class="mt-2">\
+						Since this is a library call and iRISC doesn't actually assemble and link the entire C standard library, this instruction\
+						doesn't actually branch anywhere and the <span class="token register">pc</span> is simply set to the next instruction.\
+					</div>\
+				`
+			};
+
+      // execute library call
       let callExecuted = await executeCall(instruction, callMap[addr as string]);
       if (callExecuted) {
         // if branch with link, set the link register
@@ -259,7 +295,10 @@ async function executeBranch(instruction: BranchNode) : Promise<boolean> {
       return callExecuted;
     }
   }
-  else address = state.registers[addr as Register];
+  else {
+    // TODO: add explanation for register branch
+    address = state.registers[addr as Register];
+  }
 
   switch (op) {
     case Operation.B:

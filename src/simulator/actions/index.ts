@@ -4,6 +4,7 @@ import { interaction } from "./interaction";
 import { memory } from "./memory";
 import { snapshots } from "./snapshots";
 import { io } from "./io";
+import { explainer } from './explainer';
 
 export const actions = {
     ...init,
@@ -11,5 +12,6 @@ export const actions = {
     ...memory,
     ...interaction,
     ...io,
-    ...snapshots
+    ...snapshots,
+    ...explainer
 }

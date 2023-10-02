@@ -58,12 +58,12 @@ export const common = {
       if (isIncrement) {
         return {
           base: address,
-          limit: address + (nRegisters * 4)
+          limit: address + (nRegisters * 4) - 1
         }
       }
       else {
         return {
-          base: address - (nRegisters * 4),
+          base: address - (nRegisters * 4)  + 1,
           limit: address
         }
       }
@@ -83,12 +83,12 @@ export const common = {
         if (sign === '+') {
           return {
             base: address,
-            limit: address + 4
+            limit: address + 3
           }
         }
         else {
           return {
-            base: address - 4,
+            base: address - 3,
             limit: address
           }
         }
@@ -97,7 +97,7 @@ export const common = {
         if (sign === '+') {
           return {
             base: address,
-            limit: address + 1
+            limit: address
           }
         }
         else {

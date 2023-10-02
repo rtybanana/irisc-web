@@ -1,2 +1,2 @@
-export { explain } from "./explainer";
-export { TSnapshotExplanation } from "./types";
+export { compare as explain } from "./explainer";
+export { TSnapshotDescription, TSnapshotExplanation, TSnapshotDifference } from "./types";

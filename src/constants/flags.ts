@@ -19,7 +19,7 @@ export const flagTitle: Record<Flag, string> = {
   [Flag.V]: "Overflow Flag (V)"
 }
 
-export const flagExplain: Record<Flag, string> = {
+export const flagDescribe: Record<Flag, string> = {
   [Flag.N]: "This bit is set when the signed result of the operation is negative.", 
   [Flag.Z]: "This bit is set when the result of the operation is equal to zero.", 
   [Flag.C]: "This bit is set when the operation results in an unsigned overflow.", 

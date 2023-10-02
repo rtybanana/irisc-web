@@ -63,7 +63,7 @@ export const regShortTitle: Record<Register, string> = {
   [Register.PC]: "pc"  
 };
 
-export const regExplain: Record<Register, string> = {
+export const regDescribe: Record<Register, string> = {
   [Register.R0]: "General Purpose Register.", 
   [Register.R1]: "General Purpose Register.", 
   [Register.R2]: "General Purpose Register.", 

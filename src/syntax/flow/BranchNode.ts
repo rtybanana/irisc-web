@@ -1,5 +1,5 @@
 import { bitset } from "@/assets/bitset";
-import { condExplain, Condition, condMap, condTitle, Operation, opMap, Register, regTitle } from "@/constants";
+import { condDescribe, Condition, condMap, condTitle, Operation, opMap, Register, regTitle } from "@/constants";
 import { Interpreter, SyntaxError } from "@/interpreter";
 import { Token } from "prismjs";
 import { InstructionNode } from "../InstructionNode";
@@ -68,7 +68,7 @@ export class BranchNode extends InstructionNode {
     explanation.push({
       title: "Condition Code", 
       subtitle: condTitle[this._cond], 
-      detail: condExplain[this._cond], 
+      detail: condDescribe[this._cond], 
       range: 4
     });
 
@@ -114,7 +114,7 @@ export class BranchNode extends InstructionNode {
     explanation.push({
       title: "Condition Code", 
       subtitle: condTitle[this._cond], 
-      detail: condExplain[this._cond], 
+      detail: condDescribe[this._cond], 
       range: 4
     });
 

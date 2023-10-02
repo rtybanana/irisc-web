@@ -1,3 +1,4 @@
+import { TSnapshotExplanation } from "@/explainer";
 import { IriscError, RuntimeError } from "@/interpreter/error";
 import { TInstructionNode } from '@/syntax/types';
 import { Queue } from '@/utilities';
@@ -51,6 +52,8 @@ type TSimulatorStateBase = {
   stdin?: string;
   output: string[];
   exitStatus: TExitStatus | undefined;
+
+  explanation: TSnapshotExplanation
 }
 
 export type TSimulatorSnapshot = TSimulatorStateBase & { key: number; };

@@ -1,0 +1,1 @@
+export const uncapitalize = (s: string) => s[0].toLowerCase() + s.slice(1)

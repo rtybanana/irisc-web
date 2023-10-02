@@ -1,6 +1,7 @@
 import { Queue } from '@/utilities';
 import { TAllocation, TSimulatorSnapshot, TSimulatorState } from './types';
 import Vue from 'vue';
+import { TSnapshotExplanation } from '@/explainer';
 
 export const state = Vue.observable<TSimulatorState>({
   running: false,
@@ -54,6 +55,7 @@ export const state = Vue.observable<TSimulatorState>({
   hoveredError: null,
   exitStatus: undefined,
 
+  explanation: {} as TSnapshotExplanation,
   snapshots: new Queue<TSimulatorSnapshot>(500, true),
   vue: undefined
 });

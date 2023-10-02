@@ -21,6 +21,24 @@ export const condMap: Record<string, Condition> = {
   "":   Condition.AL
 }
 
+export const condNameMap: Record<Condition, string> = {
+  [Condition.EQ]: "eq", 
+  [Condition.NE]: "ne", 
+  [Condition.CS]: "cs", 
+  [Condition.CC]: "cc",
+  [Condition.MI]: "mi", 
+  [Condition.PL]: "pl", 
+  [Condition.VS]: "vs", 
+  [Condition.VC]: "vc",
+  [Condition.HI]: "hi", 
+  [Condition.LS]: "ls", 
+  [Condition.GE]: "ge", 
+  [Condition.LT]: "lt", 
+  [Condition.GT]: "gt", 
+  [Condition.LE]: "le", 
+  [Condition.AL]: "al"
+}
+
 export const condTitle: Record<Condition, string> = {
   [Condition.EQ]: "Equal", 
   [Condition.NE]: "Not Equal", 
@@ -39,7 +57,7 @@ export const condTitle: Record<Condition, string> = {
   [Condition.AL]: "Always"
 };
 
-export const condExplain: Record<Condition, string> = {
+export const condDescribe: Record<Condition, string> = {
   [Condition.EQ]: "The instruction is only executed if the zero flag (Z) is set.", 
   [Condition.NE]: "The instruction is only executed if the zero flag (Z) is clear.", 
   [Condition.CS]: "The instruction is only executed if the carry flag (C) is set.", 
@@ -57,7 +75,7 @@ export const condExplain: Record<Condition, string> = {
   [Condition.AL]: "The instruction is executed unconditionally. This is the default condition."
 };
 
-export const condShortExplain: Record<Condition, string> = {
+export const condShortDescribe: Record<Condition, string> = {
   [Condition.EQ]: "If the zero flag (Z) is set.", 
   [Condition.NE]: "If the zero flag (Z) is clear.", 
   [Condition.CS]: "If the carry flag (C) is set.", 

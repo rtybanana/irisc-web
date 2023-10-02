@@ -1,5 +1,5 @@
 import { bitset } from '@/assets/bitset';
-import { condExplain, Condition, condMap, condTitle, Operation, opExplain, opMap, opTitle, Register, regTitle, setFlagsExplain } from '@/constants';
+import { condDescribe, Condition, condMap, condTitle, Operation, opDescribe, opMap, opTitle, Register, regTitle, setFlagsExplain } from '@/constants';
 import { Token } from 'prismjs';
 import { SyntaxError } from '../../interpreter/error';
 import { FlexOperand } from '../FlexOperand';
@@ -62,7 +62,7 @@ export class BiOperandNode extends InstructionNode {
     explanation.push({
       title: "Condition Code", 
       subtitle: condTitle[this._cond], 
-      detail: condExplain[this._cond], 
+      detail: condDescribe[this._cond], 
       range: 4
     });
   
@@ -87,7 +87,7 @@ export class BiOperandNode extends InstructionNode {
     explanation.push({
       title: "Operation Code", 
       subtitle: opTitle[this._op], 
-      detail: opExplain[this._op], 
+      detail: opDescribe[this._op], 
       range: 4
     });
     

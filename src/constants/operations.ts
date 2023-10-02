@@ -68,7 +68,7 @@ export const opTitle: Record<Operation, string> = {
   [Operation.BX]:  "Branch and Exchange"
 };
 
-export const opExplain: Record<Operation, string> = {
+export const opDescribe: Record<Operation, string> = {
   [Operation.AND]: "Performs a bitwise AND operation and stores the result.", 
   [Operation.EOR]: "Performs a bitwise exclusive OR operation and stores the result.", 
   [Operation.SUB]: "Performs an arithmetic subtraction from left to right and stores the result.", 
@@ -91,3 +91,27 @@ export const opExplain: Record<Operation, string> = {
   [Operation.BL]:  "Branches to the provided instruction address or label and stores the return address.",
   [Operation.BX]:  "Branches to the provided instruction address or label and optionally changes instruction type."
 };
+
+
+export const opExplain: Record<Operation, string> = {
+  [Operation.AND]: ``, 
+  [Operation.EOR]: ``, 
+  [Operation.SUB]: ``, 
+  [Operation.RSB]: ``,
+  [Operation.ADD]: ``, 
+  [Operation.ADC]: ``,
+  [Operation.SBC]: ``, 
+  [Operation.RSC]: ``,
+  [Operation.TST]: ``,
+  [Operation.TEQ]: ``,
+  [Operation.CMP]: ``,
+  [Operation.CMN]: ``,
+  [Operation.ORR]: ``,
+  [Operation.MOV]: ``,
+  [Operation.BIC]: ``,
+  [Operation.MVN]: ``,
+
+  [Operation.B]:  `Sets the <span class="token register">pc</span> to the result of the expression. The <span class="token register">pc</span> now points to the address of the next instruction to be executed.`,
+  [Operation.BL]: `Copies the existing <span class="token register">pc</span> into the <span class="token register">lr</span>. Sets the <span class="token register">pc</span> to the result of the expression. The <span class="token register">pc</span> now points to the address of the next instruction to be executed.`,
+  [Operation.BX]: `Sets the <span class="token register">pc</span> to the result of the expression. In a real ARM CPU this may also e<span class="token operation">x</span>change the instruction set to THUMB. The <span class="token register">pc</span> now points to the address of the next instruction to be executed.`
+}

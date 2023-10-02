@@ -1,5 +1,5 @@
 import { bitset } from '@/assets/bitset';
-import { addressModeGroup, BlockAddressMode, blockAddressModeMap, BlockTransfer, blockTransferOperations, condExplain, Condition, condMap, condTitle, Register, regShortTitle, regTitle, transferMap } from '@/constants';
+import { addressModeGroup, BlockAddressMode, blockAddressModeMap, BlockTransfer, blockTransferOperations, condDescribe, Condition, condMap, condTitle, Register, regShortTitle, regTitle, transferMap } from '@/constants';
 import { SyntaxError } from '@/interpreter/error';
 import { Token } from 'prismjs';
 import { IExplanation, TAssembled } from '../types';
@@ -159,7 +159,7 @@ export class BlockTransferNode extends TransferNode {
     explanation.push({
       title: "Condition Code", 
       subtitle: condTitle[this._cond], 
-      detail: condExplain[this._cond], 
+      detail: condDescribe[this._cond], 
       range: 4
     });
 

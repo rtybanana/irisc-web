@@ -25,7 +25,7 @@
       <div
         v-for="(_, index) in cpsr"
         class="flag"
-        @mouseover="tip(flagTitle[index], flagExplain[index])"
+        @mouseover="tip(flagTitle[index], flagDescribe[index])"
         @mouseleave="untip"
         :key="index"
       > 
@@ -49,7 +49,7 @@
 
 <script lang="ts">
 import { zip } from '@/assets/functions';
-import { flagExplain, flagName, flagTitle, regExplain, Register, regName, regTitle } from "@/constants";
+import { flagDescribe, flagName, flagTitle, regDescribe, Register, regName, regTitle } from "@/constants";
 import { SimulatorState } from "@/simulator";
 import Vue from 'vue';
 
@@ -62,11 +62,11 @@ export default Vue.extend({
     return {
       regName,
       regTitle,
-      regExplain,
+      regDescribe,
 
       flagName, 
       flagTitle,
-      flagExplain,
+      flagDescribe,
 
       cpsrTitle: "CPSR Flags", 
       cpsrExplain: "Four bits in the Current Program Status Register which are used to decide whether a conditional instruction should execute.",
@@ -109,7 +109,7 @@ export default Vue.extend({
 
       this.tip(
         this.regTitle[reg],
-        `${this.regExplain[reg]}\n\nDec: ${value}\nHex: ${hexValue}`
+        `${this.regDescribe[reg]}\n\nDec: ${value}\nHex: ${hexValue}`
       )
     },
 

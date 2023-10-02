@@ -18,7 +18,9 @@ export const snapshots = {
       wasExecuted: state.wasExecuted,
 
       output: clone(state.output),
-      exitStatus: clone(state.exitStatus)
+      exitStatus: clone(state.exitStatus),
+
+      explanation: clone(state.explanation)
     };
 
     // enqueue snapshot or replace if snapshot at that tick already exists
@@ -55,6 +57,8 @@ export const snapshots = {
 
     state.output = clone(snapshot.output);
     state.exitStatus = clone(snapshot.exitStatus);
+
+    state.explanation = clone(snapshot.explanation);
 
     memory.observeMemory();
 

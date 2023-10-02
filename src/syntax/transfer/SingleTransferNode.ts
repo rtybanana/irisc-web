@@ -1,5 +1,5 @@
 import { bitset } from '@/assets/bitset';
-import { condExplain, Condition, condMap, condTitle, Register, regTitle, SingleTransfer, TAddressMode, transferMap, TSign, TTransferSize } from '@/constants';
+import { condDescribe, Condition, condMap, condTitle, Register, regTitle, SingleTransfer, TAddressMode, transferMap, TSign, TTransferSize } from '@/constants';
 import { Interpreter } from '@/interpreter';
 import { ReferenceError, SyntaxError } from '@/interpreter/error';
 import { Token } from 'prismjs';
@@ -173,7 +173,7 @@ export class SingleTransferNode extends TransferNode {
     explanation.push({
       title: "Condition Code", 
       subtitle: condTitle[this._cond], 
-      detail: condExplain[this._cond], 
+      detail: condDescribe[this._cond], 
       range: 4
     });
 

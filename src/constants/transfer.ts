@@ -21,7 +21,7 @@ export const transferTitle: Record<TTransfer, string> = {
   [StackTransfer.POP]:    "Stack Pop"
 }
 
-export const transferExplain: Record<TTransfer, string> = {
+export const transferDescribe: Record<TTransfer, string> = {
   [SingleTransfer.LDR]:   "Loads a single byte or word of data from memory.",
   [SingleTransfer.STR]:   "Stores a single byte or work of data into memory.",
   [BlockTransfer.LDM]:    "Loads multiple bytes or words of data from memory.",
