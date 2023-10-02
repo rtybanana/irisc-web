@@ -73,7 +73,7 @@ export const common = {
       let address: number;
 
       if (typeof addr === "string") {
-        address = snapshot.memory.dataMap[addr];
+        address = snapshot.memory.dataTable[addr];
       }
       else {
         address = snapshot.cpu.registers[addr as Register];

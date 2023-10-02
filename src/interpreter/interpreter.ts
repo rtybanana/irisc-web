@@ -459,8 +459,8 @@ function checkStore(address: number, register: Register, instruction: TInstructi
  * @returns 
  */
 export function generateLabelOffset(label: string, instruction: TInstructionNode): number {
-  if (label in state.memory.dataMap) {
-    return (state.memory.dataMap[label] - state.previousPC) / 4;
+  if (label in state.memory.dataTable) {
+    return (state.memory.dataTable[label] - state.previousPC) / 4;
   }
 
   if (label in state.memory.textMap) {

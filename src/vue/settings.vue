@@ -14,10 +14,10 @@
         <!-- simulation speed -->
         <div>
           cpu tickrate
-          <span class="float-right">{{ (1000 / delay).toFixed(2) }} tps</span>
+          <span class="float-right">{{ (1000 / settings.delay).toFixed(2) }} tps</span>
         </div>
         <b-form-input 
-          :value="1000 / delay"
+          :value="1000 / settings.delay"
           @change="simulatorState.setDelay(1000 / $event)"
           type="range"
           min="0.5"
@@ -28,14 +28,14 @@
         <!-- memory size -->
         <div>
           ram size 
-          <span class="float-right">{{ memory.size }} bytes</span>
+          <span class="float-right">{{ settings.memSize }} bytes</span>
         </div>
         <b-form-input 
-          :value="memory.sizes.findIndex(e => e === memory.size)"
-          @change="simulatorState.init(memory.sizes[+$event])"
+          :value="memSizes.findIndex(e => e === settings.memSize)"
+          @change="simulatorState.init(memSizes[+$event])"
           type="range"
           min="0"
-          :max="memory.sizes.length - 1"
+          :max="memSizes.length - 1"
         ></b-form-input>
 
         <div>
@@ -55,7 +55,6 @@ import { SettingsState } from '@/utilities';
 import { BModal } from 'bootstrap-vue';
 import Vue from 'vue';
 
-
 export default Vue.extend({
   data() {
     return {
@@ -63,15 +62,24 @@ export default Vue.extend({
       settingsState: SettingsState,
     }
   },
+
   computed: {
     settings: SettingsState.settings,
-
-    memory: SimulatorState.memory,
-    delay: SimulatorState.delay
+    memSizes: () => SimulatorState.memory().sizes
   },
+
   methods: {
     show: function () {
       (this.$refs.modal as BModal).show();
+    }
+  },
+
+  watch: {
+    settings: {
+      handler: function () {
+        SettingsState.updateStorage();
+      },
+      deep: true
     }
   }
 })

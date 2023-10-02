@@ -61,13 +61,9 @@ export default Vue.extend({
     },
 
     files: function (): TFile[] {
-      let files = this.currentDirectory.files
+      return this.currentDirectory.files
         .slice()
         .sort();
-
-      console.log(files);
-
-      return files;
     },
 
     directories: function (): TDirectory[] {

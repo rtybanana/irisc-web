@@ -334,14 +334,15 @@ export default Vue.extend({
     showHistory: function () {
       this.historyShown = false;
 			(this.$refs.history as BModal).show();
-
+      
 			const v = this;
 			setTimeout(() => {
 				v.historyShown = true;
+        this.scrollToTick(this.currentTick);
 			}, 350);
     },
 
-    scrollToTick(tick: number, behavior: string) {
+    scrollToTick(tick: number, behavior: string = "smooth") {
       this.$nextTick(() => {
         const snapshot = (this.$refs[`tick_${tick}`] as any[])?.[0];
         if (snapshot) {

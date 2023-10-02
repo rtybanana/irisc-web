@@ -116,7 +116,7 @@ export class BlockTransferNode extends TransferNode {
     }
 
     // sort register list into ascending order
-    this._Rlist.sort();
+    this._Rlist.sort((a: number, b: number) => a - b);
     
     this._currentToken += index;
     this.parseBrace(this.nextToken(), 'end');
@@ -229,12 +229,6 @@ export class BlockTransferNode extends TransferNode {
     registers.forEach(reg => {
       const include = this._Rlist.includes(reg as Register) ? 1 : 0;
       instruction = (instruction << 1) | include;
-      // explanation.push({
-      //   title: "Register List Item", 
-      //   subtitle: regTitle[reg as Register], 
-      //   detail: `Indicates whether (1) or not (0) ${regTitle[reg as Register]} should be included in the block transfer.`, 
-      //   range: 1
-      // });
     });
 
     explanation.push({
