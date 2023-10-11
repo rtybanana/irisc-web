@@ -1,7 +1,7 @@
 import { Register } from "@/constants";
 import { SimulatorState } from "@/simulator";
 import { state } from "@/interpreter/interpreter";
-import { printf as cprintf, getTokens} from "@/assets/printf/printf";
+import { printf as cprintf, getTokens} from "@/assets/printf";
 import { RuntimeError } from "@/interpreter";
 import { randomiseScratch } from ".";
 
@@ -24,7 +24,7 @@ export function printf(): boolean {
 	let useStack = false;
 	let currentRegister = Register.R1;
 	let currentStackOffset = 0;
-	const args = tokens.map((token, index) => {
+	const args = tokens.map((token: any) => {
 		let data: any;
 		let register: Register = currentRegister;
 		let offset: number = currentStackOffset;         // byte view offset

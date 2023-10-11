@@ -13,15 +13,7 @@
  *      check that the accompanying message is correct.
  */
 
-import { SyntaxNode } from "@/syntax";
-import { Assembler, NumericalError } from "@/interpreter"
-import '@/assets/prism-armv7';
-
-const node = new SyntaxNode([], 0, 0);
-const assemble = (imm: string, bits: number = 8) => {
-  const token = Assembler.parse(imm);
-  return node.parseShiftedImm(token[0][0], bits);
-}
+import { assemble } from '.';
 
 /**
  * These tests check the most simple set of immediate assemblies, where no barrel-shift
@@ -70,7 +62,7 @@ describe("assembling immediates, barrel shift", () => {
 describe("assembling immediates, rolled corner edge case", () => {
   test("valid", () => {
     expect(assemble("#0xf000000f")).toStrictEqual([255, 4]);
-    expect(assemble("#0x40000010")).toStrictEqual([130, 2]);
+    expect(assemble("#0x40000010")).toStrictEqual([65, 2]);
   });
 
   test("invalid, too wide", () => {
@@ -80,7 +72,14 @@ describe("assembling immediates, rolled corner edge case", () => {
   });
 
   test("invalid, odd rotation", () => {
-    expect(() => assemble("#0x80000040")).toThrow("even number of bits");
+    // this number is binary: 10000000 00000000 00000000 01000000
+    // rotations are applied in even intervals:
+    //    rotating one interval (twice) gives:
+    //    00000000 00000000 00000001 00000010
+    //    
+    // which cannot be represented because the rotated value does not fit in the maximum 
+    // 8 bit width (not all set bits fall within the final byte)
+    expect(() => assemble("#0x80000040")).toThrow("rotated an even number of times");
   })
 });
 

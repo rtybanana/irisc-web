@@ -1,6 +1,7 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-module.exports = {
+export default {
   preset: 'ts-jest',
+  transform: {},
   testEnvironment: 'jsdom',
   moduleNameMapper: {
     "@/(.*)": "<rootDir>/src/$1",

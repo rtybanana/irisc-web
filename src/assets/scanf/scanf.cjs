@@ -1,5 +1,5 @@
-var utils = require('./utils');
-var gets = require('./gets');
+var utils = require('./utils.cjs');
+var gets = require('./gets.cjs');
 
 var input = '';
 var stdin_flag = true;

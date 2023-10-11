@@ -1,6 +1,7 @@
 {
   "name": "irisc-web",
   "version": "1.8.0",
+  "type": "module",
   "engines": {
     "node": "14.x"
   },
@@ -10,7 +11,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "deploy": "npm run build && git tag v%npm_package_version% && git push origin v%npm_package_version% && push-dir --dir=dist --branch=deploy",
-    "test": "jest"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.5.1",

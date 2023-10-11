@@ -41,8 +41,8 @@
     "tests/**/*.tsx",
     "decs.d.ts", 
     "vue-shepherd.d.ts",
-    "src/assets/scanf/scanf.js",
-    "src/assets/printf/printf.js"  
+    "src/assets/scanf/scanf.cjs",
+    "src/assets/printf/printf.cjs"  
   ],
   "exclude": [
     "node_modules"

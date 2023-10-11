@@ -473,7 +473,7 @@ Formatter.prototype.spacePad = function(token, /*Int*/ length) {
 //   }
 // };
 
-export const printf = function(){
+exports.printf = function(){
   var args = Array.prototype.slice.call(arguments),
     stream, format;
   if(args[0] instanceof require('stream').Stream){
@@ -489,7 +489,7 @@ export const printf = function(){
   }
 };
 
-export const getTokens = function(format){
+exports.getTokens = function(format){
   var formatter = new Formatter(format);
   // return formatter._tokens.length;
   return formatter._tokens.filter(token => typeof token != 'string');
