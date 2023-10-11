@@ -171,16 +171,16 @@ export class SyntaxNode {
     }
 
     if ((topbit - bottombit) > bits - 1) {
-      const validRolledCorner = this.isValidRolledCorner(imm, bits);
+      const validRolledCorner = this.isValidRolledCorner(token, imm, bits);
 
-      if (!validRolledCorner) {
-        throw new NumericalError(
-          `IMMEDIATE value '${token.content}' (decimal ${imm}) cannot be implicitly represented with a maximum set-bit width of ${bits}.`, 
-          this._statement, 
-          this._lineNumber, 
-          this._currentToken
-        );
-      }
+      // if (!validRolledCorner) {
+        // throw new NumericalError(
+        //   `IMMEDIATE value '${token.content}' (decimal ${imm}) cannot be implicitly represented with a maximum set-bit width of ${bits}.`, 
+        //   this._statement, 
+        //   this._lineNumber, 
+        //   this._currentToken
+        // );
+      // }
 
       [imm, shift] = validRolledCorner as [number, number];
     }
@@ -208,22 +208,34 @@ export class SyntaxNode {
    * @param imm 
    * @param bits 
    */
-  isValidRolledCorner(imm: number, bits: number): boolean | [number, number] {
+  isValidRolledCorner(token: Token, imm: number, bits: number): boolean | [number, number] {
     const bottomBits = (imm & 0xff) >>> 0;
-    console.log(bitset(8, bottomBits).reverse());
-
-    const correctiveRotation = fls(bottomBits) + 1;
-    console.log(correctiveRotation);
+    const correctiveRotation = Math.ceil((fls(bottomBits) + 1) / 2) * 2;
 
     const testImm = rotr((imm >>> 0), correctiveRotation);
-    console.log(bitset(32, testImm).reverse());
-
     const bottombit: number = ffs(testImm);
     const topbit: number = fls(testImm);
 
-    console.log(topbit, bottombit);
+    // catches cases where the rolled corner number cannot be represented within the target bit width
+    if ((topbit - bottombit) > bits - 1) {
+      throw new NumericalError(
+        `IMMEDIATE value '${token.content}' (decimal ${imm}) cannot be implicitly represented with a maximum set-bit width of ${bits}.`, 
+        this._statement, 
+        this._lineNumber, 
+        this._currentToken
+      );
+    }
 
-    if ((topbit - bottombit) > bits - 1) return false;
+    // catches cases where the rolled corner CAN be represented within the target bit width
+    // BUT rotating by an even number forces the top bit out of the 8 bit range into the 9th bit
+    if (bottombit <= 23) {
+      throw new NumericalError(
+        `IMMEDIATE value '${token.content} (decimal ${imm}) cannot be implicitly represented within 8 bits with the restriction that it is rotated an even number of times.\n\nThis is a complicated edge-case of the barrel shifter, well done for discovering it. If you would like to learn more, I suggest researching the rules of the barrel shifter yourself. The ARMv7-A reference manual should contain everything you need.`, 
+        this._statement, 
+        this._lineNumber, 
+        this._currentToken
+      );
+    }
 
     /**
      * return [imm, shift] where
@@ -232,7 +244,7 @@ export class SyntaxNode {
      */
     return [
       (rotr(testImm, 24) & 0xff) >>> 0, 
-      Math.floor((bits - correctiveRotation) / 2) *2
+      8 - correctiveRotation
     ];
   }
 
