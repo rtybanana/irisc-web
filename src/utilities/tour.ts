@@ -5,6 +5,7 @@ import Vue from 'vue';
 import { TInstructionNode } from '@/syntax/types';
 import { Register } from '@/constants';
 import { highlight, languages } from 'prismjs';
+import { AchievementState } from '@/achievements';
 
 
 export function createTour() {
@@ -83,9 +84,11 @@ export function createTour() {
 					`;
 				}
 				else {
-					const highlitInstruction = highlight(tourVm.currentInstruction!.text, languages.armv7, 'ARMv7');
+					AchievementState.achieve("Eh... close enough.");
 
+					const highlitInstruction = highlight(tourVm.currentInstruction!.text, languages.armv7, 'ARMv7');
 					const r1 = SimulatorState.registers()[Register.R1];
+
 					if (r1 === 1) {
 						textEl!.innerHTML = // html 
 						`
@@ -200,6 +203,7 @@ export function createTour() {
 		floatingUIOptions: {
 			middleware: [ offset(35) ]
 		},
+		canClickTarget: false,
 		buttons: [
 			{ 
 				text: "righto",
@@ -458,6 +462,7 @@ export function createTour() {
 			{ 
 				text: "finally!",
 				action: function () {
+					AchievementState.achieve("Tour de Force!");
 					this.complete(); 
 				} 
 			}

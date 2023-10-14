@@ -10,6 +10,7 @@ import { LabelNode, BranchNode, SingleTransferNode } from "@/syntax";
 import { snapshots } from "./snapshots";
 import { interaction } from "./interaction";
 import { ReferenceError } from "@/interpreter";
+import { AchievementState } from "@/achievements";
 
 
 export const init = {
@@ -45,6 +46,7 @@ export const init = {
 
 	initMemory: function (memSize?: number) {
     if (memSize !== undefined) state.memory.size = memSize;
+    if (memSize === state.memory.sizes.reduce((a, b) => Math.max(a, b), -Infinity)) AchievementState.achieve("RAM Upgrade");
 
     state.memory.textHeight = 0;
     state.memory.textMap = {};

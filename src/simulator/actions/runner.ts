@@ -8,6 +8,7 @@ import { interaction } from "./interaction";
 import { cpu } from "./cpu";
 import { snapshots } from "./snapshots";
 import { TAllocation } from "../types";
+import { AchievementState } from "@/achievements";
 
 export const runner = {
   /**
@@ -15,6 +16,7 @@ export const runner = {
    */
   run: async function (skipToSleep?: boolean) {
     if (state.errors.length > 0) {
+      AchievementState.achieve("QWOP");
       state.vue!.$root.$emit('bv::show::modal', 'errors-modal');
       return;
     }
@@ -54,12 +56,14 @@ export const runner = {
 
         // check for bx lr to static exit point (one word after memory.size)
         if (state.cpu.registers[Register.PC] === state.memory.size + 4) {
+          AchievementState.achieve("French Exit");
           interaction.setExitStatus(0);
         }
         else {
           // check for breakpoint
           const nextInstruction: TInstructionNode = memory.instruction(state.cpu.registers[Register.PC]);
           if (state.breakpoints.find(e => e.lineNumber === nextInstruction.lineNumber)) {
+            AchievementState.achieve("Certified Debugger");
             interaction.pause();
           }
         }
@@ -69,6 +73,8 @@ export const runner = {
       console.error(e);
 
       if (e instanceof RuntimeError) {
+        if (e.message.includes("SIGSEG")) AchievementState.achieve("Serious RAMifications");
+        
         interaction.setExitStatus(e);
       }
     }

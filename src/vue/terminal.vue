@@ -53,7 +53,7 @@
           <div>{{ computedTooltip.message }}</div>
         </div>
 
-        <div v-if="errors.length > 0" class="clickable hoverable rounded px-1" @click="run">
+        <div v-if="errors.length > 0" class="clickable hoverable rounded px-1" @click="$root.$emit('bv::show::modal', 'errors-modal')">
           {{ errors.length }} errors
         </div>
       </div>
@@ -73,6 +73,7 @@ import { SettingsState, TTooltip, getCaretPosition, setCaretPosition } from '@/u
 import Shepherd from "shepherd.js";
 import Vue from 'vue';
 import { FileSystemState } from "@/files";
+import { AchievementState } from "@/achievements";
 
 const prompt = "irisc:~$ ";
 
@@ -282,9 +283,12 @@ export default Vue.extend({
           Interpreter.execute(node, false);
         }
         else throw new InteractiveError("This operation is not supported on the command-line.", [], -1, -1);
+
+        AchievementState.achieve("Flawless Execution");
       }
       catch (e){
         if (e instanceof IriscError) {
+          AchievementState.achieve("Flawful Execution");
           this.printError(e);
         }
         else throw e;
@@ -314,6 +318,10 @@ export default Vue.extend({
           throw new InteractiveError("Can't switch to the editor yet. Do the tour! You'll get there.", [], -1, -1);
         }
 
+        if (input.startsWith('vi')) {
+          AchievementState.achieve("Purist")
+        }
+
         if (textEditParam !== '') FileSystemState.textEdit(textEditParam);
         this.$emit('switch');
 
@@ -326,6 +334,7 @@ export default Vue.extend({
       }
 
       if (input === 'pwd') {
+        AchievementState.achieve("Where am I?")
         this.output += `\n${FileSystemState.pwd()}`;
         return true;
       }

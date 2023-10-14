@@ -54,6 +54,17 @@
                 <div class="col-6 pl-1" style="max-height: 100%;">
                   <memory></memory>
 
+                  <div class="achievements clickable" @click="$refs.achievements.show()">
+                    <i class="button far fa-star"></i>
+                    <b-badge 
+                      v-show="newAchievements.size > 0" 
+                      class="new-achievements" 
+                      variant="light"
+                    >
+                      {{ newAchievements.size }} <span class="sr-only">new achievements</span>
+                    </b-badge>
+                  </div>
+
                   <div class="settings clickable" @click="$refs.settings.show()">
                     <i class="button fas fa-sliders-h"></i>
                   </div>
@@ -83,6 +94,7 @@
 
     <!-- size="lg" -->
     <settings ref="settings"></settings>
+    <achievements ref="achievements"></achievements>
 
     <b-modal 
       ref="about" 
@@ -150,7 +162,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { editor, terminal, registers, memory, instruction, tutorial, settings } from "@/vue";
+import { editor, terminal, registers, memory, instruction, tutorial, settings, achievements } from "@/vue";
 import { SimulatorState } from "@/simulator";
 import { Interpreter, RuntimeError } from '@/interpreter';
 import { Register, EnvironmentType } from "@/constants"
@@ -163,6 +175,7 @@ import './assets/shepherd.css';
 import { TInstructionNode } from '@/syntax/types';
 import Shepherd from 'shepherd.js';
 import { FileSystemState } from './files';
+import { AchievementState } from './achievements';
 
 export default Vue.extend({
   name: 'emulator',
@@ -173,6 +186,7 @@ export default Vue.extend({
     memory,
     instruction,
     tutorial, 
+    achievements,
     settings
   },
   data() {
@@ -196,6 +210,8 @@ export default Vue.extend({
     running: SimulatorState.running,
     paused: SimulatorState.paused,
     // step: SimulatorState.step,
+
+    newAchievements: AchievementState.new,
 
     isTooSmall: function (): boolean {
       return !this.dismissTooSmall && this.windowSize < 1250;
@@ -276,6 +292,8 @@ export default Vue.extend({
   mounted: function () {
     document.addEventListener('keydown', this.keyListener.bind(this));
 
+    AchievementState.achieve("Welcome to iRISC");
+
     let doneTour = localStorage.getItem('doneTour') ?? false;
     if (!doneTour) this.startTour();
     else {
@@ -324,6 +342,22 @@ html, body {
 
 #emulator {
   height: calc(100% - 88px);
+}
+
+.achievements {
+  position: absolute;
+  bottom: 31px;
+  right: 77px;
+  border-radius: 0.3rem;
+  background-color: #191d21;
+  padding: 0.25rem 0.33rem 0.15rem 0.4rem;
+}
+
+.achievements .new-achievements {
+  position: absolute;
+  right: -3px;
+  top: -3px;
+  padding: 1px 3px;
 }
 
 .settings {

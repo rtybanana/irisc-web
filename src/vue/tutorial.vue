@@ -67,6 +67,7 @@
 </template>
 
 <script lang="ts">
+import { AchievementState } from "@/achievements";
 import { TTutorialPage, tutorialPages, TContentsLink, contentsPage } from "@/tutorial";
 import Vue from 'vue';
 
@@ -118,6 +119,7 @@ export default Vue.extend({
     },
 
     navigateTo: function (page: TContentsLink) {
+      if (page.index - this.page >= 10) AchievementState.achieve("Booooring");
       this.page = page.index;
     }
   },

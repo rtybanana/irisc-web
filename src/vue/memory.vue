@@ -138,7 +138,7 @@
 
     <div class="flex-grow-1 dashed info px-2 py-1" style="overflow: auto;">
       <template v-if="tooltip">
-        <div style="width: calc(100% - 40px);" :style="`color: ${tooltip.color};`">
+        <div style="width: calc(100% - 75px);" :style="`color: ${tooltip.color};`">
           {{ tooltip.tip }}
         </div>
       </template>
@@ -212,7 +212,7 @@ export default Vue.extend({
         },
         stackPointer: {
           name: "stack pointer",
-          tip: "The stack pointer is a reference to the memory location which represents the current top of the stack.",
+          tip: "The stack pointer is a pointer to the current head of the program stack.",
           color: "white"
         } 
       } as TDictionary<TTip>
