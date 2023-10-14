@@ -2,6 +2,7 @@ import { bitset, ffs, fls, rotr } from '@/assets/bitset';
 import { Register, regMap } from '@/constants';
 import { Token } from 'prismjs';
 import { NumericalError, SyntaxError } from '../interpreter/error';
+import { AchievementState } from '@/achievements';
 
 /** Ancestor class which defines common functions for all child syntax nodes */
 export class SyntaxNode {
@@ -229,8 +230,10 @@ export class SyntaxNode {
     // catches cases where the rolled corner CAN be represented within the target bit width
     // BUT rotating by an even number forces the top bit out of the 8 bit range into the 9th bit
     if (bottombit <= 23) {
+      AchievementState.achieve("Edge Case Pro");
+
       throw new NumericalError(
-        `IMMEDIATE value '${token.content} (decimal ${imm}) cannot be implicitly represented within 8 bits with the restriction that it is rotated an even number of times.\n\nThis is a complicated edge-case of the barrel shifter, well done for discovering it. If you would like to learn more, I suggest researching the rules of the barrel shifter yourself. The ARMv7-A reference manual should contain everything you need.`, 
+        `IMMEDIATE value '${token.content} (decimal ${imm}) cannot be implicitly represented within 8 bits with the restriction that it is rotated an even number of times.\n\nThis is a complicated edge-case of the barrel shifter, so well done for discovering it. If you would like to learn more, I suggest researching the rules of the barrel shifter yourself. The ARMv7-A reference manual should contain everything you need.`, 
         this._statement, 
         this._lineNumber, 
         this._currentToken

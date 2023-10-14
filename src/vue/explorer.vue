@@ -226,6 +226,7 @@ import debug from './debug.vue';
 import { TAllocation, TDeclaration } from '@/simulator/types';
 import clone from "lodash.clonedeep";
 import Shepherd from 'shepherd.js';
+import { AchievementState } from '@/achievements';
 
 type TTip = {
 	title: string;
@@ -529,6 +530,10 @@ export default Vue.extend({
 					if (this.datatype === 'ascii') this.datatype = 'hex';
 				}
 			}
+		},
+
+		datatype: function () {
+			AchievementState.achieve("8'f\"+e'zz/9guuf>#l_hkW{");
 		}
 	}
 });

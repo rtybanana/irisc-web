@@ -33,6 +33,9 @@ export const text = {
     state.currentInstruction = undefined;
 
     memory.observeMemory();
+
+    // reset current tick to 0
+    state.cpu.tick = 0;
     snapshots.takeSnapshot();
   },
   

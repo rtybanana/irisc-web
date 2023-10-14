@@ -7,6 +7,7 @@ import { init } from "./init";
 import { runner } from "./runner";
 import { memory } from "./memory";
 import { Queue } from "@/utilities";
+import { AchievementState } from "@/achievements";
 
 export const interaction = {
   start: function () {
@@ -15,8 +16,12 @@ export const interaction = {
       return;
     }
 
+    console.log("reinstating first snapshot");
+
     snapshots.reinstateSnapshot(0);
     state.paused = false;
+
+    console.log("snapshot reinstated");
     
     // reset emulator state and run simulation
     init.reset();
@@ -59,6 +64,7 @@ export const interaction = {
   },
 
   setDelay(delay: number) : void {
+    if (delay === 10) AchievementState.achieve("CPU Upgrade")
     state.delay = delay;
   },
 
