@@ -1,19 +1,21 @@
 import { version } from '../../package.json';
 
-const art3 = ((s: any) => s.raw)`
+export const art = ((s: any) => s.raw)`
       ██╗  ██████╗   ██╗  ███████╗   ██████╗
       ╚═╝  ██╔══██╗  ██║  ██╔════╝  ██╔════╝
       ██║  ██████╔╝  ██║  ███████╗  ██║     
       ██║  ██╔══██╗  ██║  ╚════██║  ██║     
       ██║  ██║  ██║  ██║  ███████║  ╚██████╗
       ╚═╝  ╚═╝  ╚═╝  ╚═╝  ╚══════╝   ╚═════╝
-      repl interface
 `[0];
 
 export const replWelcome = // html
 `\
   <span class="internal">\
-    <span class="d-inline-block" style="white-space: pre;">${art3}</span>
+    <span class="d-inline-block" style="white-space: pre;">
+      ${art}\
+      repl interface
+    </span>
 
     Welcome to the iRISC ${version} repl interface.
 

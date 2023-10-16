@@ -2,7 +2,7 @@ import { Register } from "@/constants";
 import { Queue } from "@/utilities";
 import { state } from "../state";
 import Vue from 'vue';
-import { TAllocation, TSimulatorSnapshot } from "../types";
+import { SystemState, TAllocation, TSimulatorSnapshot } from "../types";
 import { cpu } from "./cpu";
 import { TInstructionNode } from "@/syntax/types";
 import { memory } from "./memory";
@@ -42,6 +42,7 @@ export const init = {
 		state.exitStatus = undefined;
 
 		state.currentInstruction = undefined;
+    state.systemState = SystemState.OK;
 	},
 
 	initMemory: function (memSize?: number) {

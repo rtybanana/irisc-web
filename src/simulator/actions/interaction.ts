@@ -1,6 +1,6 @@
-import { IriscError } from "@/interpreter";
+import { Assembler, IriscError } from "@/interpreter";
 import { state } from "../state";
-import { TExitStatus, TSimulatorSnapshot } from "../types";
+import { SystemState, TExitStatus, TSimulatorSnapshot } from "../types";
 import Vue from 'vue';
 import { snapshots } from "./snapshots";
 import { init } from "./init";
@@ -114,5 +114,24 @@ export const interaction = {
   setExitStatus: function (status: TExitStatus) {
     state.exitStatus = status;
     this.stop();
+  },
+
+  crash: async function () {
+    state.systemState = SystemState.CRASHING;
+    await new Promise(r => setTimeout(r, 2000));
+
+    state.systemState = SystemState.BLUESCREEN;
+    await new Promise(r => setTimeout(r, 4000));
+
+    state.systemState = SystemState.BIOS;
+    await new Promise(r => setTimeout(r, 5000));
+
+    AchievementState.achieve("BSoD");
+    await new Promise(r => setTimeout(r, 3000));
+
+    state.systemState = SystemState.BOOTING;
+    await new Promise(r => setTimeout(r, 3000));
+
+    state.systemState = SystemState.OK;
   }
 }

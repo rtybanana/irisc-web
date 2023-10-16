@@ -18,10 +18,12 @@ export const achievementMap: Record<string, TAchievement> = {
   // misc
   "Welcome to iRISC": { name: "Welcome to iRISC", description: "Welcome! Have an achievement on me.", rarity: Rarity.COMMON },
   "Edge Case Pro": { name: "Edge Case Pro", description: "Stumble upon a complicated barrel-shifter edge case.", rarity: Rarity.EPIC },
+  "Spring Cleaning": { name: "Spring Cleaning", description: "Attempt to delete the entire disk.", rarity: Rarity.EPIC },
+  "BSoD": { name: "BSoD", description: "Ah the computer's least favourite colour. Royal blue.", rarity: Rarity.EPIC },
 
   // tour related
   "Tour de Force!": { name: "Tour de Force!", description: "Complete the tour.", rarity: Rarity.COMMON }, 
-  "Eh... close enough.": { name: "Eh... close enough.", description: "Have trouble following instructions.", rarity: Rarity.RARE },
+  "Eh... close enough.": { name: "Eh... close enough.", description: "Have trouble following instructions.", rarity: Rarity.EPIC },
 
   // terminal
   "Flawless Execution": { name: "Flawless Execution", description: "Execute your first successful terminal command.", rarity: Rarity.COMMON },
@@ -44,5 +46,5 @@ export const achievementMap: Record<string, TAchievement> = {
 
 
   // tutorial
-  "Booooring": { name: "Booooring", description: "Skip 10 or more pages of the tutorial using the contents page.", rarity: Rarity.UNCOMMON }
+  "Booooring": { name: "Booooring", description: "Skip 10 or more pages of the tutorial using the contents page.", rarity: Rarity.RARE }
 }

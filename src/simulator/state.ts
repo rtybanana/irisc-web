@@ -1,5 +1,5 @@
 import { Queue } from '@/utilities';
-import { TAllocation, TDeclaration, TSimulatorSnapshot, TSimulatorState } from './types';
+import { SystemState, TAllocation, TDeclaration, TSimulatorSnapshot, TSimulatorState } from './types';
 import Vue from 'vue';
 
 export const state = Vue.observable<TSimulatorState>({
@@ -56,5 +56,7 @@ export const state = Vue.observable<TSimulatorState>({
   exitStatus: undefined,
 
   snapshots: new Queue<TSimulatorSnapshot>(500, true),
-  vue: undefined
+  vue: undefined,
+
+  systemState: SystemState.OK
 });

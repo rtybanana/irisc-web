@@ -34,5 +34,7 @@ export const getters = {
   exitStatus: () => state.exitStatus,
 
   snapshots: () => state.snapshots,
-  vue: () => state.vue
+  vue: () => state.vue,
+
+  systemState: () => state.systemState
 }
