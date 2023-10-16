@@ -1,6 +1,24 @@
 <template>
   <div id="app">
-    <div class="container-fluid h-100">
+    <div v-if="systemState === SystemState.BLUESCREEN" class="container-fluid h-100 p-4 text-left" style="background-color: #0000aa;">
+      <h1>A fatal error occurred.</h1>
+      <div>You did something inadvisable.</div>
+      <div class="mt-4">iRISC will now reboot.</div>
+    </div>
+
+    <div v-else-if="systemState === SystemState.BIOS" class="container-fluid h-100 text-left bios" style="background-color: black;">
+      <div class="bios-logo">
+        <pre class="pt-4 text-irisc">
+          {{ iriscArt }}
+      Polysoft Systems Inc. <span class="text-white">1998 ~ ∞</span>
+        </pre>
+        <div class="mt-4"></div>
+      </div>
+
+      <div class="bios-text flashing-caret mt-2">system booting</div>
+    </div>
+
+    <div v-else class="container-fluid h-100">
       <div class="row h-100">
         <div id="emulator" class="col-12 h-100">
           <div class="row px-0" style="height: 24px;">
@@ -165,7 +183,7 @@ import Vue from 'vue';
 import { editor, terminal, registers, memory, instruction, tutorial, settings, achievements } from "@/vue";
 import { SimulatorState } from "@/simulator";
 import { Interpreter, RuntimeError } from '@/interpreter';
-import { Register, EnvironmentType } from "@/constants"
+import { Register, EnvironmentType, art } from "@/constants"
 import { createTour, SettingsState } from '@/utilities';
 
 import './assets/generic.css';
@@ -176,6 +194,7 @@ import { TInstructionNode } from '@/syntax/types';
 import Shepherd from 'shepherd.js';
 import { FileSystemState } from './files';
 import { AchievementState } from './achievements';
+import { SystemState } from './simulator/types';
 
 export default Vue.extend({
   name: 'emulator',
@@ -192,12 +211,14 @@ export default Vue.extend({
   data() {
     return {
       env: EnvironmentType.TERMINAL,
+      iriscArt: art,
 
       dismissTooSmall: false,
       windowSize: 0
     }
   },
   computed: {
+    systemState: SimulatorState.systemState,
     currentTick: SimulatorState.currentTick,
 
     // registers: SimulatorState.registers,
@@ -219,6 +240,7 @@ export default Vue.extend({
 
     // hack so we can access the enum in dom
     EnvironmentType: () => EnvironmentType,
+    SystemState: () => SystemState
   },
   methods: {
     /**
@@ -374,8 +396,75 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #0d1117;
-  border: 1px dashed #DCDCDC;
+  border: 1px dashed #b19898;
   color: #DCDCDC;
   text-align: left;
 }
+
+.flashing-caret {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.flashing-caret::after {
+  content: "";
+  margin-top: 10px;
+  width: 8px;
+  height: 3px;
+  background: white;
+  display: inline-block;
+  animation: cursor-blink 0.3s steps(2) infinite;
+} 
+
+@keyframes cursor-blink {
+  0% {
+    opacity: 0;
+  }
+}
+
+.bios-logo {
+  visibility: hidden;
+  animation: popInOut 3s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+}
+
+.bios-text {
+  visibility: hidden;
+  animation: popInOut 2.5s;
+  animation-delay: 1.5s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes popInOut {
+  0% {
+    visibility: hidden;
+  }
+  1% {
+    visibility: visible;
+  }
+  99% {
+    visibility: visible;
+  }
+  100% {
+    visibility: hidden;
+  }
+}
+
+.bios {
+  background-color: black;
+  animation: fadeBoot 1s ease 5.5s forwards;
+}
+
+@keyframes fadeBoot {
+  0% {
+    background-color: black;
+  }
+  100% {
+    background-color: #0d1117;
+  }
+}
+
 </style>

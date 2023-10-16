@@ -3,10 +3,31 @@
     ref="container" 
     tour-item="tutorial"
     class="container p-2 text-left"
+    :class="{ 'booting': booting }"
+    style="animation-delay: 0.5s;"
   >
-    <div>
-      <div class="title px-1">{{ pageData.title }}</div>
-      <div class="content mt-2 mb-5 p-1" v-html="pageData.content"></div>
+    <template v-if="crashing">
+      <div class="title px-1"><span class='critical-error'>WW&HAT H4VE 7OU DcNE//////</span></div>
+      <div class="content mt-2 mb-5 p-1" v-html="`<span class='critical-error'>FATAL ERROR</span> `.repeat(1000)"></div>
+    </template>
+
+    <div 
+      v-else 
+    >
+      <div 
+        class="title px-1"
+        :class="{ 'booting': booting }"
+        style="animation-delay: 0.5s;"
+      >
+        {{ pageData.title }}
+      </div>
+
+      <div 
+        class="content mt-2 mb-5 p-1" 
+        :class="{ 'booting': booting }"
+        style="animation-delay: 1.5s;"
+        v-html="pageData.content"
+      ></div>
     </div>
 
     <div class="controls">
@@ -68,6 +89,8 @@
 
 <script lang="ts">
 import { AchievementState } from "@/achievements";
+import { SimulatorState } from "@/simulator";
+import { SystemState } from "@/simulator/types";
 import { TTutorialPage, tutorialPages, TContentsLink, contentsPage } from "@/tutorial";
 import Vue from 'vue';
 
@@ -85,6 +108,9 @@ export default Vue.extend({
     }
   },
   computed: {
+    crashing: () => SimulatorState.systemState() === SystemState.CRASHING,
+    booting: () => SimulatorState.systemState() === SystemState.BOOTING,
+
     pageData: function () : TTutorialPage {
       return this.pages[this.page];
     },

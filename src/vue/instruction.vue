@@ -2,8 +2,14 @@
   <div 
     tour-item="assembler"
     class="d-flex flex-column container text-left p-3"
+    :class="{ 'booting': booting }"
+    style="animation-delay: 0.15s;"
   >
-    <div class="mb-3">
+    <div 
+      class="mb-3"
+      :class="{ 'booting': booting }"
+      style="animation-delay: 1s;"
+    >
       <span 
         v-for="(section, index) in sections" 
         class="section" 
@@ -29,7 +35,11 @@
       </div>
     </div>
 
-    <div class="fenced flex-grow-1" style="overflow: auto;">
+    <div 
+      class="fenced flex-grow-1" 
+      :class="{ 'booting': booting }"
+      style="overflow: auto; animation-delay: 0.5s;"
+    >
       <template v-if="computedTooltip.type === TipType.INSTRUCTION">
         <div v-html="computedTooltip.title"></div>
         <div style="font-size: 14px;">
@@ -143,6 +153,7 @@ import Vue from 'vue';
 import { BModal } from 'bootstrap-vue';
 import debug from "./debug.vue";
 import { nextTick } from 'vue/types/umd';
+import { SystemState } from '@/simulator/types';
 
 /**
  * Extends IExplanation interface to include a portion of the instruction bitcode,
@@ -203,6 +214,7 @@ export default Vue.extend({
     wasExecuted: SimulatorState.wasExecuted,
     currentTick: SimulatorState.currentTick,
     memSize: () => SimulatorState.memory().size,
+    booting: () => SimulatorState.systemState() === SystemState.BOOTING,
 
     // hack so we can access the enum in dom
     TipType: () => TipType,
