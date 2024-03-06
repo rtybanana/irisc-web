@@ -9,6 +9,7 @@ export type TAchievement = {
   name: string;
   description: string;
   rarity: Rarity;
+  codeBased?: boolean;
 }
 
 export type TAchievementState = {

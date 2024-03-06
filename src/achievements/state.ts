@@ -1,6 +1,7 @@
 import { TAchievement, TAchievementState } from "./types";
 import { achievementMap, rarityClassMap, rarityNameMap } from "./constants";
 import Vue from 'vue';
+import { FileSystemState } from "@/files";
 
 const state = Vue.observable<TAchievementState>({
   achieved: new Set<TAchievement>(),
@@ -15,7 +16,13 @@ export const getters = {
 
 export const actions = {
   achieve: function (name: string) {
+    // TODO: think about how to prevent code related achievements for code the user did not write
+    // if the user does not own the open file then prevent earning achievements
+    
+
     let achievement = achievementMap[name];
+    if (achievement.codeBased && (FileSystemState.currentFile()?.static || !FileSystemState.currentFile()?.writeable)) return;
+
     if (achievement && !state.achieved.has(achievement)) {
       state.achieved.add(achievement);
       state.new.add(achievement);

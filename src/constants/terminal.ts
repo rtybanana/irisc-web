@@ -54,5 +54,9 @@ export const terminalHelpString = `
   tilde\
 </div>\
 
+<div class="border-left">\
+  Friendly advice. Don't play around with <u>rm</u>.\
+</div>\
+
 </span>\
 `;

@@ -154,6 +154,7 @@ import { BModal } from 'bootstrap-vue';
 import debug from "./debug.vue";
 import { nextTick } from 'vue/types/umd';
 import { SystemState } from '@/simulator/types';
+import { AchievementState } from '@/achievements';
 
 /**
  * Extends IExplanation interface to include a portion of the instruction bitcode,
@@ -295,6 +296,9 @@ export default Vue.extend({
     },
 
     reinstate: function (tick: number) {
+      if (tick > this.currentTick) AchievementState.achieve("Back to the future!")
+      if (tick < this.currentTick) AchievementState.achieve("\"Great Scott!\"");
+      if (tick === 0) AchievementState.achieve("The dawn of time...");
       SimulatorState.reinstateSnapshot(tick);
     }
   },
