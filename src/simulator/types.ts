@@ -35,6 +35,7 @@ type TMemory = {
   
   heapMap: Map<number, TAllocation>;
   heapHeight: number;
+  hasNop: boolean;
 
   stackHeight: number;
 }

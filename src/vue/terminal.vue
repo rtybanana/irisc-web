@@ -349,7 +349,7 @@ export default Vue.extend({
       }
 
       if (input === 'pwd') {
-        AchievementState.achieve("Where am I?")
+        AchievementState.achieve("You are here")
         this.output += `\n${FileSystemState.pwd()}`;
         return true;
       }
@@ -371,6 +371,13 @@ export default Vue.extend({
       if (input.startsWith('cd')) {
         const param = input.substring(3).trim();
         FileSystemState.cd(param);
+
+        return true;
+      }
+
+      if (input.startsWith("rm ")) {
+        AchievementState.achieve("Do you know who I am?");
+        this.output += `\n${input}: Permission denied.`;
 
         return true;
       }

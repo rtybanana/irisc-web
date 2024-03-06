@@ -42,6 +42,8 @@ export const interaction = {
   },
 
   stepBack: function () {
+    if (state.cpu.tick > 0) AchievementState.achieve("Reverse, reverse!");
+
     snapshots.reinstateSnapshot(state.cpu.tick - 1);
   },
 

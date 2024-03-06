@@ -37,6 +37,7 @@ export const state = Vue.observable<TSimulatorState>({
     
     heapHeight: 0,
     heapMap: new Map<number, TAllocation>(),
+    hasNop: false,
 
     stackHeight: 0,
   },

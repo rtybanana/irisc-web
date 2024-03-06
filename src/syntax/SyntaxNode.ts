@@ -194,6 +194,7 @@ export class SyntaxNode {
       [imm, shift] = validRolledCorner as [number, number];
     }
     else {
+      // TODO: check for odd rotation edge-case
       if (topbit > bits - 1) { 
         imm = rotr(imm, Math.floor((topbit - (bits - 2)) / 2) * 2);
         shift = 32 - (Math.floor((topbit - (bits - 2)) / 2) * 2);
