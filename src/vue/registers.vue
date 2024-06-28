@@ -99,6 +99,17 @@ export default Vue.extend({
       return `0x${value.toString(16)}`
     },
 
+    /**
+     * Returns a string representing the signed representation of a 32 bit number.
+     * Checks the top bit is set, if it is then returns the two's complement of the unsigned
+     * value with a preceding negative '-' sign. Otherwise the value is returned as-is, because
+     * the signed and unsigned representations are equal.
+     */
+    signedstr(value: number) : string {
+      if (value >>> 31 === 1) return `-${~value + 1}`
+      return `${value}`;
+    },
+
     flagstr(value: boolean) : string {
       return value ? '1' : '0';
     },
@@ -106,10 +117,18 @@ export default Vue.extend({
     registerTip(reg: Register) {
       let value = this.registers[reg];
       let hexValue = this.hexstr(value);
+      let signedValue = this.signedstr(value);
 
       this.tip(
         this.regTitle[reg],
-        `${this.regExplain[reg]}\n\nDec: ${value}\nHex: ${hexValue}`
+        `\
+          ${this.regExplain[reg]}
+          
+          Hex: ${hexValue}
+          Dec:
+          - Unsigned: ${value}
+          - Signed:   ${signedValue}\
+        `
       )
     },
 
