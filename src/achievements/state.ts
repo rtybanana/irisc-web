@@ -2,6 +2,7 @@ import { TAchievement, TAchievementState } from "./types";
 import { achievementMap, rarityClassMap, rarityNameMap } from "./constants";
 import Vue from 'vue';
 import { FileSystemState } from "@/files";
+import Shepherd from "shepherd.js";
 
 const state = Vue.observable<TAchievementState>({
   achieved: new Set<TAchievement>(),
@@ -22,10 +23,12 @@ export const actions = {
 
     let achievement = achievementMap[name];
     if (achievement.codeBased && (FileSystemState.currentFile()?.static || !FileSystemState.currentFile()?.writeable)) return;
+    if (!achievement.allowInTour && Shepherd.activeTour) return;
 
     if (achievement && !state.achieved.has(achievement)) {
       state.achieved.add(achievement);
       state.new.add(achievement);
+      localStorage.setItem("achievements", JSON.stringify(""))
 
       state.achieved = new Set([...state.achieved]);
       state.new = new Set([...state.new]);
