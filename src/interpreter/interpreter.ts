@@ -84,6 +84,8 @@ function applyFlexShift(shift: Shift, value: number, amount: number) : number {
     case Shift.LSR:
       if (amount == 0) amount = 32;       // special case for right shifts
       return value >>> amount;
+    case Shift.ASR:
+      return value >> amount;
     case Shift.ROR:
       return rotr(value, amount);
     default:
@@ -218,6 +220,9 @@ function executeShift(instruction: ShiftNode) : boolean {
       result = n >>> m;
       break;
     case Shift.ASR:
+      if (set) SimulatorState.setFlags(n, m, n >> m);
+      result = n >> m;
+      break;
     case Shift.ROR:
       if (set) SimulatorState.setFlags(n, m, rotr(n, m));
       result = rotr(n, m);
