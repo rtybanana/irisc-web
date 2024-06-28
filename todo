@@ -1,0 +1,5 @@
+achievements
+- move achievement toast to top right
+- prevent getting most achievements while in tour
+- save achievement progress in local storage
+- accept self

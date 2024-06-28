@@ -16,7 +16,7 @@ export const rarityClassMap: Record<Rarity, string> = {
 
 export const achievementMap: Record<string, TAchievement> = {
   // misc
-  "Welcome to iRISC": { name: "Welcome to iRISC", description: "Welcome! Have an achievement on me.", rarity: Rarity.COMMON },
+  "Welcome to iRISC": { name: "Welcome to iRISC", description: "Welcome! Have an achievement on me.", rarity: Rarity.COMMON, allowInTour: true },
   "Edge Case Pro": { name: "Edge Case Pro", description: "Stumble upon a complicated barrel-shifter edge case.", rarity: Rarity.EPIC },
   "Do you know who I am?": { name: "Do you know who I am?", description: "Permission denied.", rarity: Rarity.EPIC },
   "Spring Cleaning": { name: "Spring Cleaning", description: "Foolishly attempt to delete the entire disk.", rarity: Rarity.EPIC },
@@ -24,7 +24,7 @@ export const achievementMap: Record<string, TAchievement> = {
 
   // tour
   "Tour de Force!": { name: "Tour de Force!", description: "Complete the tour.", rarity: Rarity.COMMON }, 
-  "Eh... close enough.": { name: "Eh... close enough.", description: "Have trouble following instructions.", rarity: Rarity.EPIC },
+  "Eh... close enough.": { name: "Eh... close enough.", description: "Have trouble following instructions.", rarity: Rarity.EPIC, allowInTour: true },
 
   // terminal
   "Flawless Execution": { name: "Flawless Execution", description: "Execute your first successful terminal command.", rarity: Rarity.COMMON },
@@ -50,9 +50,13 @@ export const achievementMap: Record<string, TAchievement> = {
   "nop": { name: "nop", description: "Discover a curious instruction at the end of your assembled program that you didn't write.", rarity: Rarity.EPIC },
 
   // runner
-  "Certified Debugger": { name: "Certified Debugger", description: "Pause execution on a breakpoint.", rarity: Rarity.COMMON },
+  "Debugger in Training": { name: "Debugger in Training", description: "Add your first breakpoint.", rarity: Rarity.COMMON, allowInTour: true },
+  "Certified Debugger": { name: "Certified Debugger", description: "Pause execution on a breakpoint.", rarity: Rarity.UNCOMMON },
   "French Exit": { name: "French Exit", description: "Gracefully exit a program.", rarity: Rarity.UNCOMMON, codeBased: true },
   "Alexandria": { name: "Alexandria", description: "Include and call a C Standard Library function.", rarity: Rarity.RARE, codeBased: true },
+
+  // TODO: find a way to determine that an executed instruction has an explicit 'al' condition suffix
+  // "A Mother's Love": { name: "A Mother's Love", description: "Execute an instruction with a totally redundant condition suffix.", rarity: Rarity.EPIC, codeBased: true },
 
   // TODO: find a way to know if a branch is looping or entering a function (potentially hard)
   // "Loop-de-loop": { name: "Loop-de-loop", description: "Run a program containing at least one loop.", rarity: Rarity.UNCOMMON },
