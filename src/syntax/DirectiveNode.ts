@@ -63,7 +63,7 @@ export class DirectiveNode extends SyntaxNode {
   }
 
   private parseBalign() {
-    const size = this.parseImm(this.nextToken());
+    const size = this.parseNum(this.nextToken());
     this._value = size;
   }
 }

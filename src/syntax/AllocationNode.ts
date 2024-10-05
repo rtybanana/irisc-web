@@ -3,6 +3,7 @@ import { DataType, dataTypeMap } from '@/constants';
 import { Token } from "prismjs";
 import { SyntaxError } from "../interpreter/error";
 import { SyntaxNode } from "./SyntaxNode";
+import { tokens } from "@/constants/tokens";
 
 export class AllocationNode extends SyntaxNode {
   protected _identifier: string;
@@ -41,7 +42,7 @@ export class AllocationNode extends SyntaxNode {
 
   parseString(token: Token) : Uint8Array {
     if (token.type !== "string") {
-      throw new SyntaxError(`Expected STRING - received ${token.type.toUpperCase()} '${token.content}' instead.`, this.statement, this.lineNumber, this._currentToken);
+      throw SyntaxError.badToken(tokens.string, token, this._statement, this._lineNumber, this._currentToken);
     }
 
     const string = (token.content as string).slice(1, -1);
@@ -55,7 +56,7 @@ export class AllocationNode extends SyntaxNode {
 
   parseByte(token: Token) : Uint8Array {
     const data = new Uint8Array(new ArrayBuffer(1));
-    const bits = bitset(8, this.parseImm(token));
+    const bits = bitset(8, this.parseNum(token));
     data[0] = parseInt(bits.join(''), 2);
 
     return data;
@@ -64,7 +65,7 @@ export class AllocationNode extends SyntaxNode {
   parseHWord(token: Token) : Uint8Array {
     const buffer = new ArrayBuffer(2);
     const data = new Uint16Array(buffer);
-    const bits = bitset(16, this.parseImm(token));
+    const bits = bitset(16, this.parseNum(token));
     data[0] = parseInt(bits.join(''), 2);
 
     return new Uint8Array(buffer);
@@ -73,14 +74,14 @@ export class AllocationNode extends SyntaxNode {
   parseWord(token: Token) : Uint8Array {
     const buffer = new ArrayBuffer(4);
     const data = new Uint32Array(buffer);
-    const bits = bitset(32, this.parseImm(token));
+    const bits = bitset(32, this.parseNum(token));
     data[0] = parseInt(bits.join(''), 2);
 
     return new Uint8Array(buffer);
   }
 
   parseSkip(token: Token) : Uint8Array {
-    const length = this.parseImm(token);
+    const length = this.parseNum(token);
     
     return new Uint8Array(new ArrayBuffer(length));
   }
