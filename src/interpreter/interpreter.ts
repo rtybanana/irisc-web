@@ -1,5 +1,5 @@
 import { rotr } from "@/assets/bitset";
-import { addressModeGroup, BlockTransfer, callAddress, callMap, Flag, Operation, opTitle, Register, Shift, SingleTransfer, TTransferSize } from "@/constants";
+import { addressModeGroup, BlockTransfer, callAddress, callMap, Flag, Operation, Register, Shift, SingleTransfer, TTransferSize } from "@/constants";
 import { SimulatorState } from "@/simulator";
 import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode, BranchNode, BlockTransferNode, SingleTransferNode } from "@/syntax";
 import { TInstructionNode } from "@/syntax/types";
@@ -89,8 +89,8 @@ function applyFlexShift(shift: Shift, value: number, amount: number) : number {
     case Shift.ROR:
       return rotr(value, amount);
     default:
-      let instruction = state.memory.text[state.registers[Register.PC]];
-      throw new RuntimeError("While attempting to perform a flex operand optional shift.", instruction.statement, instruction.lineNumber);
+      // TODO: get executing instruction from the EmulatorState and populate the error location params
+      throw new RuntimeError("While attempting to perform a flex operand optional shift.", [], -1);
   }
 }
 
@@ -186,8 +186,8 @@ function executeTriOperand(instruction: TriOperandNode) : boolean {
   } 
 
   if (result === undefined) {
-    let instruction = state.memory.text[state.registers[Register.PC]];
-    throw new RuntimeError(`While attempting to perform a '${opTitle[op]}' instruction.`, instruction.statement, instruction.lineNumber);
+    // TODO: get executing instruction from the EmulatorState and populate the error location params
+    throw new RuntimeError("While attempting to perform a an instruction.", [], -1);
   }
 
   SimulatorState.setRegister(dest, result);
