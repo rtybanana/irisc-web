@@ -2,7 +2,6 @@ import { bitset, ffs, fls, rotr } from '@/assets/bitset';
 import { Register, regMap } from '@/constants';
 import { Token } from 'prismjs';
 import { NumericalError, SyntaxError } from '../interpreter/error';
-import { tokens } from '@/constants/tokens';
 
 /** Ancestor class which defines common functions for all child syntax nodes */
 export class SyntaxNode {
@@ -86,7 +85,7 @@ export class SyntaxNode {
    */
   parseComma(token: Token) : boolean {
     if (token.type == "comma") return true;
-    else throw SyntaxError.badToken(tokens.comma, token, this._statement, this._lineNumber, this._currentToken);
+    else throw new SyntaxError("COMMA expected between operands - received " + token.type + " '" + token.content + "', instead.", this._statement, this._lineNumber, this._currentToken - 1);
   }
 
   /**
@@ -96,7 +95,7 @@ export class SyntaxNode {
    */
   parseReg(token: Token) : Register {
     if (token.type == "register") return regMap[token.content as string];
-    else throw SyntaxError.badToken(tokens.register, token, this._statement, this._lineNumber, this._currentToken);
+    else throw new SyntaxError("REGISTER expected - received " + token.type.toUpperCase() + " '" + token.content + "' instead.", this._statement, this._lineNumber, this._currentToken - 1);
   }
 
   /**
@@ -106,14 +105,6 @@ export class SyntaxNode {
    * @returns 
    */
   parseImm(token: Token, bits?: number) : number {
-    if (token.type != tokens.immediate) {
-      throw SyntaxError.badToken(tokens.immediate, token, this._statement, this._lineNumber, this._currentToken);
-    }
-    
-    return this.parseNum(token, bits);
-  }
-
-  parseNum(token: Token, bits?: number) : number {
     let base: number = 0;
     let start: number;
     const reveresedToken = [...(token.content as string)].reverse();
@@ -134,7 +125,7 @@ export class SyntaxNode {
       base = 16;
       start = reveresedToken.findIndex(e => !"0123456789abcdef".includes(e));
     }
-    else throw SyntaxError.badToken(tokens.immediate, token, this._statement, this._lineNumber, this._currentToken);
+    else throw new SyntaxError("IMMEDIATE value expected - received " + token.type.toUpperCase() + " '" + token.content + "' instead.", this._statement, this._lineNumber, this._currentToken);
 
     // correct start index for tokens which don't have '#' or '0n' identifiers
     start = start === -1 ? reveresedToken.length : start;
@@ -144,6 +135,7 @@ export class SyntaxNode {
 
     if (!bits || imm < Math.pow(2, bits)) return imm;
     else throw new NumericalError("IMMEDIATE value '" + token.content + "' (decimal " + imm + ") is greater than the " + bits + "-bit maximum.", this._statement, this._lineNumber, this._currentToken)
+    
   }
 
   /**
