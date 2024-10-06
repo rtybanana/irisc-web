@@ -1,6 +1,6 @@
-export enum SingleTransfer  { LDR = 0, STR = 1 }
-export enum BlockTransfer   { LDM = 2, STM = 3 }
-export enum StackTransfer   { POP = 4, PUSH = 5 }
+export enum SingleTransfer  { LDR, STR }
+export enum BlockTransfer   { LDM, STM }
+export enum StackTransfer   { POP, PUSH }
 export type TTransfer = SingleTransfer | BlockTransfer | StackTransfer;
 
 export const transferMap: Record<string, TTransfer> = {
