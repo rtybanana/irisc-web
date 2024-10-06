@@ -1,5 +1,5 @@
 import { rotr } from "@/assets/bitset";
-import { addressModeGroup, BlockTransfer, callAddress, callMap, Flag, OperandType, Operation, opTitle, Register, Shift, SingleTransfer, TTransferSize } from "@/constants";
+import { addressModeGroup, BlockTransfer, callAddress, callMap, Flag, Operation, opTitle, Register, Shift, SingleTransfer, TTransferSize } from "@/constants";
 import { SimulatorState } from "@/simulator";
 import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode, BranchNode, BlockTransferNode, SingleTransferNode } from "@/syntax";
 import { TInstructionNode } from "@/syntax/types";
