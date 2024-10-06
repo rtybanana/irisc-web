@@ -1,5 +1,5 @@
 import { bitset } from "@/assets/bitset";
-import { DataType, dataTypeBufferConstructorMap, dataTypeMap, dataTypeBitSizeMap } from '@/constants';
+import { DataType, dataTypeBufferConstructorMap, dataTypeMap, dataTypeBitSizeMap, dataTypeByteSizeMap } from '@/constants';
 import { Token } from "prismjs";
 import { SyntaxError } from "../interpreter/error";
 import { SyntaxNode } from "./SyntaxNode";
@@ -53,19 +53,31 @@ export class AllocationNode extends SyntaxNode {
   }
 
   parseIntArray(size: DataType) : ArrayBuffer {
-    const ints: number[] = [this.parseSizedInt(this.nextToken(), size)];
+    const ints: number[] = [this.parseSignedInt()];
 
     while (this.hasToken()) {
       this.parseComma(this.nextToken());
-      ints.push(this.parseSizedInt(this.nextToken(), size));
+      ints.push(this.parseSignedInt());
     }
 
-    return new dataTypeBufferConstructorMap[size](ints);
+    const buffer = new ArrayBuffer(ints.length * dataTypeByteSizeMap[size]);
+    const data = new dataTypeBufferConstructorMap[size](buffer);
+    ints.forEach((e, i) => data[i] = e);
+
+    return buffer;
   }
 
-  parseSizedInt(token: Token, size: DataType) : number {
-    const bits = bitset(dataTypeBitSizeMap[size], this.parseNum(token));
-    return parseInt(bits.join(''), 2);
+  parseSignedInt() : number {
+    let isNegative = false;
+
+    let next = this.peekToken();
+    if (next.type === tokens.sign && next.alias === "minus") {
+      isNegative = true;
+      this.nextToken();
+    }
+
+    let number = this.parseNum(this.nextToken());
+    return isNegative ? -number : number;
   }
 
   parseSkip(token: Token) : Uint8Array {

@@ -10,6 +10,12 @@ export const dataTypeMap: Record<string, DataType> = {
   '.skip': DataType.BYTE
 }
 
+export const dataTypeByteSizeMap = {
+  [DataType.BYTE]: 1,
+  [DataType.HWORD]: 2,
+  [DataType.WORD]: 4
+}
+
 export const dataTypeBitSizeMap = {
   [DataType.BYTE]: 8,
   [DataType.HWORD]: 16,
