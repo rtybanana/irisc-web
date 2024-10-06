@@ -190,9 +190,15 @@
 										style="font-size: 14px;"
 									>
 										<div>labl: <span class="token label">{{ hoveredDeclaration.label }}</span></div>
-										<div>type: <span class="token directive">{{ hoveredDeclaration.type }}</span></div>
+										<div>
+											type: 
+											<span class="token directive">{{ hoveredDeclaration.type }} </span> 
+											<span v-show="hoveredDeclaration.size > dataTypeByteSizeMap[dataTypeMap[hoveredDeclaration.type]]">
+												[{{ hoveredDeclaration.size / dataTypeByteSizeMap[dataTypeMap[hoveredDeclaration.type]] }}]
+											</span>
+										</div>
 										<div>addr: {{ hoveredDeclaration.offset + textHeight }}</div>
-										<div>size: {{ hoveredDeclaration.size }}</div>
+										<div>size: {{ hoveredDeclaration.size }} bytes</div>
 									</div>
 								</div>
 							</template>
@@ -226,6 +232,7 @@ import debug from './debug.vue';
 import { TAllocation, TDeclaration } from '@/simulator/types';
 import clone from "lodash.clonedeep";
 import Shepherd from 'shepherd.js';
+import { dataTypeByteSizeMap, dataTypeMap } from '@/constants';
 
 type TTip = {
 	title: string;
@@ -381,6 +388,8 @@ export default Vue.extend({
 			controlTooltip: undefined as string | undefined,
 
 			ascii: asciiTable.ascii,
+			dataTypeMap: dataTypeMap,
+			dataTypeByteSizeMap: dataTypeByteSizeMap,
 			shown: false
 		};
 	},

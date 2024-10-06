@@ -88,9 +88,10 @@ function applyFlexShift(shift: Shift, value: number, amount: number) : number {
       return value >> amount;
     case Shift.ROR:
       return rotr(value, amount);
-    default:
+    default: {
       let instruction = state.memory.text[state.registers[Register.PC]];
       throw new RuntimeError("While attempting to perform a flex operand optional shift.", instruction.statement, instruction.lineNumber);
+    }
   }
 }
 
