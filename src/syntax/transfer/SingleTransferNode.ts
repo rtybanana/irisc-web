@@ -216,7 +216,7 @@ export class SingleTransferNode extends TransferNode {
     });
     
     const sizeBit = this._transferSize === "byte" ? 1 : 0;         
-    instruction = (instruction << 1) | upDownBit;
+    instruction = (instruction << 1) | sizeBit;
     explanation.push({
       title: "Byte/Word Bit", 
       subtitle: sizeBit ? "Byte" : "Word", 
@@ -291,10 +291,6 @@ export class SingleTransferNode extends TransferNode {
         range: 4
       });
 
-      // TODO: not very robust, needs to be able to generate more complex flexoperand values to
-      // reference labels which out of the 255 range.
-      // const labelOffset = Interpreter.generateLabelOffset(this);
-
       // empty barrel shifter - could try to reference more distance addresses 
       instruction = (instruction << 4); 
       explanation.push({
@@ -313,10 +309,6 @@ export class SingleTransferNode extends TransferNode {
         range: 8
       });
     }
-
-
-    // TODO: finish implementation
-    // instruction <<= 20;
 
     return {
       bitcode: bitset(32, instruction).reverse(), 

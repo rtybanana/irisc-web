@@ -245,7 +245,7 @@ var dealType = function(format) {
     case '%u':
       ret = getInteger(pre, next);
       break;
-    case '%c': // TODO getChar
+    case '%c':
       ret = getChar(pre, next);
       break;
     case '%s':

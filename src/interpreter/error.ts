@@ -82,6 +82,13 @@ export class SyntaxError extends IriscError {
   constructor(message: string, statement: Token[], lineNumber: number, tokenIndex: number) {
     super(message, statement, lineNumber, tokenIndex);
   }
+
+  static badToken(expected: string, received: Token, statement: Token[], lineNumber: number, tokenIndex: number) {
+    return new SyntaxError(
+      `${expected.toUpperCase()} value expected - received ${received.type.toUpperCase()} '${received.content}' instead.`, 
+      statement, lineNumber, tokenIndex
+    );
+  }
 } 
 
 /**
