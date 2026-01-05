@@ -2,6 +2,7 @@ export const tokens = {
   // operations
   bi_operand: "bi-operand",
   tri_operand: "tri-operand",
+  multiply: "multiply",
   branch: "branch",
   shift: "shift",
   transfer: {

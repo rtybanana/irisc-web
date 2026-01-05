@@ -1,5 +1,5 @@
 import { SimulatorState } from '@/simulator';
-import { AllocationNode, BiOperandNode, BlockTransferNode, BranchNode, DirectiveNode, InstructionNode, LabelNode, ShiftNode, SingleTransferNode, SyntaxNode, TriOperandNode } from '@/syntax';
+import { AllocationNode, BiOperandNode, BlockTransferNode, BranchNode, DirectiveNode, InstructionNode, LabelNode, MulNode, ShiftNode, SingleTransferNode, SyntaxNode, TriOperandNode } from '@/syntax';
 import { languages, Token, tokenize } from 'prismjs';
 import { AssemblyError, IriscError, SyntaxError } from './error';
 import { Directive, callAddress } from '@/constants';
@@ -80,6 +80,9 @@ function compileOne(line: Token[], lineNumber: number) : SyntaxNode | null {
   }
   if (line[0].type === "tri-operand") {
     return new TriOperandNode(line, lineNumber, 0);
+  }
+  if (line[0].type === "multiply") {
+    return new MulNode(line, lineNumber, 0);
   }
   if (line[0].type === "shift") {
     return new ShiftNode(line, lineNumber, 0);

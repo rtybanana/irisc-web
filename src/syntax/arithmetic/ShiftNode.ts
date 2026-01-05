@@ -2,7 +2,7 @@ import { Condition, condMap, OperandType, Register, Shift, shiftMap } from '@/co
 import { SyntaxError } from '@/interpreter';
 import { Token } from 'prismjs';
 import { InstructionNode } from '../InstructionNode';
-import { TRegOrImm } from '../types';
+import { TAssembled, TRegOrImm } from '../types';
 
 
 /** Class which holds all the information required to execute a bi-operand instruction */
@@ -85,7 +85,15 @@ export class ShiftNode extends InstructionNode {
   /**
    * TODO: implement for explanation section
    */
-  // assemble(): TAssembled {
-    
-  // }
+  assemble(): TAssembled {
+    return {
+      bitcode: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      explanation: [{
+        title: "Unsupported Instruction",
+        subtitle: "Cannot assemble this instruction",
+        detail: "The assembler is currently work-in-progress. Support for this instruction type is coming soon.",
+        range: 32
+      }]
+    }
+  }
 }

@@ -18,6 +18,9 @@ export const operations = [
   "and", "eor", "sub", "rsb", "add",
   "adc", "sbc", "rsc", "orr", "bic",
 
+  // multiply instructions
+  "mul", "mla", "mls",
+
   // shift instructions
   "lsl", "lsr", "asr", "ror",
   

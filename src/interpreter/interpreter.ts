@@ -1,7 +1,7 @@
 import { rotr } from "@/assets/bitset";
 import { addressModeGroup, BlockTransfer, callAddress, callMap, Flag, Operation, opTitle, Register, Shift, SingleTransfer, TTransferSize } from "@/constants";
 import { SimulatorState } from "@/simulator";
-import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode, BranchNode, BlockTransferNode, SingleTransferNode } from "@/syntax";
+import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode, BranchNode, BlockTransferNode, SingleTransferNode, MulNode } from "@/syntax";
 import { TInstructionNode } from "@/syntax/types";
 import { ReferenceError, RuntimeError } from "./error";
 import { executeCall } from "./extern";
@@ -34,6 +34,7 @@ export async function execute(instruction: TInstructionNode, incPC: boolean = tr
 
     if (instruction instanceof BiOperandNode) executed = executeBiOperand(instruction);
     if (instruction instanceof TriOperandNode) executed = executeTriOperand(instruction);
+    if (instruction instanceof MulNode) executed = executeMultiply(instruction);
     if (instruction instanceof ShiftNode) executed = executeShift(instruction);
 
     if (instruction instanceof SingleTransferNode) executed = executeSingleTransfer(instruction);
@@ -138,12 +139,12 @@ function executeBiOperand(instruction: BiOperandNode) : boolean {
  */
 function executeTriOperand(instruction: TriOperandNode) : boolean {
   const [op, cond, set, dest, src, flex] = instruction.unpack();        // unpack the instruction
-  if (!SimulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
+  if (!SimulatorState.checkFlags(cond)) return false;                   // returns early if condition code is not satisfied
 
   const n = state.registers[src];
   const m = deflex(flex);                                               // deflex the flex operand into a value
   let result: number | undefined;
-  switch (op) {                                                       // check opcode and execute instruction
+  switch (op) {                                                         // check opcode and execute instruction
     case Operation.AND:
       if (set) SimulatorState.setFlags(n, m, n & m);
       result = n & m;
@@ -183,6 +184,40 @@ function executeTriOperand(instruction: TriOperandNode) : boolean {
     case Operation.RSC:
       result = m - n - (state.cpsr[Flag.C] ? 0 : 1);
       if (set) SimulatorState.setFlags(n, m, m - n - (state.cpsr[Flag.C] ? 0 : 1), '-');
+      break;
+  } 
+
+  if (result === undefined) {
+    let instruction = state.memory.text[state.registers[Register.PC]];
+    throw new RuntimeError(`While attempting to perform a '${opTitle[op]}' instruction.`, instruction.statement, instruction.lineNumber);
+  }
+
+  SimulatorState.setRegister(dest, result);
+
+  return true;
+}
+
+function executeMultiply(instruction: MulNode) : boolean {
+  const [op, cond, set, dest, Rn, Rm, Ra] = instruction.unpack();       // unpack the instruction
+  if (!SimulatorState.checkFlags(cond)) return false;                   // returns early if condition code is not satisfied
+
+  let n = state.registers[Rn];
+  let m = state.registers[Rm];
+  let a = Ra === undefined ? 0 : state.registers[Ra];
+
+  let result: number = n * m;
+  switch (op) {                                                         // check opcode and execute instruction
+    case Operation.MUL:
+      if (set) SimulatorState.setFlags(n, m, n * m);
+      result = n * m;
+      break;
+    case Operation.MLA:
+      if (set) SimulatorState.setFlags(n, m, a + (n * m));
+      result = a + result;
+      break;
+    case Operation.MLS:
+      if (set) SimulatorState.setFlags(n, m, a - (n * m));
+      result = a - result;
       break;
   } 
 

@@ -46,15 +46,7 @@ export abstract class InstructionNode extends SyntaxNode {
     return [operation, modifier, condition];
   }
 
-  assemble(): TAssembled {
-    return {
-      bitcode: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-      explanation: [{
-        title: "Unsupported Instruction",
-        subtitle: "Cannot assemble this instruction",
-        detail: "The assembler is currently work-in-progress. Support for this instruction type is coming soon.",
-        range: 32
-      }]
-    }
-  }
+  abstract assemble(): TAssembled
+
+  abstract unpack(): any 
 }

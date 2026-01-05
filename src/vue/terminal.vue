@@ -18,6 +18,7 @@
       <pre
         ref="input"
         class="repl input"
+        spellcheck="false"
         :contenteditable="!running || interrupted"
         @keydown.enter.stop="enter"
         @keydown.up.stop.prevent="upHistory"
