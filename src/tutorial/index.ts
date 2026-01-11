@@ -1,9 +1,9 @@
 // import { intro, basics } from "./tutorial";
-export { TTutorialPage, TContentsLink } from "./types";
+export type { TTutorialPage, TContentsLink } from "./types";
 import intro from "./intro";
 import basics from "./basics";
 import intermediate from "./intermediate";
-import { TTutorialPage, TContentsLink } from "./types";
+import type { TTutorialPage, TContentsLink } from "./types";
 
 const chapters: TTutorialPage[][] = [
   intro,
