@@ -276,7 +276,7 @@ export default Vue.extend({
   mounted: function () {
     document.addEventListener('keydown', this.keyListener.bind(this));
 
-    let doneTour = localStorage.getItem('doneTour') ?? false;
+    const doneTour = localStorage.getItem('doneTour') ?? false;
     if (!doneTour) this.startTour();
     else {
       this.env = (localStorage.getItem('environment') as EnvironmentType) ?? EnvironmentType.TERMINAL;

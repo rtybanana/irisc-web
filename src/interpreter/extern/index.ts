@@ -14,7 +14,7 @@ import { malloc, free, calloc } from './allocation';
  * registers should not be assumed to stay the same after a function call.
  */
 export function randomiseScratch() {
-	let randomRange = 256
+	const randomRange = 256
 	SimulatorState.setRegister(Register.R0, Math.floor(Math.random() * randomRange));
 	SimulatorState.setRegister(Register.R1, Math.floor(Math.random() * randomRange));
 	SimulatorState.setRegister(Register.R2, Math.floor(Math.random() * randomRange));

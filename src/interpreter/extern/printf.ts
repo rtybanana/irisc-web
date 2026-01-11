@@ -6,7 +6,7 @@ import { RuntimeError } from "@/interpreter";
 import { randomiseScratch } from ".";
 
 export function printf(): boolean {
-	let stringArr: string[] = [];
+	const stringArr: string[] = [];
 
 	// fetch full string from simulator memory
 	let index = state.registers[Register.R0];
@@ -16,7 +16,7 @@ export function printf(): boolean {
 	}
 
 	// join char array
-	let formatStr = stringArr.join("");
+	const formatStr = stringArr.join("");
 
 	// get replaceable identifiers
 	const tokens = getTokens(formatStr);
@@ -75,7 +75,7 @@ function getChar(useStack: boolean, register: Register, offset: number): [string
 		register = (register + 1) as Register;
 	}
 	else {
-		let framePointer = state.registers[Register.R11];
+		const framePointer = state.registers[Register.R11];
 		data = String.fromCharCode(state.memory.byteView[framePointer + offset]);
 		offset += 4;
 	}
@@ -91,12 +91,12 @@ function getString(useStack: boolean, register: Register, offset: number): [stri
 		register = (register + 1) as Register;
 	}
 	else {
-		let framePointer = state.registers[Register.R11];
+		const framePointer = state.registers[Register.R11];
 		address = state.memory.byteView[framePointer + offset]
 		offset += 4;
 	}
 
-	let stringArr: string[] = [];
+	const stringArr: string[] = [];
 	while (state.memory.byteView[address] !== 0) {
 		stringArr.push(String.fromCharCode(state.memory.byteView[address]));
 		address++;
@@ -117,7 +117,7 @@ function getDecimal(useStack: boolean, register: Register, offset: number, signe
 		register = (register + 1) as Register;
 	}
 	else {
-		let framePointer = state.registers[Register.R11];
+		const framePointer = state.registers[Register.R11];
 		data = state.memory.wordView[(framePointer + offset) / 4];
 		offset += 4;
 	}

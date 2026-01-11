@@ -35,14 +35,14 @@ export const runner = {
       while(state.running) {
         if (!skipToSleep) {
           interaction.setStep(false);
-          let node: TInstructionNode = memory.instruction(state.cpu.registers[Register.PC]);
+          const node: TInstructionNode = memory.instruction(state.cpu.registers[Register.PC]);
 
           state.previousPC = state.cpu.registers[Register.PC];
           cpu.setRegister(Register.PC, state.cpu.registers[Register.PC] + 4);
 
           // if runtime instruction runoff
           if (node === undefined) {
-            let last: TInstructionNode = state.currentInstruction!;
+            const last: TInstructionNode = state.currentInstruction!;
             throw new RuntimeError("SIGSEG: Segmentation fault.", last.statement, last.lineNumber);
           }
 

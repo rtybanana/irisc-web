@@ -1,9 +1,9 @@
 // import { intro, basics } from "./tutorial";
-export { TTutorialPage, TContentsLink } from "./types";
+export type { TTutorialPage, TContentsLink } from "./types";
 import intro from "./intro";
 import basics from "./basics";
 import intermediate from "./intermediate";
-import { TTutorialPage, TContentsLink } from "./types";
+import type { TTutorialPage, TContentsLink } from "./types";
 
 const chapters: TTutorialPage[][] = [
   intro,
@@ -18,10 +18,10 @@ export const tutorialPages = chapters
 
 export const contentsPage = tutorialPages
   .map((page, index) => {
-    let matches = [...page.title.matchAll(/([\d-]+)(?::\s)(.*)/g)][0];
-    let chapter = chapters.findIndex(e => e.includes(page));
+    const matches = [...page.title.matchAll(/([\d-]+)(?::\s)(.*)/g)][0];
+    const chapter = chapters.findIndex(e => e.includes(page));
 
-    let contentsLink: TContentsLink = {
+    const contentsLink: TContentsLink = {
       title: `${chapter}-${matches[1]} ${matches[2]}`,
       index: index
     };

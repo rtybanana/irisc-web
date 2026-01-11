@@ -75,10 +75,10 @@ export const interaction = {
   },
 
 	toggleBreakpoint: function (lineNumber: number) {
-    let instruction = state.memory.text.find(e => e.lineNumber === lineNumber);
+    const instruction = state.memory.text.find(e => e.lineNumber === lineNumber);
 
     if (instruction) {
-      let breakpoint = state.breakpoints.find(e => e.lineNumber === instruction?.lineNumber);
+      const breakpoint = state.breakpoints.find(e => e.lineNumber === instruction?.lineNumber);
       if (breakpoint) {
         state.breakpoints = state.breakpoints.filter(e => e.lineNumber !== breakpoint?.lineNumber)
       }
@@ -96,8 +96,8 @@ export const interaction = {
     [...output].forEach(char => {
       if (char === '\n') state.output.push("");
       else {
-        let lastLine = state.output.length -1;
-        let existingLine = state.output[lastLine];
+        const lastLine = state.output.length -1;
+        const existingLine = state.output[lastLine];
         
         Vue.set(state.output, lastLine, `${existingLine}${char}`);
       }

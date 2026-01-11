@@ -4,7 +4,7 @@ import { state } from "@/interpreter/interpreter";
 import { randomiseScratch } from ".";
 
 export function puts() : boolean {
-  let stringArr: string[] = [];
+  const stringArr: string[] = [];
 
   // fetch full string from simulator memory
   let index = state.registers[Register.R0];
@@ -14,7 +14,7 @@ export function puts() : boolean {
   }
 
   // join char array
-  let string = stringArr.join("");
+  const string = stringArr.join("");
 
   // append newline character and add to output
   SimulatorState.addOutput(`${string}\n`);

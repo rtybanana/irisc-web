@@ -1,7 +1,7 @@
 import { rotr } from "@/assets/bitset";
 import { addressModeGroup, BlockTransfer, callAddress, callMap, Flag, Operation, opTitle, Register, Shift, SingleTransfer, TTransferSize } from "@/constants";
 import { SimulatorState } from "@/simulator";
-import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode, BranchNode, BlockTransferNode, SingleTransferNode } from "@/syntax";
+import { BiOperandNode, FlexOperand, ShiftNode, TriOperandNode, BranchNode, BlockTransferNode, SingleTransferNode, MulNode } from "@/syntax";
 import { TInstructionNode } from "@/syntax/types";
 import { ReferenceError, RuntimeError } from "./error";
 import { executeCall } from "./extern";
@@ -34,6 +34,7 @@ export async function execute(instruction: TInstructionNode, incPC: boolean = tr
 
     if (instruction instanceof BiOperandNode) executed = executeBiOperand(instruction);
     if (instruction instanceof TriOperandNode) executed = executeTriOperand(instruction);
+    if (instruction instanceof MulNode) executed = executeMultiply(instruction);
     if (instruction instanceof ShiftNode) executed = executeShift(instruction);
 
     if (instruction instanceof SingleTransferNode) executed = executeSingleTransfer(instruction);
@@ -89,7 +90,7 @@ function applyFlexShift(shift: Shift, value: number, amount: number) : number {
     case Shift.ROR:
       return rotr(value, amount);
     default: {
-      let instruction = state.memory.text[state.registers[Register.PC]];
+      const instruction = state.memory.text[state.registers[Register.PC]];
       throw new RuntimeError("While attempting to perform a flex operand optional shift.", instruction.statement, instruction.lineNumber);
     }
   }
@@ -138,12 +139,12 @@ function executeBiOperand(instruction: BiOperandNode) : boolean {
  */
 function executeTriOperand(instruction: TriOperandNode) : boolean {
   const [op, cond, set, dest, src, flex] = instruction.unpack();        // unpack the instruction
-  if (!SimulatorState.checkFlags(cond)) return false;                  // returns early if condition code is not satisfied
+  if (!SimulatorState.checkFlags(cond)) return false;                   // returns early if condition code is not satisfied
 
   const n = state.registers[src];
   const m = deflex(flex);                                               // deflex the flex operand into a value
   let result: number | undefined;
-  switch (op) {                                                       // check opcode and execute instruction
+  switch (op) {                                                         // check opcode and execute instruction
     case Operation.AND:
       if (set) SimulatorState.setFlags(n, m, n & m);
       result = n & m;
@@ -187,11 +188,47 @@ function executeTriOperand(instruction: TriOperandNode) : boolean {
   } 
 
   if (result === undefined) {
-    let instruction = state.memory.text[state.registers[Register.PC]];
+    const instruction = state.memory.text[state.registers[Register.PC]];
     throw new RuntimeError(`While attempting to perform a '${opTitle[op]}' instruction.`, instruction.statement, instruction.lineNumber);
   }
 
   SimulatorState.setRegister(dest, result);
+
+  return true;
+}
+
+function executeMultiply(instruction: MulNode) : boolean {
+  const [op, cond, set, dest, Rn, Rm, Ra] = instruction.unpack();       // unpack the instruction
+  if (!SimulatorState.checkFlags(cond)) return false;                   // returns early if condition code is not satisfied
+
+  const n = state.registers[Rn];
+  const m = state.registers[Rm];
+  const a = Ra === undefined ? 0 : state.registers[Ra];
+
+  // result needs to be a bigint because valid multiplications can sometimes create values so large that they cannot
+  // be represented by the standard number type without losing precision (0xffffffff * 0xffffffff, for example) 
+  let result: bigint = BigInt(n) * BigInt(m);
+  if (result > Number.MAX_SAFE_INTEGER) {
+    console.log("You've created a result so large that standard JS numbers can't properly describe it.");
+  }
+
+  switch (op) {                                                         // check opcode and execute instruction
+    case Operation.MLA:
+      result = BigInt(a) + result;
+      break;
+    case Operation.MLS:
+      result = BigInt(a) - result;
+      break;
+  } 
+
+  if (set) SimulatorState.setFlags(n, m, result);
+
+  if (result === undefined) {
+    const instruction = state.memory.text[state.registers[Register.PC]];
+    throw new RuntimeError(`While attempting to perform a '${opTitle[op]}' instruction.`, instruction.statement, instruction.lineNumber);
+  }
+
+  SimulatorState.setRegister(dest, Number(result & 0xffffffffn));
 
   return true;
 }
@@ -251,7 +288,7 @@ async function executeBranch(instruction: BranchNode) : Promise<boolean> {
     address = SimulatorState.label(addr as string);
     if (address === callAddress) {
 
-      let callExecuted = await executeCall(instruction, callMap[addr as string]);
+      const callExecuted = await executeCall(instruction, callMap[addr as string]);
       if (callExecuted) {
         // if branch with link, set the link register
         if (op === Operation.BL) {
@@ -335,7 +372,9 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
 }
 
 function executeBlockTransfer(instruction: BlockTransferNode) : boolean {
-  let [op, cond, base, reglist, mode, wb] = instruction.unpack();
+  const [op, cond, base, rlist, mode, wb] = instruction.unpack();
+  let reglist = rlist;
+  
   if (!SimulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
   let address = state.registers[base as Register];

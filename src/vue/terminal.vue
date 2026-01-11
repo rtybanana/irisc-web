@@ -18,6 +18,7 @@
       <pre
         ref="input"
         class="repl input"
+        spellcheck="false"
         :contenteditable="!running || interrupted"
         @keydown.enter.stop="enter"
         @keydown.up.stop.prevent="upHistory"
@@ -152,7 +153,7 @@ export default Vue.extend({
       
       if (this.isActive) {
         // move cursor to the end
-        let sel = window.getSelection();
+        const sel = window.getSelection();
         sel?.selectAllChildren((this.$refs.input as HTMLElement));
         sel?.collapseToEnd();
       }
@@ -180,7 +181,7 @@ export default Vue.extend({
     enter: function (e: any) {
       e.preventDefault();
 
-      let input = this.input
+      const input = this.input
         .substring(this.leadingLine.length)
         .trim()
         .replace(/(\r\n|\n|\r)/gm, "");
@@ -208,7 +209,7 @@ export default Vue.extend({
         this.focus();
 
         this.$nextTick(() => {
-          let element = this.$refs.container as HTMLElement;
+          const element = this.$refs.container as HTMLElement;
           element.scrollTop = element.scrollHeight;
         });
       });
@@ -219,7 +220,7 @@ export default Vue.extend({
         this.setLeadingLine("");
 
         this.$nextTick(() => {
-          let element = this.$refs.container as HTMLElement;
+          const element = this.$refs.container as HTMLElement;
           element.scrollTop = element.scrollHeight;
         });
 
@@ -238,7 +239,7 @@ export default Vue.extend({
       this.historyIndex = Math.min(this.historyIndex + 1, this.history.length - 1);
       if (this.historyIndex < 0) return;
 
-      let input = this.history[this.historyIndex];
+      const input = this.history[this.historyIndex];
       this.insertInput(e.target, input);
     },
 
@@ -271,8 +272,8 @@ export default Vue.extend({
       try {
         if (this.specialInput(input)) return;
 
-        let line = Assembler.parse(input)[0];
-        let node = Assembler.compileOne(line, 0);
+        const line = Assembler.parse(input)[0];
+        const node = Assembler.compileOne(line, 0);
 
         if (node instanceof InstructionNode) {
           if (node instanceof BranchNode) {
@@ -482,7 +483,7 @@ export default Vue.extend({
         this.setLeadingLine(lastLine);
 
         this.$nextTick(() => {
-          let element = this.$refs.container as HTMLElement;
+          const element = this.$refs.container as HTMLElement;
           element.scrollTop = element.scrollHeight;
         });
       }

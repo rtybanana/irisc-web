@@ -2,8 +2,8 @@ export enum Operation {
   // arithmetic operations
   AND = 0,  EOR, SUB, RSB, ADD, ADC, SBC, RSC, TST, TEQ, CMP, CMN, ORR, MOV, BIC, MVN,
 
-  // // load/store instructions
-  // LDR = 16,  STR, 
+  // multiply
+  MUL = 16, MLA, MLS = 19,
 
   // branch instructions
   B = 32,  BL, BX
@@ -34,14 +34,15 @@ export const opMap: Record<string, Operation> = {
   "bic": Operation.BIC,
   "mvn": Operation.MVN,
 
-  // //load/store instructions
-  // "ldr": Operation.LDR,
-  // "str": Operation.STR,
+  // multiply
+  "mul": Operation.MUL,
+  "mla": Operation.MLA,
+  "mls": Operation.MLS,
 
   // branch instructions
-  "bx": Operation.BX,
-  "bl": Operation.BL, 
-   "b": Operation.B 
+   "bx": Operation.BX,
+   "bl": Operation.BL, 
+    "b": Operation.B 
 };
 
 export const opTitle: Record<Operation, string> = {
@@ -61,8 +62,9 @@ export const opTitle: Record<Operation, string> = {
   [Operation.MOV]: "Move",
   [Operation.BIC]: "Bit Clear",
   [Operation.MVN]: "Move Negative",
-  // [Operation.LDR]: "Load",
-  // [Operation.STR]: "Store",
+  [Operation.MUL]: "Multiply",
+  [Operation.MLA]: "Multiply Accumulate",
+  [Operation.MLS]: "Multiply and Subtract",
   [Operation.B]:   "Branch",
   [Operation.BL]:  "Branch and Link",
   [Operation.BX]:  "Branch and Exchange"
@@ -74,9 +76,9 @@ export const opExplain: Record<Operation, string> = {
   [Operation.SUB]: "Performs an arithmetic subtraction from left to right and stores the result.", 
   [Operation.RSB]: "Performs an arithmetic subtraction from right to left and stores the result.",
   [Operation.ADD]: "Performs an arithmetic addition and stores the result.", 
-  [Operation.ADC]: "???",
-  [Operation.SBC]: "???", 
-  [Operation.RSC]: "???",
+  [Operation.ADC]: "ADC ???",
+  [Operation.SBC]: "SBC ???", 
+  [Operation.RSC]: "RSC ???",
   [Operation.TST]: "Performs a bitwise AND operation, sets the CPSR flags and discards the result.",
   [Operation.TEQ]: "Performs a bitwise XOR operation, sets the CPSR flags and discards the result.",
   [Operation.CMP]: "Performs an arithmetic subtraction, sets the CPSR flags and discards the result.",
@@ -85,8 +87,9 @@ export const opExplain: Record<Operation, string> = {
   [Operation.MOV]: "Stores the second operand value in the destination register.",
   [Operation.BIC]: "Performs a bitwise AND operation with the complement of the second operand.",
   [Operation.MVN]: "Stores the additive inverse of the second operand value in the destination register.",
-  // [Operation.LDR]: "Loads the data at the memory address in the source register into the destination register.",
-  // [Operation.STR]: "Stores the data in the destination register into the memory address of the source register.",
+  [Operation.MUL]: "Performs a multiplication and stores the result.",
+  [Operation.MLA]: "Performs a multiplication, adds the result to a fourth (accumulation) operand and stores the result.",
+  [Operation.MLS]: "Performs a multiplication, substracts the result from a fourth (accumulation) operand and stores the result.",
   [Operation.B]:   "Branches to the provided instruction address or label.",
   [Operation.BL]:  "Branches to the provided instruction address or label and stores the return address.",
   [Operation.BX]:  "Branches to the provided instruction address or label and optionally changes instruction type."

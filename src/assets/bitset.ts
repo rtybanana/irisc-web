@@ -38,15 +38,18 @@ export function rotr(n: number, d: number) : number {
  * @param n 
  * @returns 
  */
-export function bitset(size: number, value: number = 0) : number[] {
+export function bitset(size: number, value: number | bigint = 0) : number[] {
   const binary = get64binary(value);
   return binary.substring(64 - size).split('').map(e => parseInt(e, 10)).reverse();
 }
 
-function get64binary(int: number) {
-  if (int>=0) return int.toString(2).padStart(64, "0");
+function get64binary(int: number | bigint) {
+  if (int>=0) {
+    const binary = int.toString(2);
+    return binary.padStart(64, "0");     // pad to width 64 with leading 0s
+  }
   
-  return (-int-1)
+  return (-BigInt(int)-1n)
     .toString(2)
     .replace(/[01]/g, function(d: string) : string { return (+!+d).toString(); }) // hehe: inverts each char
     .padStart(64, "1");

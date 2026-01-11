@@ -241,10 +241,10 @@ export default Vue.extend({
       if (e.target.parentNode?.className.includes("error")) {
         if (!e.target.parentNode.dataset["errorIdx"]) return;
         
-        let errorIndex = parseInt(e.target.parentNode.dataset["errorIdx"]) as number;
+        const errorIndex = parseInt(e.target.parentNode.dataset["errorIdx"]) as number;
         if (errorIndex === -1) return;
 
-        let error = this.errors[errorIndex];
+        const error = this.errors[errorIndex];
 
         this.tooltip = {
           title: error.type,
@@ -266,10 +266,10 @@ export default Vue.extend({
         e.preventDefault();
         e.stopPropagation();
 
-        let prismEditor = this.$refs.prism as any;    // casting to any :(
-        let newTarget = prismEditor.$refs.textarea as HTMLInputElement;
+        const prismEditor = this.$refs.prism as any;    // casting to any :(
+        const newTarget = prismEditor.$refs.textarea as HTMLInputElement;
 
-        let errorIndex = parseInt(e.target.parentNode.dataset["errorIdx"]) as number;
+        const errorIndex = parseInt(e.target.parentNode.dataset["errorIdx"]) as number;
         
         let error: IriscError;
         if (errorIndex === -1) error = this.exitStatus as RuntimeError;
@@ -297,10 +297,10 @@ export default Vue.extend({
         e.preventDefault();
         e.stopPropagation();
 
-        let prismEditor = this.$refs.prism as any;    // casting to any :(
-        let newTarget = prismEditor.$refs.textarea as HTMLInputElement;
+        const prismEditor = this.$refs.prism as any;    // casting to any :(
+        const newTarget = prismEditor.$refs.textarea as HTMLInputElement;
 
-        let errorIndex = parseInt(e.target.parentNode.dataset["errorIdx"]) as number;
+        const errorIndex = parseInt(e.target.parentNode.dataset["errorIdx"]) as number;
         
         let error: IriscError;
         if (errorIndex === -1) error = this.exitStatus as RuntimeError;
@@ -318,20 +318,20 @@ export default Vue.extend({
     },
 
     lineComment: function (e: any) {
-      let prismEditor = this.$refs.prism as any;    // casting to any :(
-      let textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
+      const prismEditor = this.$refs.prism as any;    // casting to any :(
+      const textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
 
       // save current selection and reinstate after comments are added
-      let selectionStart = textarea.selectionStart;
+      const selectionStart = textarea.selectionStart;
       let selectionEnd = textarea.selectionEnd;
       
       // split into lines
-      let lines = textarea.value.split(/\r?\n|\r/);
+      const lines = textarea.value.split(/\r?\n|\r/);
 
       // get selected line indexes
-      let lineIdxs = getSelectedLineIndexes(textarea);
-      let commentCount = lineIdxs.reduce((count, lineIdx) => {
-        let line = lines[lineIdx];
+      const lineIdxs = getSelectedLineIndexes(textarea);
+      const commentCount = lineIdxs.reduce((count, lineIdx) => {
+        const line = lines[lineIdx];
         if (line.substring(0, 3) !== "// " && line !== "") count++;
 
         return count;
@@ -357,8 +357,8 @@ export default Vue.extend({
       this.$nextTick(() => textarea.setSelectionRange(selectionStart, selectionEnd));
 
       function getSelectedLineIndexes(textarea: HTMLTextAreaElement) {
-        let start = textarea.value.substr(0, textarea.selectionStart).split(/\r?\n|\r/).length - 1;
-        let end = textarea.value.substr(0, textarea.selectionEnd).split(/\r?\n|\r/).length - 1;
+        const start = textarea.value.substr(0, textarea.selectionStart).split(/\r?\n|\r/).length - 1;
+        const end = textarea.value.substr(0, textarea.selectionEnd).split(/\r?\n|\r/).length - 1;
 
         // create array of all line indexes i.e.
         // [3, 4, 5] if lines 4, 5, and 6 are selected
@@ -371,14 +371,14 @@ export default Vue.extend({
      */
     highlighter: function (program: string) {
       // initial ARMv7 syntax highlighting from file
-      let highlit: string = highlight(program, languages.armv7, 'ARMv7');
+      const highlit: string = highlight(program, languages.armv7, 'ARMv7');
       if (highlit.length === 0) return "";
 
       // deconstruct program to lines
       let lines = highlit.split(`<span class="token end">\n</span>`);
 
       // deconstruct lines to tokens
-      let tokens = lines.map(e => e.match(/<span.*?<\/span>\s*/gim) ?? []) as RegExpMatchArray[];
+      const tokens = lines.map(e => e.match(/<span.*?<\/span>\s*/gim) ?? []) as RegExpMatchArray[];
 
       // squiggly underline token errors
       this.highlightTokenErrors(tokens);
@@ -401,14 +401,14 @@ export default Vue.extend({
         .forEach((error, index) => {
           if (error.tokenIndex === -1) return;
 
-          let line = elements[error.lineNumber];
+          const line = elements[error.lineNumber];
 
           let filteredIndex: number = -1;
-          let tokenIndex = line?.findIndex((e, i) => {
+          const tokenIndex = line?.findIndex((e, i) => {
             if (!e.includes("whitespace")) filteredIndex++;
             if (filteredIndex === error.tokenIndex) return true;
           })
-          let tokenString = line?.[tokenIndex];
+          const tokenString = line?.[tokenIndex];
 
           if (tokenString !== undefined) {
             line[tokenIndex] = `<span class="token error" style="text-decoration-color: ${error.color}" data-error-idx="${index}">${tokenString}</span>`;
@@ -425,7 +425,7 @@ export default Vue.extend({
         .forEach((error, index) => {
           if (error.tokenIndex !== -1) return;
 
-          let line = lines[error.lineNumber];
+          const line = lines[error.lineNumber];
           if (line !== undefined) {
             lines[error.lineNumber] = `<span class="line error" style="text-decoration-color: ${error.color}" data-error-idx="${index}">${line}</span>`;
           }
@@ -433,7 +433,7 @@ export default Vue.extend({
 
       // exit status runtime error
       if (this.exitStatus instanceof RuntimeError) {
-        let line = lines[this.exitStatus.lineNumber];
+        const line = lines[this.exitStatus.lineNumber];
         if (line !== undefined) {
           lines[this.exitStatus.lineNumber] = `<span class="line error" style="text-decoration-color: ${this.exitStatus.color}" data-error-idx="${-1}">${line}</span>`;
         }
@@ -447,7 +447,7 @@ export default Vue.extend({
       // user breakpoints
       this.breakpoints
         .forEach((instruction) => {
-          let line = lines[instruction.lineNumber];
+          const line = lines[instruction.lineNumber];
           if (line !== undefined) {
             lines[instruction.lineNumber] = `<span class="line breakpoint">${line}</span>`;
           }
@@ -459,7 +459,7 @@ export default Vue.extend({
      */
     highlightExecuting: function (lines: string[]) {
       if (this.running && this.currentInstruction) {
-        let executing = lines[this.currentInstruction!.lineNumber];
+        const executing = lines[this.currentInstruction!.lineNumber];
 
         if (executing !== undefined) {
           lines[this.currentInstruction!.lineNumber] = `<span class="line executing">${executing}</span>`;
@@ -483,9 +483,9 @@ export default Vue.extend({
      * 
      */
     moveCaretToCursor: function (e: any) {
-      let mouseCoords: TPoint = e.detail.coords;
-      let textarea = e.target as HTMLTextAreaElement;
-      let caretPosition = this.getCaretPositionAtCursor(textarea, mouseCoords, e.detail.lineNumber);
+      const mouseCoords: TPoint = e.detail.coords;
+      const textarea = e.target as HTMLTextAreaElement;
+      const caretPosition = this.getCaretPositionAtCursor(textarea, mouseCoords, e.detail.lineNumber);
 
       textarea.setSelectionRange(caretPosition, caretPosition);
       textarea.focus();
@@ -495,9 +495,9 @@ export default Vue.extend({
      * 
      */
     highlightWordAtCursor: function (e: any) {
-      let mouseCoords: TPoint = e.detail.coords;
-      let textarea = e.target as HTMLTextAreaElement;
-      let caretPosition = this.getCaretPositionAtCursor(textarea, mouseCoords, e.detail.lineNumber);
+      const mouseCoords: TPoint = e.detail.coords;
+      const textarea = e.target as HTMLTextAreaElement;
+      const caretPosition = this.getCaretPositionAtCursor(textarea, mouseCoords, e.detail.lineNumber);
       let [wordStart, wordEnd] = [caretPosition, caretPosition];
 
       while (/\w/.test(textarea.value[wordStart - 1]) && wordStart > 0) wordStart--;
@@ -518,17 +518,17 @@ export default Vue.extend({
         startIndex += lines[i].length + 1   // +1 here because of newline character which was removed during the split
       }
 
-      let endIndex = startIndex + lines[lineNumber].length;
+      const endIndex = startIndex + lines[lineNumber].length;
       let smallestDistance = Number.MAX_VALUE;
       let caretPosition = 0;
       for (let i = startIndex; i < endIndex; i++) {
-        let textPos = getCaretCoordinates(element, i);
-        let charCoords: TPoint = { 
+        const textPos = getCaretCoordinates(element, i);
+        const charCoords: TPoint = { 
           x: textPos.left, 
           y: textPos.top + (textPos.height / 2)
         };
 
-        let distance = getRoughDistance(mouseCoords, charCoords);
+        const distance = getRoughDistance(mouseCoords, charCoords);
         if (distance < smallestDistance) {
           smallestDistance = distance;
           caretPosition = i;
@@ -538,8 +538,8 @@ export default Vue.extend({
       return caretPosition;
 
       function getRoughDistance(p1: TPoint, p2: TPoint) : number {
-        let y = p2.x - p1.x;
-        let x = p2.y - p1.y;
+        const y = p2.x - p1.x;
+        const x = p2.y - p1.y;
         
         return x * x + y * y;
       }
@@ -626,8 +626,8 @@ export default Vue.extend({
    * 
    */
   mounted: function () {
-    let prismEditor = this.$refs.prism as any;    // casting to any :(
-    let textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
+    const prismEditor = this.$refs.prism as any;    // casting to any :(
+    const textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
 
     textarea.addEventListener('errorClick', this.moveCaretToCursor);
     textarea.addEventListener('errorDblClick', this.highlightWordAtCursor);
@@ -656,8 +656,8 @@ export default Vue.extend({
    * 
    */
   beforeDestroy: function () {
-    let prismEditor = this.$refs.prism as any;    // casting to any :(
-    let textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
+    const prismEditor = this.$refs.prism as any;    // casting to any :(
+    const textarea = prismEditor.$refs.textarea as HTMLTextAreaElement;
 
     textarea.removeEventListener('errorClick', this.moveCaretToCursor);
     textarea.removeEventListener('errorDblClick', this.highlightWordAtCursor);

@@ -70,7 +70,7 @@ export class BiOperandNode extends InstructionNode {
     explanation.push({
       title: "Instruction Type", 
       subtitle: "Arithmetic Operation", 
-      detail: "Indicates the organisation of bits to the processor so that the instruction can be decoded.", 
+      detail: "Structural bits in a set pattern to indicate the organisation of bits to the processor so that the instruction can be decoded.", 
       range: 2
     });
 

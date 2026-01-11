@@ -63,7 +63,7 @@ export const heap = {
 		if (!state.memory.heapMap.has(ptr)) return;
 
 		// set block to freed
-		let block = state.memory.heapMap.get(ptr)!;
+		const block = state.memory.heapMap.get(ptr)!;
 		state.memory.heapMap.set(ptr, { ...block, allocated: false })
 
 		// TODO:
@@ -101,7 +101,7 @@ function findFirstSpace(size: number): number | null {
 	let firstPtr: number | null = null;
 
 	// find pointer of first available space that is large enough to hold $size
-	for (let [ptr, allocation] of state.memory.heapMap) {
+	for (const [ptr, allocation] of state.memory.heapMap) {
 		if (allocation.allocated) continue;
 		if (size > allocation.size) continue;
 
@@ -149,8 +149,8 @@ function mergeEmptyBlocks() {
 }
 
 function splitBlock(ptr: number, size: number): number {
-	let block = state.memory.heapMap.get(ptr)!;
-	let leftoverSize = block.size - size;
+	const block = state.memory.heapMap.get(ptr)!;
+	const leftoverSize = block.size - size;
 
 	// allocate new block
 	ptr = allocate(ptr, size);

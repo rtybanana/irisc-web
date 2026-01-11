@@ -49,7 +49,7 @@ export const common = {
     }
 
     if (transfer instanceof BlockTransferNode) {
-      let [op, cond, base, reglist, mode, wb] = transfer.unpack();
+      const [op, cond, base, reglist, mode, wb] = transfer.unpack();
 
       const address = snapshot.cpu.registers[base as Register];
       const isIncrement = addressModeGroup.increment.includes(mode);

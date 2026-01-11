@@ -19,6 +19,10 @@ languages.armv7 =  {
 		pattern: /\b(adc|add|and|bic|eor|orr|rsb|rsc|sbc|sub)(s)?(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)?\b/i,
 		alias: 'operation'
 	},
+	[tokens.multiply]: {
+		pattern: /\b(mul|mla|mls)(s)?(eq|ne|cs|cc|mi|pl|vs|vc|hi|ls|ge|lt|gt|le|al)?\b/i,
+		alias: 'operation'
+	},
 	[tokens.branch]: {
 		pattern: branchRegex,
 		alias: 'operation'
