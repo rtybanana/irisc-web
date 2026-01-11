@@ -180,16 +180,6 @@ export class SyntaxNode {
 
     if ((topbit - bottombit) > bits - 1) {
       const validRolledCorner = this.isValidRolledCorner(token, imm, bits);
-
-      // if (!validRolledCorner) {
-        // throw new NumericalError(
-        //   `IMMEDIATE value '${token.content}' (decimal ${imm}) cannot be implicitly represented with a maximum set-bit width of ${bits}.`, 
-        //   this._statement, 
-        //   this._lineNumber, 
-        //   this._currentToken
-        // );
-      // }
-
       [imm, shift] = validRolledCorner as [number, number];
     }
     else {

@@ -14,7 +14,7 @@
  */
 
 import { SyntaxNode } from "@/syntax";
-import { Assembler, NumericalError } from "@/interpreter"
+import { Assembler } from "@/interpreter"
 import '@/assets/prism-armv7';
 
 const node = new SyntaxNode([], 0, 0);
@@ -70,7 +70,7 @@ describe("assembling immediates, barrel shift", () => {
 describe("assembling immediates, rolled corner edge case", () => {
   test("valid", () => {
     expect(assemble("#0xf000000f")).toStrictEqual([255, 4]);
-    expect(assemble("#0x40000010")).toStrictEqual([130, 2]);
+    expect(assemble("#0x40000010")).toStrictEqual([65, 2]);
   });
 
   test("invalid, too wide", () => {
@@ -80,7 +80,7 @@ describe("assembling immediates, rolled corner edge case", () => {
   });
 
   test("invalid, odd rotation", () => {
-    expect(() => assemble("#0x80000040")).toThrow("even number of bits");
+    expect(() => assemble("#0x80000040")).toThrow("even number of times");
   })
 });
 
