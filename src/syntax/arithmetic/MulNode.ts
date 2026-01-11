@@ -14,12 +14,6 @@ export class MulNode extends InstructionNode {
 	protected _Rm: Register;
 	protected _Ra?: Register;
 
-	private static _opCodes: Partial<Record<Operation, number>> = {
-		[Operation.MUL]: 0,
-    [Operation.MLA]: 1,
-		[Operation.MLS]: 3
-	}
-
 	constructor(statement: Token[], lineNumber: number, currentToken: number = 0) {
 		super(statement, lineNumber, currentToken);
 
