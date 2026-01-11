@@ -3,7 +3,7 @@ export enum Operation {
   AND = 0,  EOR, SUB, RSB, ADD, ADC, SBC, RSC, TST, TEQ, CMP, CMN, ORR, MOV, BIC, MVN,
 
   // multiply
-  MUL, MLA, MLS,
+  MUL = 16, MLA, MLS = 19,
 
   // branch instructions
   B = 32,  BL, BX
@@ -87,9 +87,9 @@ export const opExplain: Record<Operation, string> = {
   [Operation.MOV]: "Stores the second operand value in the destination register.",
   [Operation.BIC]: "Performs a bitwise AND operation with the complement of the second operand.",
   [Operation.MVN]: "Stores the additive inverse of the second operand value in the destination register.",
-  [Operation.MUL]: "MUL ???",
-  [Operation.MLA]: "MLA ???",
-  [Operation.MLS]: "MLS ???",
+  [Operation.MUL]: "Performs a multiplication and stores the result.",
+  [Operation.MLA]: "Performs a multiplication, adds the result to a fourth (accumulation) operand and stores the result.",
+  [Operation.MLS]: "Performs a multiplication, substracts the result from a fourth (accumulation) operand and stores the result.",
   [Operation.B]:   "Branches to the provided instruction address or label.",
   [Operation.BL]:  "Branches to the provided instruction address or label and stores the return address.",
   [Operation.BX]:  "Branches to the provided instruction address or label and optionally changes instruction type."

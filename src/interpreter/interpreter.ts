@@ -205,28 +205,30 @@ function executeMultiply(instruction: MulNode) : boolean {
   let m = state.registers[Rm];
   let a = Ra === undefined ? 0 : state.registers[Ra];
 
-  let result: number = n * m;
+  // result needs to be a bigint because valid multiplications can sometimes create values so large that they cannot
+  // be represented by the standard number type without losing precision (0xffffffff * 0xffffffff, for example) 
+  let result: bigint = BigInt(n) * BigInt(m);
+  if (result > Number.MAX_SAFE_INTEGER) {
+    console.log("You've created a result so large that standard JS numbers can't properly describe it.");
+  }
+
   switch (op) {                                                         // check opcode and execute instruction
-    case Operation.MUL:
-      if (set) SimulatorState.setFlags(n, m, n * m);
-      result = n * m;
-      break;
     case Operation.MLA:
-      if (set) SimulatorState.setFlags(n, m, a + (n * m));
-      result = a + result;
+      result = BigInt(a) + result;
       break;
     case Operation.MLS:
-      if (set) SimulatorState.setFlags(n, m, a - (n * m));
-      result = a - result;
+      result = BigInt(a) - result;
       break;
   } 
+
+  if (set) SimulatorState.setFlags(n, m, result);
 
   if (result === undefined) {
     let instruction = state.memory.text[state.registers[Register.PC]];
     throw new RuntimeError(`While attempting to perform a '${opTitle[op]}' instruction.`, instruction.statement, instruction.lineNumber);
   }
 
-  SimulatorState.setRegister(dest, result);
+  SimulatorState.setRegister(dest, Number(result & 0xffffffffn));
 
   return true;
 }
