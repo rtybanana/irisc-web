@@ -70,13 +70,13 @@ export class AllocationNode extends SyntaxNode {
   parseSignedInt() : number {
     let isNegative = false;
 
-    let next = this.peekToken();
+    const next = this.peekToken();
     if (next.type === tokens.sign && next.alias === "minus") {
       isNegative = true;
       this.nextToken();
     }
 
-    let number = this.parseNum(this.nextToken());
+    const number = this.parseNum(this.nextToken());
     return isNegative ? -number : number;
   }
 

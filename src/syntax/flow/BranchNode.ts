@@ -37,7 +37,7 @@ export class BranchNode extends InstructionNode {
 
   protected splitOpCode(token: Token): [string, string, string] {
     let operation: string = "";
-    let modifier: string = "";
+    const modifier: string = "";
     let condition: string = "";
 
     const matches = this._regex.exec(token.content as string)!;

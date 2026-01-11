@@ -31,7 +31,7 @@ export class IriscError extends Error {
   constructHelperHTML() : string {
     const lineContent = this.statement
       .map((token, index) => {
-        let content = `
+        const content = `
           <span 
             class="token ${token.alias} ${token.type} ${index === this.tokenIndex ? 'error' : ''}"
             style="text-decoration-color: ${this.color}"

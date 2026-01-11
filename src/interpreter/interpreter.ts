@@ -90,7 +90,7 @@ function applyFlexShift(shift: Shift, value: number, amount: number) : number {
     case Shift.ROR:
       return rotr(value, amount);
     default: {
-      let instruction = state.memory.text[state.registers[Register.PC]];
+      const instruction = state.memory.text[state.registers[Register.PC]];
       throw new RuntimeError("While attempting to perform a flex operand optional shift.", instruction.statement, instruction.lineNumber);
     }
   }
@@ -188,7 +188,7 @@ function executeTriOperand(instruction: TriOperandNode) : boolean {
   } 
 
   if (result === undefined) {
-    let instruction = state.memory.text[state.registers[Register.PC]];
+    const instruction = state.memory.text[state.registers[Register.PC]];
     throw new RuntimeError(`While attempting to perform a '${opTitle[op]}' instruction.`, instruction.statement, instruction.lineNumber);
   }
 
@@ -201,9 +201,9 @@ function executeMultiply(instruction: MulNode) : boolean {
   const [op, cond, set, dest, Rn, Rm, Ra] = instruction.unpack();       // unpack the instruction
   if (!SimulatorState.checkFlags(cond)) return false;                   // returns early if condition code is not satisfied
 
-  let n = state.registers[Rn];
-  let m = state.registers[Rm];
-  let a = Ra === undefined ? 0 : state.registers[Ra];
+  const n = state.registers[Rn];
+  const m = state.registers[Rm];
+  const a = Ra === undefined ? 0 : state.registers[Ra];
 
   // result needs to be a bigint because valid multiplications can sometimes create values so large that they cannot
   // be represented by the standard number type without losing precision (0xffffffff * 0xffffffff, for example) 
@@ -224,7 +224,7 @@ function executeMultiply(instruction: MulNode) : boolean {
   if (set) SimulatorState.setFlags(n, m, result);
 
   if (result === undefined) {
-    let instruction = state.memory.text[state.registers[Register.PC]];
+    const instruction = state.memory.text[state.registers[Register.PC]];
     throw new RuntimeError(`While attempting to perform a '${opTitle[op]}' instruction.`, instruction.statement, instruction.lineNumber);
   }
 
@@ -288,7 +288,7 @@ async function executeBranch(instruction: BranchNode) : Promise<boolean> {
     address = SimulatorState.label(addr as string);
     if (address === callAddress) {
 
-      let callExecuted = await executeCall(instruction, callMap[addr as string]);
+      const callExecuted = await executeCall(instruction, callMap[addr as string]);
       if (callExecuted) {
         // if branch with link, set the link register
         if (op === Operation.BL) {
@@ -372,7 +372,9 @@ function executeSingleTransfer(instruction: SingleTransferNode) : boolean {
 }
 
 function executeBlockTransfer(instruction: BlockTransferNode) : boolean {
-  let [op, cond, base, reglist, mode, wb] = instruction.unpack();
+  const [op, cond, base, rlist, mode, wb] = instruction.unpack();
+  let reglist = rlist;
+  
   if (!SimulatorState.checkFlags(cond)) return false;                          // returns early if condition code is not satisfied
 
   let address = state.registers[base as Register];

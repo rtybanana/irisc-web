@@ -45,7 +45,7 @@ export function bitset(size: number, value: number | bigint = 0) : number[] {
 
 function get64binary(int: number | bigint) {
   if (int>=0) {
-    let binary = int.toString(2);
+    const binary = int.toString(2);
     return binary.padStart(64, "0");     // pad to width 64 with leading 0s
   }
   

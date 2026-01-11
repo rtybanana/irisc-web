@@ -125,7 +125,7 @@ export class MulNode extends InstructionNode {
 		else {
 			instruction |= this._Ra!
 
-			let accumulatedWith = this._op === Operation.MLA ? "added to" : "subtracted from"
+			const accumulatedWith = this._op === Operation.MLA ? "added to" : "subtracted from"
 			explanation.push({
 				title: "Accumulation Operand (Ra)", 
 				subtitle: regTitle[this._Ra!],

@@ -11,6 +11,6 @@ export const state = {
 }
 
 export const compileOne = (instruction: string) : InstructionNode => {
-	let parsed = Assembler.parse(instruction);
+	const parsed = Assembler.parse(instruction);
 	return Assembler.compileOne(parsed[0], 1) as InstructionNode;
 }

@@ -4,7 +4,7 @@ import { SimulatorState } from "@/simulator";
 import { InstructionNode, MulNode } from "@/syntax";
 
 const compile = (program: string) => {
-  let parsed = Assembler.parse(program);
+  const parsed = Assembler.parse(program);
 	return Assembler.compileOne(parsed[0], 1);
 }
 
@@ -14,7 +14,7 @@ const state = {
 
 describe("MUL", () => {
 	test("compilation | two operands", () => {
-		let node = compile("muleq r0, r1");
+		const node = compile("muleq r0, r1");
 
 		expect(node).toHaveProperty("_Rd", Register.R0);
 		expect(node).toHaveProperty("_Rn", Register.R1);
@@ -25,7 +25,7 @@ describe("MUL", () => {
 	});
 
 	test("compilation | three operands", () => {
-		let node = compile("mulspl r0, r1, r2");
+		const node = compile("mulspl r0, r1, r2");
 
 		expect(node).toHaveProperty("_Rd", Register.R0);
 		expect(node).toHaveProperty("_Rn", Register.R1);
@@ -38,7 +38,7 @@ describe("MUL", () => {
 
 describe("MLA", () => {
 	test("compilation", () => {
-		let node = compile("mla r0, r1, r2, r3");
+		const node = compile("mla r0, r1, r2, r3");
 
 		expect(node).toHaveProperty("_Rd", Register.R0);
 		expect(node).toHaveProperty("_Rn", Register.R1);
@@ -49,7 +49,7 @@ describe("MLA", () => {
 
 describe("MLS", () => {
 	test("compilation", () => {
-		let node = compile("mls r0, r1, r2, r3");
+		const node = compile("mls r0, r1, r2, r3");
 
 		expect(node).toHaveProperty("_Rd", Register.R0);
 		expect(node).toHaveProperty("_Rn", Register.R1);

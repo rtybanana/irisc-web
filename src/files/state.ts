@@ -49,7 +49,7 @@ export const actions = {
   },
 
   loadLocal: function () {
-    let keys = Object.keys(localStorage)
+    const keys = Object.keys(localStorage)
       .filter(e => e.startsWith('/'))
       .sort();
 

@@ -15,7 +15,7 @@ export async function scanf() : Promise<boolean> {
 		return true;
 	}
 
-  let stringArr: string[] = [];
+  const stringArr: string[] = [];
 
 	// fetch full string from simulator memory
 	let index = state.registers[Register.R0];
@@ -38,8 +38,8 @@ export async function scanf() : Promise<boolean> {
 	let currentRegister = Register.R1;
 	let currentStackOffset = 0;
 	tokens.forEach((token: string | number) => {
-		let ptr = state.registers[currentRegister];
-		let offset: number = currentStackOffset;         // byte view offset
+		const ptr = state.registers[currentRegister];
+		const offset: number = currentStackOffset;         // byte view offset
 
 		if (!useStack && currentRegister > Register.R3) useStack = true;
 

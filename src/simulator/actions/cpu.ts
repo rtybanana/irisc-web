@@ -52,7 +52,7 @@ export const cpu = {
     const signr: number = bitset(32, result)[31];          // sign of result
     const result_ext: number[] = bitset(33, result);       // msb = carry bit
     
-    let cpsr = [false, false, false, false];
+    const cpsr = [false, false, false, false];
     
     cpsr[Flag.N] = result_ext[31] === 1;                    // if msb = 1
     cpsr[Flag.Z] = (BigInt(result) & 0xffffffffn) === 0n    // if first 32 bits are 0 
