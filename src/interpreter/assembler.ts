@@ -165,6 +165,7 @@ function load(nodes: (SyntaxNode | null)[]) {
         type: node.type,
         data: node.data,
         size: node.data.length,
+        lineNumber: node.lineNumber,
         offset: dataHeight
       });
 

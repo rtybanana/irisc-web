@@ -541,15 +541,15 @@ export default Vue.extend({
 
 	watch: {
 		size: {
-			handler: function (value) {
+			handler: function (value: string) {
 				if (value === 'word') {
 					if (this.datatype === 'ascii') this.datatype = 'hex';
 				}
 			}
 		},
 
-		datatype: function () {
-			AchievementState.achieve("8'f\"+e'zz/9guuf>#l_hkW{");
+		datatype: function (newValue: string) {
+			if (newValue === "ascii") AchievementState.achieve("8'f\"+e'zz/9guuf>#l_hkW{");
 		}
 	}
 });

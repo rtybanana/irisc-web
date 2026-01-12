@@ -12,6 +12,7 @@ export type TDeclaration = {
   type: string;
   size: number;
   offset: number;
+  lineNumber: number;
   data: Uint8Array;
 }
 

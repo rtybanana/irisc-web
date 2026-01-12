@@ -1,5 +1,5 @@
 import { AssemblyError, RuntimeError } from "@/interpreter";
-import { state as state } from "../../state";
+import { state } from "../../state";
 import Vue from 'vue';
 import { TInstructionNode } from "@/syntax/types";
 import { Register, TTransferSize, addressModeGroup } from "@/constants";
@@ -13,19 +13,19 @@ export const data = {
     const table: Record<string, number> = {};
     const map = new Map<number, TDeclaration>();
 
-    declarations.forEach(e => {
-      data.set(e.data, e.offset);
-
-      const address = state.memory.textHeight + e.offset;
-      table[e.label] = address; 
-      map.set(address, e);
-    });
-
     try {
+      declarations.forEach(e => {
+        data.set(e.data, e.offset);
+
+        const address = state.memory.textHeight + e.offset;
+        table[e.label] = address; 
+        map.set(address, e);
+      });
+    
       state.memory.byteView?.set(data.slice(0, height), state.memory.textHeight);
     }
     catch (e) {
-      SimulatorState.addError(new AssemblyError('Not enough memory to assemble program in editor.', [], -1, -1));
+      SimulatorState.addError(new AssemblyError('Not enough memory to assemble program in editor.', [], declarations[0].lineNumber, -1));
     }
 
     state.memory.dataHeight = Math.ceil(height / 4) * 4;

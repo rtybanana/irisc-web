@@ -62,5 +62,5 @@ export const achievementMap: Record<string, TAchievement> = {
   // "Loop-de-loop": { name: "Loop-de-loop", description: "Run a program containing at least one loop.", rarity: Rarity.UNCOMMON },
 
   // tutorial
-  "Booooring": { name: "Booooring", description: "Skip 10 or more pages of the tutorial using the contents page.", rarity: Rarity.RARE }
+  "Booooring": { name: "Booooring", description: "Skip 10 or more pages of the tutorial using the contents page.", rarity: Rarity.UNCOMMON }
 }
