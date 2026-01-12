@@ -4,6 +4,7 @@ import clone  from 'lodash.clonedeep';
 import { memory } from "./memory";
 import { runner } from "./runner";
 import { interaction } from "./interaction";
+import { AchievementState } from "@/achievements";
 
 export const io = {
   interrupt: async function () {
@@ -16,6 +17,9 @@ export const io = {
   setStdin: function (stdin: string) {
     state.stdin = stdin;
     interaction.addOutput(stdin);
+
+    // TODO: add achievement for IO
+    // AchievementState.achieve("")
     
     state.interrupted = false;
   },

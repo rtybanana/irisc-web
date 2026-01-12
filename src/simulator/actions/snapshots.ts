@@ -22,7 +22,7 @@ export const snapshots = {
     };
 
     // enqueue snapshot or replace if snapshot at that tick already exists
-    state.snapshots.enqueue(snapshot, (existingSnapshot) => existingSnapshot.cpu.tick === snapshot.cpu.tick );
+    state.snapshots.enqueue(snapshot, (existingSnapshot) => existingSnapshot.cpu.tick === snapshot.cpu.tick);
   },
 
   reinstateSnapshot: function (tick: number) {

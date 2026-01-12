@@ -165,6 +165,7 @@ function load(nodes: (SyntaxNode | null)[]) {
         type: node.type,
         data: node.data,
         size: node.data.length,
+        lineNumber: node.lineNumber,
         offset: dataHeight
       });
 
@@ -199,6 +200,7 @@ function load(nodes: (SyntaxNode | null)[]) {
     
     const nopnode = compileOne(tokens[0], -1) as InstructionNode;
     instructions.push(nopnode);
+    SimulatorState.setHasNop(true);
   }
 
   // set all simulator data

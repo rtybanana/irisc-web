@@ -1,6 +1,24 @@
 <template>
   <div id="app">
-    <div class="container-fluid h-100">
+    <div v-if="systemState === SystemState.BLUESCREEN" class="container-fluid h-100 p-4 text-left" style="background-color: #0000aa;">
+      <h1>A fatal error occurred.</h1>
+      <div>You did something inadvisable.</div>
+      <div class="mt-4">iRISC will now reboot.</div>
+    </div>
+
+    <div v-else-if="systemState === SystemState.BIOS" class="container-fluid h-100 text-left bios" style="background-color: black;">
+      <div class="bios-logo">
+        <pre class="pt-4 text-irisc">
+          {{ iriscArt }}
+      Polysoft Systems Inc. <span class="text-white">1998 ~ ∞</span>
+        </pre>
+        <div class="mt-4"></div>
+      </div>
+
+      <div class="bios-text flashing-caret mt-2">system booting</div>
+    </div>
+
+    <div v-else class="container-fluid h-100">
       <div class="row h-100">
         <div id="emulator" class="col-12 h-100">
           <div class="row px-0" style="height: 24px;">
@@ -54,6 +72,17 @@
                 <div class="col-6 pl-1" style="max-height: 100%;">
                   <memory></memory>
 
+                  <div class="achievements clickable" @click="$refs.achievements.show()">
+                    <i class="button far fa-star"></i>
+                    <b-badge 
+                      v-show="newAchievements.size > 0" 
+                      class="new-achievements" 
+                      variant="light"
+                    >
+                      {{ newAchievements.size }} <span class="sr-only">new achievements</span>
+                    </b-badge>
+                  </div>
+
                   <div class="settings clickable" @click="$refs.settings.show()">
                     <i class="button fas fa-sliders-h"></i>
                   </div>
@@ -83,6 +112,7 @@
 
     <!-- size="lg" -->
     <settings ref="settings"></settings>
+    <achievements ref="achievements"></achievements>
 
     <b-modal 
       ref="about" 
@@ -150,10 +180,10 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { editor, terminal, registers, memory, instruction, tutorial, settings } from "@/vue";
+import { editor, terminal, registers, memory, instruction, tutorial, settings, achievements } from "@/vue";
 import { SimulatorState } from "@/simulator";
 import { Interpreter, RuntimeError } from '@/interpreter';
-import { Register, EnvironmentType } from "@/constants"
+import { Register, EnvironmentType, art } from "@/constants"
 import { createTour, SettingsState } from '@/utilities';
 
 import './assets/generic.css';
@@ -163,6 +193,8 @@ import './assets/shepherd.css';
 import { TInstructionNode } from '@/syntax/types';
 import Shepherd from 'shepherd.js';
 import { FileSystemState } from './files';
+import { AchievementState } from './achievements';
+import { SystemState } from './simulator/types';
 
 export default Vue.extend({
   name: 'emulator',
@@ -173,17 +205,20 @@ export default Vue.extend({
     memory,
     instruction,
     tutorial, 
+    achievements,
     settings
   },
   data() {
     return {
       env: EnvironmentType.TERMINAL,
+      iriscArt: art,
 
       dismissTooSmall: false,
       windowSize: 0
     }
   },
   computed: {
+    systemState: SimulatorState.systemState,
     currentTick: SimulatorState.currentTick,
 
     // registers: SimulatorState.registers,
@@ -197,12 +232,15 @@ export default Vue.extend({
     paused: SimulatorState.paused,
     // step: SimulatorState.step,
 
+    newAchievements: AchievementState.new,
+
     isTooSmall: function (): boolean {
       return !this.dismissTooSmall && this.windowSize < 1250;
     },
 
     // hack so we can access the enum in dom
     EnvironmentType: () => EnvironmentType,
+    SystemState: () => SystemState
   },
   methods: {
     /**
@@ -276,6 +314,9 @@ export default Vue.extend({
   mounted: function () {
     document.addEventListener('keydown', this.keyListener.bind(this));
 
+    
+    AchievementState.achieve("Welcome to iRISC");
+
     const doneTour = localStorage.getItem('doneTour') ?? false;
     if (!doneTour) this.startTour();
     else {
@@ -326,6 +367,22 @@ html, body {
   height: calc(100% - 88px);
 }
 
+.achievements {
+  position: absolute;
+  bottom: 31px;
+  right: 77px;
+  border-radius: 0.3rem;
+  background-color: #191d21;
+  padding: 0.25rem 0.33rem 0.15rem 0.4rem;
+}
+
+.achievements .new-achievements {
+  position: absolute;
+  right: -3px;
+  top: -3px;
+  padding: 1px 3px;
+}
+
 .settings {
   position: absolute;
   bottom: 31px;
@@ -340,8 +397,75 @@ html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #0d1117;
-  border: 1px dashed #DCDCDC;
+  border: 1px dashed #b19898;
   color: #DCDCDC;
   text-align: left;
 }
+
+.flashing-caret {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+
+.flashing-caret::after {
+  content: "";
+  margin-top: 10px;
+  width: 8px;
+  height: 3px;
+  background: white;
+  display: inline-block;
+  animation: cursor-blink 0.3s steps(2) infinite;
+} 
+
+@keyframes cursor-blink {
+  0% {
+    opacity: 0;
+  }
+}
+
+.bios-logo {
+  visibility: hidden;
+  animation: popInOut 3s;
+  animation-delay: 1s;
+  animation-fill-mode: forwards;
+}
+
+.bios-text {
+  visibility: hidden;
+  animation: popInOut 2.5s;
+  animation-delay: 1.5s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes popInOut {
+  0% {
+    visibility: hidden;
+  }
+  1% {
+    visibility: visible;
+  }
+  99% {
+    visibility: visible;
+  }
+  100% {
+    visibility: hidden;
+  }
+}
+
+.bios {
+  background-color: black;
+  animation: fadeBoot 1s ease 5.5s forwards;
+}
+
+@keyframes fadeBoot {
+  0% {
+    background-color: black;
+  }
+  100% {
+    background-color: #0d1117;
+  }
+}
+
 </style>

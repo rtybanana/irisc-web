@@ -231,8 +231,8 @@ import { TInstructionNode } from '@/syntax/types';
 import debug from './debug.vue';
 import { TAllocation, TDeclaration } from '@/simulator/types';
 import clone from "lodash.clonedeep";
-import Shepherd from 'shepherd.js';
 import { dataTypeByteSizeMap, dataTypeMap } from '@/constants';
+import { AchievementState } from '@/achievements';
 
 type TTip = {
 	title: string;
@@ -275,6 +275,7 @@ export default Vue.extend({
 			],
 
 			instructionIndex: undefined as number | undefined,
+			isNop: false,
 			highlitData: [] as number[],
 			hoveredDeclaration: undefined as TDeclaration | undefined,
 
@@ -395,6 +396,7 @@ export default Vue.extend({
 	},
 
 	computed: {
+		hasNop: () => SimulatorState.memory().hasNop,
 		byteView: SimulatorState.byteView,
 		wordView: SimulatorState.wordView,
 		memSize: () => SimulatorState.memory().size,
@@ -453,7 +455,13 @@ export default Vue.extend({
 
 		instructions: () => SimulatorState.memory().text,
 		instruction: function (): TInstructionNode | undefined {
-			if (this.instructionIndex !== undefined) return this.instructions[this.instructionIndex];
+			if (this.instructionIndex !== undefined) {
+				if (this.instructionIndex === this.instructions.length - 1 && this.hasNop) {
+					AchievementState.achieve("nop");
+				}
+
+				return this.instructions[this.instructionIndex];
+			}
 			return undefined;
 		}
 	},
@@ -533,11 +541,15 @@ export default Vue.extend({
 
 	watch: {
 		size: {
-			handler: function (value) {
+			handler: function (value: string) {
 				if (value === 'word') {
 					if (this.datatype === 'ascii') this.datatype = 'hex';
 				}
 			}
+		},
+
+		datatype: function (newValue: string) {
+			if (newValue === "ascii") AchievementState.achieve("8'f\"+e'zz/9guuf>#l_hkW{");
 		}
 	}
 });

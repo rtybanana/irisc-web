@@ -17,6 +17,8 @@ import { SyntaxNode } from "@/syntax";
 import { Assembler } from "@/interpreter"
 import '@/assets/prism-armv7';
 
+jest.mock("@/achievements");
+
 const node = new SyntaxNode([], 0, 0);
 const assemble = (imm: string, bits: number = 8) => {
   const token = Assembler.parse(imm);

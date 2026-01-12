@@ -1,12 +1,13 @@
-import { IriscError } from "@/interpreter";
+import { Assembler, IriscError } from "@/interpreter";
 import { state } from "../state";
-import { TExitStatus, TSimulatorSnapshot } from "../types";
+import { SystemState, TExitStatus, TSimulatorSnapshot } from "../types";
 import Vue from 'vue';
 import { snapshots } from "./snapshots";
 import { init } from "./init";
 import { runner } from "./runner";
 import { memory } from "./memory";
 import { Queue } from "@/utilities";
+import { AchievementState } from "@/achievements";
 
 export const interaction = {
   start: function () {
@@ -15,8 +16,12 @@ export const interaction = {
       return;
     }
 
+    console.log("reinstating first snapshot");
+
     snapshots.reinstateSnapshot(0);
     state.paused = false;
+
+    console.log("snapshot reinstated");
     
     // reset emulator state and run simulation
     init.reset();
@@ -37,6 +42,8 @@ export const interaction = {
   },
 
   stepBack: function () {
+    if (state.cpu.tick > 0) AchievementState.achieve("Reverse, reverse!");
+
     snapshots.reinstateSnapshot(state.cpu.tick - 1);
   },
 
@@ -59,6 +66,7 @@ export const interaction = {
   },
 
   setDelay(delay: number) : void {
+    if (delay === 10) AchievementState.achieve("CPU Upgrade")
     state.delay = delay;
   },
 
@@ -108,5 +116,24 @@ export const interaction = {
   setExitStatus: function (status: TExitStatus) {
     state.exitStatus = status;
     this.stop();
+  },
+
+  crash: async function () {
+    state.systemState = SystemState.CRASHING;
+    await new Promise(r => setTimeout(r, 2000));
+
+    state.systemState = SystemState.BLUESCREEN;
+    await new Promise(r => setTimeout(r, 4000));
+
+    state.systemState = SystemState.BIOS;
+    await new Promise(r => setTimeout(r, 5000));
+
+    AchievementState.achieve("BSoD");
+    await new Promise(r => setTimeout(r, 3000));
+
+    state.systemState = SystemState.BOOTING;
+    await new Promise(r => setTimeout(r, 3000));
+
+    state.systemState = SystemState.OK;
   }
 }

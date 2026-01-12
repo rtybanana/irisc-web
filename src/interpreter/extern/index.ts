@@ -8,6 +8,7 @@ import { puts } from './puts';
 import { gets } from './gets';
 import { scanf } from './scanf';
 import { malloc, free, calloc } from './allocation';
+import { AchievementState } from "@/achievements";
 
 /**
  * Randomises the scratch registers to demonstrate that the contents of these
@@ -22,6 +23,7 @@ export function randomiseScratch() {
 }
 
 export async function executeCall(instruction: TInstructionNode, call: Call) : Promise<boolean> {
+  AchievementState.achieve("Alexandria");
 
   // stdout
   if (call === Call.PUTCHAR) return putchar();

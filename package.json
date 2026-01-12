@@ -9,7 +9,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "deploy": "npm run build && git tag v%npm_package_version% && git push origin v%npm_package_version% && push-dir --dir=dist --branch=deploy",
+    "deploy": "cross-var \"npm run build && git tag v$npm_package_version && git push origin v$npm_package_version && push-dir --dir=dist --branch=deploy\"",
     "test": "jest"
   },
   "dependencies": {
@@ -43,6 +43,7 @@
     "@vue/eslint-config-typescript": "^5.0.2",
     "@vue/runtime-dom": "^3.3.4",
     "babel-eslint": "^10.1.0",
+    "cross-var": "^1.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
     "jest": "^28.1.1",

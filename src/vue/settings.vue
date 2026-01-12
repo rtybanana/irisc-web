@@ -7,7 +7,7 @@
     body-class="irisc-modal p-1"
   >
 
-    <div class="px-5 py-1">
+    <div class="px-4 py-1">
       <h4>configuration</h4>
       <div class="mt-3">
 
@@ -21,7 +21,7 @@
           @change="simulatorState.setDelay(1000 / $event)"
           type="range"
           min="0.5"
-          max="50"
+          max="100"
           step="0.1"
         ></b-form-input>
 

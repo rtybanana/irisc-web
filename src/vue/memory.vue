@@ -2,12 +2,20 @@
   <div 
     class="d-flex flex-column container text-center p-3"
     tour-item="memory"
+    :class="{ 'booting': booting }"
+    style="animation-delay: 0.3s;"
   >
-    <div class="dashed mb-3 px-2 py-1">
+    <div 
+      class="dashed mb-3 px-2 py-1"
+      :class="{ 'booting': booting }"
+      style="animation-delay: 0.5s;"
+    >
       <div 
         class="d-flex align-items-end position-relative w-100"
         tour-item="memory-usage"
       >
+        <span v-if="crashing" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);" class="critical-error">CRITICAL ERROR</span>
+
         <div 
           class="d-flex flex-column sector text"
           :style="`width: ${textWidth}%;`"
@@ -136,9 +144,18 @@
       </div>
     </div>
 
-    <div class="flex-grow-1 dashed info px-2 py-1" style="overflow: auto;">
-      <template v-if="tooltip">
-        <div style="width: calc(100% - 40px);" :style="`color: ${tooltip.color};`">
+    <div 
+      class="flex-grow-1 dashed info px-2 py-1" 
+      :class="{ 'booting': booting }"
+      style="overflow: auto; animation-delay: 1.2s;"
+    >
+      <template v-if="crashing">
+        <div>Total: 2147483647 bytes</div>
+        <div>User: <span class="text-danger">2147483647 bytes</span></div>
+      </template>
+
+      <template v-else-if="tooltip">
+        <div style="width: calc(100% - 75px);" :style="`color: ${tooltip.color};`">
           {{ tooltip.tip }}
         </div>
       </template>
@@ -173,6 +190,7 @@ import { SimulatorState } from "@/simulator";
 import { default as explorer } from "./explorer.vue";
 import { BModal } from "bootstrap-vue";
 import Vue from 'vue';
+import { SystemState } from "@/simulator/types";
 
 type TTip = {
   name: string;
@@ -212,7 +230,7 @@ export default Vue.extend({
         },
         stackPointer: {
           name: "stack pointer",
-          tip: "The stack pointer is a reference to the memory location which represents the current top of the stack.",
+          tip: "The stack pointer is a pointer to the current head of the program stack.",
           color: "white"
         } 
       } as TDictionary<TTip>
@@ -221,6 +239,8 @@ export default Vue.extend({
   computed: {
     memory: SimulatorState.memory,
     registers: SimulatorState.registers,
+    crashing: () => SimulatorState.systemState() === SystemState.CRASHING,
+    booting: () => SimulatorState.systemState() === SystemState.BOOTING,
 
     textWidth: function (): number {
       return this.memory.textHeight / this.memory.size * 100;

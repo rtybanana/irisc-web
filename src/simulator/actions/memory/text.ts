@@ -34,7 +34,14 @@ export const text = {
     state.cpu.tick = 0;
 
     memory.observeMemory();
+
+    // reset current tick to 0
+    state.cpu.tick = 0;
     snapshots.takeSnapshot();
+  },
+
+  setHasNop: function (val: boolean) {
+    state.memory.hasNop = val;
   },
   
 	instruction: function (offset: number) : TInstructionNode {
