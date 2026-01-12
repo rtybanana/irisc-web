@@ -30,7 +30,10 @@ export async function execute(instruction: TInstructionNode, incPC: boolean = tr
   SimulatorState.setCurrentInstruction(instruction);
 
   {
-    if (instruction instanceof BranchNode) executed = await executeBranch(instruction);
+    if (instruction instanceof BranchNode) {
+      executed = await executeBranch(instruction);
+      SimulatorState.countLoops(instruction);
+    }
 
     if (instruction instanceof BiOperandNode) executed = executeBiOperand(instruction);
     if (instruction instanceof TriOperandNode) executed = executeTriOperand(instruction);
@@ -314,6 +317,8 @@ async function executeBranch(instruction: BranchNode) : Promise<boolean> {
       SimulatorState.setRegister(Register.PC, address);
       break;
   }
+
+  // SimulatorState.countLoops(instruction);
 
   return true;
 }

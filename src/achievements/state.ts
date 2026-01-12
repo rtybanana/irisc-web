@@ -44,7 +44,7 @@ export const actions = {
         { 
           title: `Achievement Unlocked!`, 
           toastClass: `irisc-toast`, 
-          toaster: "b-toaster-bottom-right", 
+          toaster: "b-toaster-bottom-left", 
           variant: 'dark',
           autoHideDelay: 4000,
           noHoverPause: true,

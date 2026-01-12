@@ -56,10 +56,11 @@ export const achievementMap: Record<string, TAchievement> = {
   "Alexandria": { name: "Alexandria", description: "Include and call a C Standard Library function.", rarity: Rarity.RARE, codeBased: true },
 
   // TODO: find a way to determine that an executed instruction has an explicit 'al' condition suffix
-  // "A Mother's Love": { name: "A Mother's Love", description: "Execute an instruction with a totally redundant condition suffix.", rarity: Rarity.EPIC, codeBased: true },
+  
 
-  // TODO: find a way to know if a branch is looping or entering a function (potentially hard)
-  // "Loop-de-loop": { name: "Loop-de-loop", description: "Run a program containing at least one loop.", rarity: Rarity.UNCOMMON },
+  // code
+  "ATM Machine": { name: "ATM Machine", description: "Execute an instruction with a totally redundant condition suffix.", rarity: Rarity.RARE, codeBased: true },
+  "Loop-de-loop": { name: "Loop-de-loop", description: "Loop to a single label five times.", rarity: Rarity.UNCOMMON, codeBased: true },
 
   // tutorial
   "Booooring": { name: "Booooring", description: "Skip 10 or more pages of the tutorial using the contents page.", rarity: Rarity.UNCOMMON }
