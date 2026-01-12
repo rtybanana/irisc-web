@@ -1,20 +1,31 @@
 <template>
-  <div class="d-flex flex-column container text-left py-3">
+  <div 
+    class="d-flex flex-column container text-left py-3"
+    :class="{ 'booting': booting }"
+  >
     <!-- registers -->
     <div 
       v-for="(value, index) in registers" 
       class="register text-truncate"
+      :class="{ 'booting': booting }"
+      :style="`animation-delay: ${(index + 5) * 0.06}s`"
       :tour-item="regName[index]"
       @mouseover="registerTip(index)"
       @mouseleave="untip"
       :key="index"
-    >
+    > 
       <span class="register-name">{{ regName[index] }}</span>  
-      <span class="ml-1 px-1" :class="{ 'changed': changeSet.has(index) }">{{ regstr(value) }}</span>
+
+      <span v-if="crashing" class="ml-1 px-1"><span class='critical-error'>/// REG_ERR</span></span>
+      <span v-else class="ml-1 px-1" :class="{ 'changed': changeSet.has(index) }">{{ regstr(value) }}</span>      
     </div>
 
     <!-- cpsr -->
-    <div class="d-flex my-3 pr-0">
+    <div 
+      class="d-flex my-3 pr-0"
+      :class="{ 'booting': booting }"
+      style="animation-delay: 1s;"
+    >
       <div 
         class="flex-grow-1 cpsr"
         @mouseover="tip(cpsrTitle, cpsrExplain)"
@@ -30,19 +41,32 @@
         :key="index"
       > 
         <span class="flag-name">{{ flagName[index] }}</span>
-        <span :class="{ 'changed': flagChangeSet.has(index) }">{{ flagstr(cpsr[index]) }}</span>
+
+        <span v-if="crashing" class='critical-error'>?</span>
+        <span v-else :class="{ 'changed': flagChangeSet.has(index) }">{{ flagstr(cpsr[index]) }}</span>
       </div>
     </div>
     
     <!-- tooltip -->
-    <div class="dashed flex-grow-1">
-      <div>
-        {{ computedTitle }}
-      </div>
+    <div 
+      class="dashed flex-grow-1"
+      :class="{ 'booting': booting }"
+      style="animation-delay: 0.5s;"
+    >
+      <template v-if="crashing">
+        GREAT WE@RE CRASHING NICE ONE
+        <div v-html="`<span class='critical-error'>ARRGHJG</span> `.repeat(1000)"></div>
+      </template>
 
-      <div class="description">
-        {{ computedDescription }}
-      </div>
+      <template v-else>
+        <div>
+          {{ computedTitle }}
+        </div>
+
+        <div class="description">
+          {{ computedDescription }}
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -51,6 +75,7 @@
 import { zip } from '@/assets/functions';
 import { flagExplain, flagName, flagTitle, regExplain, Register, regName, regTitle } from "@/constants";
 import { SimulatorState } from "@/simulator";
+import { SystemState } from '@/simulator/types';
 import Vue from 'vue';
 
 export default Vue.extend({
@@ -81,6 +106,8 @@ export default Vue.extend({
   computed: {
     registers: SimulatorState.registers,
     cpsr: SimulatorState.cpsr,
+    crashing: () => SimulatorState.systemState() === SystemState.CRASHING,
+    booting: () => SimulatorState.systemState() === SystemState.BOOTING,
 
     computedTitle() : string {
       return this.title ?? "Registers";

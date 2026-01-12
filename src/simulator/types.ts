@@ -35,6 +35,7 @@ type TMemory = {
   
   heapMap: Map<number, TAllocation>;
   heapHeight: number;
+  hasNop: boolean;
 
   stackHeight: number;
 }
@@ -77,4 +78,14 @@ export type TSimulatorState = TSimulatorStateBase & {
 
   snapshots: Queue<TSimulatorSnapshot>;
   vue: Vue | undefined;
+
+  systemState: SystemState
+}
+
+export enum SystemState {
+  OK,
+  CRASHING,
+  BLUESCREEN,
+  BIOS,
+  BOOTING
 }

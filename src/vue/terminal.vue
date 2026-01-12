@@ -1,7 +1,8 @@
 <template>
   <div 
     class="terminal-container pl-1 py-1"
-    :class="{ crt: settings.crtEffect }"
+    :class="{ crt: settings.crtEffect, 'booting': booting  }"
+    style="animation-delay: 0.2s;"
   >
     <div 
       ref="container"
@@ -11,25 +12,36 @@
       @click.self="focus"
     >
       <!-- prompt output -->
-      <pre class="repl output" v-html="output"></pre>
+      <pre 
+        class="repl output" 
+        :class="{ 'booting': booting  }"
+        style="animation-delay: 0.8s;"
+        v-html="output"
+      ></pre>
 
       <!-- input and syntax highlighter -->
       <!-- :style="`margin-left: ${running ? 0 : leadingLine.length}ch`" -->
-      <pre
-        ref="input"
-        class="repl input"
-        spellcheck="false"
-        :contenteditable="!running || interrupted"
-        @keydown.enter.stop="enter"
-        @keydown.up.stop.prevent="upHistory"
-        @keydown.down.stop.prevent="downHistory"
-        @input="onInput"
-      ></pre>
-      <pre
-        class="repl input-highlight"
-        v-html="highlitInput"
-        @click="focus"
-      ></pre>
+      <div
+        :class="{ 'booting': booting }"
+        style="animation-delay: 2.5s; animation-duration: 0s;"
+      >
+        <pre
+          ref="input"
+          class="repl input"
+          spellcheck="false"
+          :contenteditable="!running || interrupted"
+          @keydown.enter.stop="enter"
+          @keydown.up.stop.prevent="upHistory"
+          @keydown.down.stop.prevent="downHistory"
+          @input="onInput"
+        ></pre>
+        <pre
+          class="repl input-highlight"
+          v-html="highlitInput"
+          @click="focus"
+        ></pre>
+      </div>
+      
     </div>
 
     <!-- environment controls -->
@@ -54,7 +66,7 @@
           <div>{{ computedTooltip.message }}</div>
         </div>
 
-        <div v-if="errors.length > 0" class="clickable hoverable rounded px-1" @click="run">
+        <div v-if="errors.length > 0" class="clickable hoverable rounded px-1" @click="$root.$emit('bv::show::modal', 'errors-modal')">
           {{ errors.length }} errors
         </div>
       </div>
@@ -68,12 +80,14 @@ import { Assembler, InteractiveError, Interpreter, IriscError, RuntimeError } fr
 import { SimulatorState } from "@/simulator";
 import { InstructionNode } from '@/syntax';
 import { BranchNode } from '@/syntax/flow/BranchNode';
-import { BIconTelephoneMinus } from "bootstrap-vue";
+import { BIconHandThumbsDown, BIconTelephoneMinus } from "bootstrap-vue";
 import { highlight, languages } from 'prismjs';
 import { SettingsState, TTooltip, getCaretPosition, setCaretPosition } from '@/utilities';
 import Shepherd from "shepherd.js";
 import Vue from 'vue';
 import { FileSystemState } from "@/files";
+import { AchievementState } from "@/achievements";
+import { SystemState } from "@/simulator/types";
 
 const prompt = "irisc:~$ ";
 
@@ -107,6 +121,8 @@ export default Vue.extend({
     errors: SimulatorState.errors,
     currentInstruction: SimulatorState.currentInstruction,
     running: SimulatorState.running,
+    crashing: () => SimulatorState.systemState() === SystemState.CRASHING,
+    booting: () => SimulatorState.systemState() === SystemState.BOOTING,
     simulatorOutput: SimulatorState.output,
     interrupted: SimulatorState.interrupted,
     exitStatus: SimulatorState.exitStatus,
@@ -283,9 +299,12 @@ export default Vue.extend({
           Interpreter.execute(node, false);
         }
         else throw new InteractiveError("This operation is not supported on the command-line.", [], -1, -1);
+
+        AchievementState.achieve("Flawless Execution");
       }
       catch (e){
         if (e instanceof IriscError) {
+          AchievementState.achieve("Flawful Execution");
           this.printError(e);
         }
         else throw e;
@@ -315,6 +334,10 @@ export default Vue.extend({
           throw new InteractiveError("Can't switch to the editor yet. Do the tour! You'll get there.", [], -1, -1);
         }
 
+        if (input.startsWith('vi')) {
+          AchievementState.achieve("Purist")
+        }
+
         if (textEditParam !== '') FileSystemState.textEdit(textEditParam);
         this.$emit('switch');
 
@@ -327,6 +350,7 @@ export default Vue.extend({
       }
 
       if (input === 'pwd') {
+        AchievementState.achieve("You are here")
         this.output += `\n${FileSystemState.pwd()}`;
         return true;
       }
@@ -352,16 +376,23 @@ export default Vue.extend({
         return true;
       }
 
+      if (input.startsWith("rm ")) {
+        AchievementState.achieve("Do you know who I am?");
+        this.output += `\n${input}: Permission denied.`;
+
+        return true;
+      }
+
       // TODO: secret crash easter egg
-      // if (input === 'sudo rm -rf /*') {
-      //   SimulatorState.interrupt();
+      if (input === 'sudo rm -rf /*') {
+        AchievementState.achieve("Spring Cleaning");
 
-      //   // remove prompt
-      //   this.setLeadingLine("");
-      //   this.$emit('crash');
+        // remove prompt
+        this.setLeadingLine("");
+        SimulatorState.crash();
 
-      //   return true;
-      // }
+        return true;
+      }
 
       if (input === './src') {
         if (Shepherd.activeTour) {
@@ -485,6 +516,37 @@ export default Vue.extend({
         this.$nextTick(() => {
           const element = this.$refs.container as HTMLElement;
           element.scrollTop = element.scrollHeight;
+        });
+      }
+    },
+
+    crashing: async function (isCrashing: boolean) {
+      if (isCrashing) {
+        // this.output = "";
+        this.setLeadingLine("");
+
+        let errortext = ""
+        const output = this.output.slice();
+
+        let indent = 0;
+        while (SimulatorState.systemState() === SystemState.CRASHING) {
+          errortext += `<span class="critical-error">//// FATAL ERROR ////</span>\n`;
+          this.output = errortext + output.slice(errortext.length / 2, output.length);
+          this.$nextTick(() => {
+            let element = this.$refs.container as HTMLElement;
+            element.scrollTop = element.scrollHeight;
+          });
+
+          await new Promise(r => setTimeout(r, 50));
+        }
+      }
+      else {
+        this.output = replWelcome;
+        this.setLeadingLine(prompt);
+
+        // focus to the end of the terminal
+        this.$nextTick(() => {
+          this.focus();
         });
       }
     }

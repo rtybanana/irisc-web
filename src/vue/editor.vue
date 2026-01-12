@@ -49,7 +49,7 @@
           <div>{{ computedTooltip.message }}</div>
         </div>
 
-        <div v-else-if="errors.length > 0" class="clickable hoverable rounded px-1" @click="run">
+        <div v-else-if="errors.length > 0" class="clickable hoverable rounded px-1" @click="$root.$emit('bv::show::modal', 'errors-modal')">
           {{ errors.length }} errors
         </div>
       </div>
@@ -124,6 +124,7 @@ import 'prismjs/themes/prism.css'; // import syntax highlighting styles
 import 'vue-prism-editor/dist/prismeditor.min.css';
 import { TFile } from "@/files";
 import { FileSystemState, helloWorldSample } from "@/files";
+import { AchievementState } from "@/achievements";
 
 
 type TPoint = {
@@ -241,6 +242,8 @@ export default Vue.extend({
       if (e.target.parentNode?.className.includes("error")) {
         if (!e.target.parentNode.dataset["errorIdx"]) return;
         
+        AchievementState.achieve("Why are you squiggly?");
+
         const errorIndex = parseInt(e.target.parentNode.dataset["errorIdx"]) as number;
         if (errorIndex === -1) return;
 

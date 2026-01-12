@@ -2,7 +2,7 @@ import { Register } from "@/constants";
 import { Queue } from "@/utilities";
 import { state } from "../state";
 import Vue from 'vue';
-import { TAllocation, TSimulatorSnapshot } from "../types";
+import { SystemState, TAllocation, TSimulatorSnapshot } from "../types";
 import { cpu } from "./cpu";
 import { TInstructionNode } from "@/syntax/types";
 import { memory } from "./memory";
@@ -10,6 +10,7 @@ import { LabelNode, BranchNode, SingleTransferNode } from "@/syntax";
 import { snapshots } from "./snapshots";
 import { interaction } from "./interaction";
 import { ReferenceError } from "@/interpreter";
+import { AchievementState } from "@/achievements";
 
 
 export const init = {
@@ -41,10 +42,12 @@ export const init = {
 		state.exitStatus = undefined;
 
 		state.currentInstruction = undefined;
+    state.systemState = SystemState.OK;
 	},
 
 	initMemory: function (memSize?: number) {
     if (memSize !== undefined) state.memory.size = memSize;
+    if (memSize === state.memory.sizes.reduce((a, b) => Math.max(a, b), -Infinity)) AchievementState.achieve("RAM Upgrade");
 
     state.memory.textHeight = 0;
     state.memory.textMap = {};

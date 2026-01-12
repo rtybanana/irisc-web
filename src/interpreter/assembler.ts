@@ -199,6 +199,7 @@ function load(nodes: (SyntaxNode | null)[]) {
     
     const nopnode = compileOne(tokens[0], -1) as InstructionNode;
     instructions.push(nopnode);
+    SimulatorState.setHasNop(true);
   }
 
   // set all simulator data
